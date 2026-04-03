@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الإدارة السحابية 🦅</title>
+    <title>إدارة فولتشر السحابية 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #3182ce; }
@@ -12,32 +12,29 @@
         .container { padding: 20px; max-width: 1200px; margin: auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .u-card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .u-name { color: var(--link); font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; display: block; }
-        .prog-mini { height: 8px; background: var(--s); border-radius: 5px; overflow: hidden; margin: 10px 0; position: relative; }
+        .u-name { color: var(--link); font-weight: bold; font-size: 1.1rem; }
+        .prog-mini { height: 10px; background: var(--s); border-radius: 5px; overflow: hidden; margin: 10px 0; position: relative; }
         .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s; }
-        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 10px; }
-        .btn { padding: 8px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
+        .btn { padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin: 2px; }
         .btn-link { background: #ebf8ff; color: var(--link); border: 1px solid #bee3f8; }
-        .btn-edit { background: #f0fff4; color: var(--s); border: 1px solid #c6f6d5; }
         .btn-del { background: #fff5f5; color: var(--d); border: 1px solid #fed7d7; }
-        .modal { background: white; border-radius: 20px; padding: 25px; margin-bottom: 30px; border: 2px dashed var(--link); }
+        .logo-section { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #ddd; text-align: center; }
+        .modal { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 2px dashed var(--link); }
         input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .save-all { background: var(--s); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .logo-upload { background: #f8fafc; border: 1px solid #ddd; padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <button class="btn btn-edit" style="font-size: 1rem;" onclick="toggleAdd()">+ إضافة مشترك</button>
-    <h3 style="margin:0;"><i class="fas fa-cloud"></i> الإدارة السحابية</h3>
+    <button class="btn btn-link" style="font-size: 1rem;" onclick="toggleAdd()">+ إضافة مشترك</button>
+    <h3 style="margin:0;">إدارة فولتشر 🦅</h3>
 </div>
 
 <div class="container">
-    <div class="logo-upload">
-        <b>تغيير لوقو المنصة (من الاستديو):</b><br>
-        <input type="file" id="mainLogo" accept="image/*" style="width: auto;">
-        <button class="btn btn-link" onclick="uploadLogo()">حفظ اللوقو</button>
+    <div class="logo-section">
+        <b>تحديث لوقو المنصة من الاستوديو:</b><br><br>
+        <input type="file" id="logoFile" accept="image/*" style="width: auto;">
+        <button class="btn btn-link" onclick="saveLogo()">حفظ اللوقو للسحابة</button>
     </div>
 
     <div id="addForm" class="modal" style="display:none;">
@@ -47,7 +44,7 @@
         <input type="text" id="ck" placeholder="الرقم السري">
         <input type="text" id="cl" placeholder="رابط الدخول">
         <div style="display:flex; gap:5px;"><input type="date" id="cs" title="البداية"><input type="date" id="ce" title="النهاية"></div>
-        <button class="save-all" onclick="addClient()">حفظ المشترك في السحابة</button>
+        <button class="btn btn-link" style="width:100%; padding:15px;" onclick="addClient()">حفظ وإرسال للسحابة</button>
     </div>
 
     <div class="grid" id="clientGrid"></div>
@@ -72,16 +69,15 @@
             <div class="u-card">
                 <span class="u-name">${c.name}</span>
                 <div class="prog-mini"><div class="fill-red" style="width: ${p}%"></div></div>
-                <div class="actions">
-                    <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
-                    <button class="btn btn-del" onclick="delI(${i})">حذف</button>
-                </div>
+                <div style="font-size:0.8rem; color:#666;">النهاية: ${c.ce}</div>
+                <button class="btn btn-link" onclick="copyLink('${c.name}')">نسخ رابط العميل</button>
+                <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
             </div>`;
         }).join('');
     }
 
-    function uploadLogo() {
-        const file = document.getElementById('mainLogo').files[0];
+    function saveLogo() {
+        const file = document.getElementById('logoFile').files[0];
         if(!file) return alert("اختر صورة أولاً");
         const reader = new FileReader();
         reader.onloadend = async () => {
@@ -105,12 +101,12 @@
     }
 
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); load(); }
-    function copyL(name) {
+    function copyLink(name) {
         const link = window.location.href.replace('index.html','') + 'user.html?name=' + encodeURIComponent(name);
         navigator.clipboard.writeText(link);
         alert("تم نسخ الرابط!");
     }
-    async function delI(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); } }
+    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); } }
     function v(id) { return document.getElementById(id).value; }
     function toggleAdd() { const f = document.getElementById('addForm'); f.style.display = f.style.display==='none'?'block':'none'; }
     load();
