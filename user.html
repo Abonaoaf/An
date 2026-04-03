@@ -6,34 +6,46 @@
     <title>بطاقة اشتراك فولتشر 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; }
+        :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; min-height: 100vh; }
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
+        
+        /* القسم العلوي والتاريخ */
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
         .date-box { background: #fff; border: 1px solid #ddd; border-radius: 15px; padding: 8px 15px; text-align: center; min-width: 80px; }
         .date-box span { display: block; font-size: 0.7rem; color: #666; }
         .date-box b { font-size: 1.2rem; color: #333; }
         .main-logo { width: 70px; height: 70px; border-radius: 15px; object-fit: contain; }
 
+        /* رسالة الترحيب */
         .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.6; }
         .v-family { color: var(--danger); font-weight: bold; }
         .u-name-highlight { color: var(--main); font-weight: bold; font-size: 1.1rem; display: block; margin-top: 5px; }
 
-        .progress-bar-container { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 20px; position: relative; }
+        /* شريط التقدم */
+        .status-container { padding: 0 20px; text-align: right; }
+        .progress-bar-container { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 0; position: relative; }
         .progress-fill-consumed { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s; }
         
+        /* بيانات الاشتراك */
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         .data-label { font-size: 0.7rem; color: #888; }
-        .data-value { font-size: 0.85rem; font-weight: bold; }
+        .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
+        .copy-btn { color: var(--main); cursor: pointer; padding: 5px; font-size: 1rem; }
+
+        /* العداد */
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px 0; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eef; border-radius: 10px; padding: 8px 2px; text-align: center; }
         .t-box b { display: block; color: var(--main); font-size: 1rem; }
+        .t-box span { font-size: 0.55rem; color: #aaa; }
 
+        /* الأزرار الملونة */
         .action-btns { padding: 20px; }
-        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.9rem; }
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.9rem; transition: 0.3s; }
         .btn-store { background: #5e4cc1; }
-        .btn-support { background: #2ecc71; }
+        .btn-support { background: var(--success); }
+        .btn-wa-channel { background: var(--wa); }
     </style>
 </head>
 <body>
@@ -49,21 +61,25 @@
         <div>مرحباً بك معنا 🤝 <span id="userName" class="u-name-highlight">...</span></div>
     </div>
 
-    <div class="status-container" style="padding: 0 20px; text-align: right;">
-        <span style="font-size: 0.75rem; font-weight: bold;">حالة الاشتراك: <span id="statusText" style="color:var(--success)">ساري</span></span>
+    <div class="status-container">
+        <span style="font-size: 0.75rem; font-weight: bold;">حالة الاشتراك: <span id="statusText" style="color:var(--success)">ساري ومفعل</span></span>
         <div class="progress-bar-container"><div id="barConsumed" class="progress-fill-consumed"></div></div>
     </div>
 
     <div class="data-section">
         <div class="data-row"><div><span class="data-label">تاريخ البداية</span><div class="data-value" id="dStart">--</div></div></div>
         <div class="data-row"><div><span class="data-label">تاريخ النهاية</span><div class="data-value" id="dEnd">--</div></div></div>
-        <div class="data-row"><div><span class="data-label">اسم المستخدم</span><div class="data-value" id="vUser">--</div></div></div>
-        <div class="data-row"><div><span class="data-label">الرقم السري</span><div class="data-value" id="vPass">--</div></div></div>
+        <div class="data-row"><div><span class="data-label">الجوال</span><div class="data-value" id="vPhone">--</div></div><i class="far fa-copy copy-btn" onclick="copy('vPhone')"></i></div>
+        <div class="data-row"><div><span class="data-label">اسم المستخدم</span><div class="data-value" id="vUser">--</div></div><i class="far fa-copy copy-btn" onclick="copy('vUser')"></i></div>
+        <div class="data-row"><div><span class="data-label">كلمة السر</span><div class="data-value" id="vPass">--</div></div><i class="far fa-copy copy-btn" onclick="copy('vPass')"></i></div>
+        <div class="data-row"><div><span class="data-label">رابط الدخول</span><div class="data-value" id="vLink" style="font-size:0.7rem;">--</div></div><i class="far fa-copy copy-btn" onclick="copy('vLink')"></i></div>
+        
         <div class="timer-grid" id="timerGrid"></div>
     </div>
 
     <div class="action-btns">
         <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
+        <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة فولتشر بالواتساب</a>
         <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
     </div>
 </div>
@@ -71,7 +87,7 @@
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     
-    // التاريخ
+    // ضبط التاريخ
     const d = new Date();
     const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
     const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
@@ -81,34 +97,42 @@
 
     async function load() {
         const name = new URLSearchParams(window.location.search).get('name');
-        const res = await fetch(DB_URL);
-        const data = await res.json();
-        
-        // جلب اللوقو المخصص من السحابة
-        if(data && data.logo) document.getElementById('userLogo').src = data.logo;
-
-        const user = (data.clients || []).find(u => u.name === name);
-        if(user) {
-            document.getElementById('userName').innerText = user.name;
-            document.getElementById('dStart').innerText = user.cs;
-            document.getElementById('dEnd').innerText = user.ce;
-            document.getElementById('vUser').innerText = user.cu;
-            document.getElementById('vPass').innerText = user.ck;
+        if(!name) return;
+        try {
+            const res = await fetch(DB_URL);
+            const data = await res.json();
             
-            const up = () => {
-                const n = new Date().getTime(), st = new Date(user.cs).getTime(), en = new Date(user.ce).getTime();
-                const r = en - n, tot = en - st;
-                let cp = Math.max(0, Math.min(100, ((n - st) / tot) * 100));
-                document.getElementById('barConsumed').style.width = cp + "%";
-                if(r <= 0) document.getElementById('statusText').innerText = "منتهي";
+            if(data && data.logo) document.getElementById('userLogo').src = data.logo;
+
+            const user = (data.clients || []).find(u => u.name === name);
+            if(user) {
+                document.getElementById('userName').innerText = user.name;
+                document.getElementById('dStart').innerText = user.cs;
+                document.getElementById('dEnd').innerText = user.ce;
+                document.getElementById('vPhone').innerText = user.cp;
+                document.getElementById('vUser').innerText = user.cu;
+                document.getElementById('vPass').innerText = user.ck;
+                document.getElementById('vLink').innerText = user.cl;
                 
-                const sec=Math.floor(r/1000), min=Math.floor(sec/60), hr=Math.floor(min/60), day=Math.floor(hr/24);
-                const units = [['ثانية', sec%60], ['دقيقة', min%60], ['ساعة', hr%24], ['يوم', day%30], ['شهر', Math.floor(day/30)]];
-                document.getElementById('timerGrid').innerHTML = r > 0 ? units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('') : "";
-            };
-            up(); setInterval(up, 1000);
-        }
+                const up = () => {
+                    const n = new Date().getTime(), st = new Date(user.cs).getTime(), en = new Date(user.ce).getTime();
+                    const r = en - n, tot = en - st;
+                    let cp = Math.max(0, Math.min(100, ((n - st) / tot) * 100));
+                    document.getElementById('barConsumed').style.width = cp + "%";
+                    if(r <= 0) {
+                        document.getElementById('statusText').innerText = "منتهي";
+                        document.getElementById('statusText').style.color = "red";
+                    }
+                    
+                    const sec=Math.floor(r/1000), min=Math.floor(sec/60), hr=Math.floor(min/60), day=Math.floor(hr/24);
+                    const units = [['ثانية', sec%60], ['دقيقة', min%60], ['ساعة', hr%24], ['يوم', day%30], ['شهر', Math.floor(day/30)]];
+                    document.getElementById('timerGrid').innerHTML = r > 0 ? units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('') : "";
+                };
+                up(); setInterval(up, 1000);
+            }
+        } catch(e) { console.error("Cloud connection failed"); }
     }
+    function copy(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("تم النسخ!"); }
     load();
 </script>
 </body>
