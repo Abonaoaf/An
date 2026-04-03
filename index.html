@@ -10,30 +10,20 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
         .header { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .container { padding: 20px; max-width: 1200px; margin: auto; }
-        
-        /* تصميم الشبكة (Grid) للكروت */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        
-        /* كرت العميل الصغير */
         .u-card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
         .u-name { color: var(--link); font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; display: block; }
-        .u-info { font-size: 0.8rem; color: #666; margin-bottom: 10px; }
-        
-        /* شريط التقدم "الأكول" الصغير */
         .prog-mini { height: 8px; background: var(--s); border-radius: 5px; overflow: hidden; margin: 10px 0; position: relative; }
         .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s; }
-        
-        /* الأزرار */
         .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 10px; }
-        .btn { padding: 8px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: bold; transition: 0.2s; }
+        .btn { padding: 8px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
         .btn-link { background: #ebf8ff; color: var(--link); border: 1px solid #bee3f8; }
         .btn-edit { background: #f0fff4; color: var(--s); border: 1px solid #c6f6d5; }
         .btn-del { background: #fff5f5; color: var(--d); border: 1px solid #fed7d7; }
-        
-        /* نافذة الإضافة */
         .modal { background: white; border-radius: 20px; padding: 25px; margin-bottom: 30px; border: 2px dashed var(--link); }
         input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         .save-all { background: var(--s); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .logo-upload { background: #f8fafc; border: 1px solid #ddd; padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: center; }
     </style>
 </head>
 <body>
@@ -44,6 +34,12 @@
 </div>
 
 <div class="container">
+    <div class="logo-upload">
+        <b>تغيير لوقو المنصة (من الاستديو):</b><br>
+        <input type="file" id="mainLogo" accept="image/*" style="width: auto;">
+        <button class="btn btn-link" onclick="uploadLogo()">حفظ اللوقو</button>
+    </div>
+
     <div id="addForm" class="modal" style="display:none;">
         <input type="text" id="cn" placeholder="اسم العميل">
         <input type="text" id="cp" placeholder="رقم الجوال">
@@ -59,67 +55,64 @@
 
 <script>
     const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
-    let cloudData = { clients: [], apps: [] };
+    let cloudData = { clients: [], apps: [], logo: "" };
 
     async function load() {
         const r = await fetch(DB);
         const d = await r.json();
-        if (d) cloudData = { clients: d.clients || [], apps: d.apps || [] };
+        if (d) cloudData = d;
         render();
     }
 
     function render() {
         const grid = document.getElementById('clientGrid');
-        grid.innerHTML = cloudData.clients.map((c, i) => {
+        grid.innerHTML = (cloudData.clients || []).map((c, i) => {
             const p = calcProg(c.cs, c.ce);
             return `
             <div class="u-card">
                 <span class="u-name">${c.name}</span>
-                <div class="u-info">الجوال: ${c.cp} | النهاية: ${c.ce}</div>
-                
-                <div class="prog-mini">
-                    <div class="fill-red" style="width: ${p}%"></div>
-                </div>
-                
+                <div class="prog-mini"><div class="fill-red" style="width: ${p}%"></div></div>
                 <div class="actions">
-                    <button class="btn btn-link" onclick="copyL('${c.name}')"><i class="fas fa-link"></i> الرابط</button>
-                    <button class="btn btn-edit" onclick="editI(${i})"><i class="fas fa-edit"></i> تعديل</button>
-                    <button class="btn btn-del" onclick="delI(${i})"><i class="fas fa-trash"></i> حذف</button>
+                    <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
+                    <button class="btn btn-del" onclick="delI(${i})">حذف</button>
                 </div>
             </div>`;
         }).join('');
     }
 
+    function uploadLogo() {
+        const file = document.getElementById('mainLogo').files[0];
+        if(!file) return alert("اختر صورة أولاً");
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            cloudData.logo = reader.result;
+            await sync();
+            alert("تم تحديث اللوقو بنجاح!");
+        };
+        reader.readAsDataURL(file);
+    }
+
     function calcProg(s, e) {
         const n = new Date().getTime(), st = new Date(s).getTime(), en = new Date(e).getTime();
-        const cons = n - st, tot = en - st;
-        let perc = (cons / tot) * 100;
-        return Math.max(0, Math.min(100, perc));
+        return Math.max(0, Math.min(100, ((n - st) / (en - st)) * 100));
     }
 
     async function addClient() {
-        cloudData.clients.push({
-            name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce')
-        });
+        if(!cloudData.clients) cloudData.clients = [];
+        cloudData.clients.push({name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce')});
         await sync();
         toggleAdd();
     }
 
-    async function sync() {
-        await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) });
-        load();
-    }
-
+    async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); load(); }
     function copyL(name) {
         const link = window.location.href.replace('index.html','') + 'user.html?name=' + encodeURIComponent(name);
         navigator.clipboard.writeText(link);
-        alert("تم نسخ رابط العميل!");
+        alert("تم نسخ الرابط!");
     }
-
     async function delI(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); } }
     function v(id) { return document.getElementById(id).value; }
     function toggleAdd() { const f = document.getElementById('addForm'); f.style.display = f.style.display==='none'?'block':'none'; }
-    
     load();
 </script>
 </body>
