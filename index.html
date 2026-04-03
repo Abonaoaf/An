@@ -3,155 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فولتشر السحابي 🚀</title>
+    <title>فولتشر السحابي 🚀 | الإدارة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --p: #1a202c; --s: #38a169; --d: #e53e3e; --bg: #f7fafc; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; color: #2d3748; }
-        .header { background: var(--p); color: white; text-align: center; padding: 35px; border-bottom: 4px solid #3182ce; }
-        .nav { display: flex; justify-content: center; gap: 12px; margin-top: -22px; }
-        .btn-nav { background: white; border: none; padding: 12px 22px; border-radius: 12px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s; }
-        .btn-nav.active { background: #3182ce; color: white; }
-        .container { max-width: 700px; margin: 40px auto; padding: 0 15px; }
-        .card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #edf2f7; }
-        .progress-bar { height: 10px; background: var(--d); border-radius: 10px; margin: 15px 0; overflow: hidden; position: relative; }
-        .progress-fill { height: 100%; background: var(--s); transition: 1s linear; float: right; }
-        .timer { display: flex; justify-content: center; gap: 5px; direction: ltr; margin: 15px 0; }
-        .unit { background: #fff; border: 1px solid #e2e8f0; padding: 8px; border-radius: 10px; min-width: 45px; text-align: center; }
-        .unit b { display: block; color: #3182ce; font-size: 1.1rem; }
-        .unit span { font-size: 0.65rem; color: #718096; }
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; }
-        .btn-save { background: var(--s); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .info-row { display: flex; justify-content: space-between; background: #f8fafc; padding: 12px; border-radius: 12px; margin-top: 8px; border: 1px solid #eee; }
-        .copy-btn { border: none; background: none; color: #3182ce; cursor: pointer; font-size: 1.1rem; }
+        :root { --p: #1a202c; --s: #38a169; --d: #e53e3e; --bg: #f7fafc; --link: #3182ce; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #2d3748; }
+        
+        /* الهيدر العلوي */
+        .header { background: var(--p); color: white; text-align: center; padding: 40px 20px; border-bottom: 5px solid var(--link); }
+        .nav { display: flex; justify-content: center; gap: 15px; margin-top: -25px; }
+        .nav-btn { background: white; border: none; padding: 12px 25px; border-radius: 15px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .nav-btn.active { background: var(--link); color: white; }
+
+        .container { max-width: 650px; margin: 40px auto; padding: 0 20px; }
+        .section { display: none; animation: fadeIn 0.4s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* الكروت والتصميم */
+        .card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #edf2f7; position: relative; }
+        .progress-container { height: 12px; background: var(--d); border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--s); transition: 1s linear; float: right; width: 100%; }
+        
+        /* مؤقت العد التنازلي */
+        .timer { display: flex; justify-content: center; gap: 6px; direction: ltr; margin: 15px 0; }
+        .unit { background: #fff; border: 1px solid #e2e8f0; padding: 8px; border-radius: 12px; min-width: 45px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .unit b { display: block; color: var(--link); font-size: 1.1rem; }
+        .unit span { font-size: 0.65rem; color: #718096; font-weight: bold; }
+
+        /* الحقول والأزرار */
+        input, textarea { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; font-size: 1rem; transition: 0.3s; }
+        input:focus { border-color: var(--link); outline: none; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1); }
+        .btn-save { background: var(--s); color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s; margin-top: 10px; }
+        .btn-save:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        .info-row { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px; border-radius: 12px; margin-top: 10px; border: 1px solid #eee; }
+        .copy-icon { color: var(--link); cursor: pointer; padding: 5px; transition: 0.2s; }
+        .copy-icon:active { transform: scale(1.3); }
+        .del-btn { color: var(--d); background: none; border: none; cursor: pointer; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>فولتشر السحابي 🚀</h1>
-    <p>بوابة الإدارة (ثانوية الأمير عبدالمجيد)</p>
+    <h1>فولتشر السحابي 🦅</h1>
+    <p>نظام إدارة المشتركين والمتجر الذكي</p>
 </div>
 
 <div class="nav">
-    <button class="btn-nav active" id="btn-c" onclick="tab('c')"><i class="fas fa-user-friends"></i> العملاء</button>
-    <button class="btn-nav" id="id="btn-m" onclick="tab('m')"><i class="fas fa-shopping-basket"></i> المتجر</button>
+    <button class="nav-btn active" id="btn-c" onclick="switchTab('c')"><i class="fas fa-users"></i> المشتركين</button>
+    <button class="nav-btn" id="btn-m" onclick="switchTab('m')"><i class="fas fa-box-open"></i> المتجر</button>
 </div>
 
 <div class="container">
-    <div id="c-sec">
+    <div id="c-sec" class="section active">
         <div class="card">
-            <h3><i class="fas fa-plus-circle"></i> إضافة مشترك جديد</h3>
-            <input type="text" id="cn" placeholder="اسم العميل">
+            <h3 style="margin-top:0; color:var(--link);"><i class="fas fa-user-plus"></i> إضافة عميل جديد</h3>
+            <input type="text" id="cn" placeholder="اسم العميل الكامل">
             <input type="text" id="cp" placeholder="رقم الجوال">
             <input type="text" id="cu" placeholder="اسم المستخدم">
             <input type="text" id="ck" placeholder="الرقم السري">
             <input type="text" id="cl" placeholder="رابط الاشتراك">
             <div style="display:flex; gap:10px;">
-                <div style="flex:1;"><label>البداية:</label><input type="date" id="cs"></div>
-                <div style="flex:1;"><label>النهاية:</label><input type="date" id="ce"></div>
+                <div style="flex:1;"><small>تاريخ البداية:</small><input type="date" id="cs"></div>
+                <div style="flex:1;"><small>تاريخ النهاية:</small><input type="date" id="ce"></div>
             </div>
-            <button class="btn-save" onclick="add('c')">حفظ ومزامنة السحابة</button>
+            <button class="btn-save" onclick="addItem('c')">حفظ ومزامنة السحابة</button>
         </div>
         <div id="clist"></div>
     </div>
 
-    <div id="m-sec" style="display:none;">
+    <div id="m-sec" class="section">
         <div class="card">
-            <h3><i class="fas fa-app-store"></i> إضافة تطبيق</h3>
-            <input type="file" id="ai" accept="image/*" title="صورة التطبيق">
+            <h3 style="margin-top:0; color:var(--link);"><i class="fas fa-plus-square"></i> إضافة تطبيق للمتجر</h3>
+            <input type="file" id="ai" accept="image/*" title="أيقونة التطبيق">
             <input type="text" id="an" placeholder="اسم التطبيق">
             <input type="text" id="ad" placeholder="كود دونلودر">
-            <input type="text" id="al" placeholder="رابط التحميل">
-            <textarea id="at" placeholder="وصف التطبيق"></textarea>
-            <button class="btn-save" onclick="add('m')">نشر في المتجر</button>
+            <input type="text" id="al" placeholder="رابط التحميل المباشر">
+            <textarea id="at" placeholder="وصف قصير للتطبيق..."></textarea>
+            <button class="btn-save" onclick="addItem('m')" style="background:var(--link);">نشر في المتجر</button>
         </div>
         <div id="alist"></div>
     </div>
 </div>
 
 <script>
-    // رابط سحابة AzizTest الخاصة بك
-    const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
-    let dbData = { clients: [], apps: [] };
+    // الرابط السحابي المباشر لمشروع AzizTest
+    const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    let cloudData = { clients: [], apps: [] };
 
-    async function load() {
+    // 1. جلب البيانات عند فتح الصفحة
+    async function init() {
         try {
-            const r = await fetch(DB);
-            const d = await r.json();
-            if (d) dbData = { clients: d.clients || [], apps: d.apps || [] };
-            render();
-        } catch (e) { console.log("Offline Mode"); }
+            const res = await fetch(DB_URL);
+            const data = await res.json();
+            if (data) cloudData = { clients: data.clients || [], apps: data.apps || [] };
+            renderUI();
+        } catch (e) { console.error("اتصال السحابة مقطوع"); }
     }
 
-    function render() {
+    // 2. عرض البيانات وتحديث العد التنازلي
+    function renderUI() {
         const cl = document.getElementById('clist');
-        cl.innerHTML = dbData.clients.map((c, i) => {
-            const time = calcTime(c.cs, c.ce);
-            return `<div class="card">
-                <div style="display:flex; justify-content:space-between;"><b>${c.name}</b><button class="copy-btn" onclick="del('c',${i})"><i class="fas fa-trash-alt" style="color:var(--d)"></i></button></div>
-                <div class="progress-bar"><div class="progress-fill" style="width:${time.p}%"></div></div>
+        cl.innerHTML = cloudData.clients.map((c, i) => {
+            const time = getTimer(c.cs, c.ce);
+            return `
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <b style="font-size:1.2rem;">${c.name}</b>
+                    <button class="del-btn" onclick="removeItem('c',${i})"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                <div class="progress-container"><div class="progress-fill" style="width:${time.p}%"></div></div>
                 <div class="timer">${time.html}</div>
-                <div class="info-row"><span>الجوال: ${c.cp}</span><button class="copy-btn" onclick="copy('${c.cp}')"><i class="far fa-copy"></i></button></div>
-                <div class="info-row"><span>المستخدم: ${c.cu}</span><button class="copy-btn" onclick="copy('${c.cu}')"><i class="far fa-copy"></i></button></div>
-                <div class="info-row"><span>السر: ${c.ck}</span><button class="copy-btn" onclick="copy('${c.ck}')"><i class="far fa-copy"></i></button></div>
+                <div class="info-row"><span><i class="fas fa-phone"></i> ${c.cp}</span><i class="far fa-copy copy-icon" onclick="copy('${c.cp}')"></i></div>
+                <div class="info-row"><span><i class="fas fa-user"></i> ${c.cu}</span><i class="far fa-copy copy-icon" onclick="copy('${c.cu}')"></i></div>
+                <div class="info-row"><span><i class="fas fa-key"></i> ${c.ck}</span><i class="far fa-copy copy-icon" onclick="copy('${c.ck}')"></i></div>
+                <div class="info-row"><span><i class="fas fa-link"></i> رابط الاشتراك</span><i class="far fa-copy copy-icon" onclick="copy('${c.cl}')"></i></div>
             </div>`;
         }).join('');
 
         const al = document.getElementById('alist');
-        al.innerHTML = dbData.apps.map((a, i) => `
+        al.innerHTML = cloudData.apps.map((a, i) => `
             <div class="card" style="display:flex; gap:15px; align-items:center;">
-                <img src="${a.img || ''}" style="width:55px; height:55px; border-radius:12px; border:1px solid #eee;">
+                <img src="${a.img || ''}" style="width:60px; height:60px; border-radius:15px; border:1px solid #eee; object-fit:cover;">
                 <div style="flex:1;">
-                    <b style="color:#3182ce;">${a.name}</b><br><small>${a.at}</small>
-                    <div class="info-row"><span>كود: ${a.ad}</span><button class="copy-btn" onclick="copy('${a.ad}')"><i class="far fa-copy"></i></button></div>
+                    <b style="color:var(--link); font-size:1.1rem;">${a.name}</b><br>
+                    <small style="color:#718096;">${a.at}</small>
+                    <div class="info-row" style="padding:5px 10px; margin-top:5px; font-size:0.8rem;">
+                        <span>كود: ${a.ad}</span><i class="far fa-copy copy-icon" onclick="copy('${a.ad}')"></i>
+                    </div>
                 </div>
-                <button class="copy-btn" onclick="del('m',${i})"><i class="fas fa-trash-alt" style="color:var(--d)"></i></button>
+                <button class="del-btn" onclick="removeItem('m',${i})"><i class="fas fa-minus-circle"></i></button>
             </div>`).join('');
     }
 
-    async function add(t) {
-        if(t==='c') {
-            dbData.clients.push({name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce')});
+    // 3. إضافة البيانات للسحابة
+    async function addItem(type) {
+        if(type === 'c') {
+            cloudData.clients.push({name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce')});
         } else {
-            const f = document.getElementById('ai').files[0];
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                dbData.apps.push({name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img: reader.result});
-                await sync();
-            };
-            if(f) reader.readAsDataURL(f); else { dbData.apps.push({name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img:''}); await sync(); }
-            return;
+            const file = document.getElementById('ai').files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    cloudData.apps.push({name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img: reader.result});
+                    await sync();
+                };
+                reader.readAsDataURL(file); return;
+            } else { cloudData.apps.push({name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img:''}); }
         }
         await sync();
     }
 
     async function sync() {
-        await fetch(DB, { method: 'PUT', body: JSON.stringify(dbData) });
-        alert("تمت المزامنة بنجاح مع AzizTest!"); load();
+        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cloudData) });
+        alert("تمت المزامنة بنجاح مع AzizTest ✅");
+        init();
     }
 
-    function calcTime(s, e) {
+    function getTimer(s, e) {
         const now = new Date().getTime(), start = new Date(s).getTime(), end = new Date(e).getTime();
         const remain = end - now;
-        let p = ((remain) / (end - start)) * 100; p = p > 100 ? 100 : (p < 0 ? 0 : p);
-        if (remain <= 0) return { p: 0, html: "<b style='color:var(--d)'>الاشتراك منتهي</b>" };
+        let p = ((remain) / (end - start)) * 100; p = Math.max(0, Math.min(100, p));
+        if (remain <= 0) return { p: 0, html: "<b style='color:var(--d)'>الاشتراك منتهي ❌</b>" };
+        
         const sc = Math.floor(remain/1000), mn = Math.floor(sc/60), hr = Math.floor(mn/60), dy = Math.floor(hr/24);
-        const html = [['يوم', dy], ['ساعة', hr%24], ['دقيقة', mn%60], ['ثانية', sc%60]].map(x => `<div class="unit"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+        const units = [['يوم', dy], ['ساعة', hr%24], ['دقيقة', mn%60], ['ثانية', sc%60]];
+        const html = units.map(u => `<div class="unit"><b>${u[1]}</b><span>${u[0]}</span></div>`).join('');
         return { p, html };
     }
 
-    async function del(t, i) { if(confirm("حذف؟")) { if(t==='c') dbData.clients.splice(i,1); else dbData.apps.splice(i,1); await sync(); } }
+    async function removeItem(t, i) { if(confirm("هل أنت متأكد من الحذف؟")) { if(t==='c') cloudData.clients.splice(i,1); else cloudData.apps.splice(i,1); await sync(); } }
     function v(id) { return document.getElementById(id).value; }
     function copy(t) { navigator.clipboard.writeText(t); alert("تم النسخ!"); }
-    function tab(t) { 
-        document.getElementById('c-sec').style.display = t==='c'?'block':'none';
-        document.getElementById('m-sec').style.display = t==='m'?'block':'none';
-        document.getElementById('btn-c').classList.toggle('active', t==='c');
-        document.getElementById('btn-m').classList.toggle('active', t==='m');
+    function switchTab(t) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(t+'-sec').classList.add('active');
+        document.getElementById('btn-'+t).classList.add('active');
     }
-    load(); setInterval(render, 1000);
+    init(); setInterval(renderUI, 1000);
 </script>
 </body>
 </html>
-
