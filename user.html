@@ -3,31 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اشتراك فولتشر السحابي 🦅</title>
+    <title>بطاقة اشتراك فولتشر 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; min-height: 100vh; }
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
-        
-        /* القسم العلوي */
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
         .date-box { background: #fff; border: 1px solid #ddd; border-radius: 15px; padding: 8px 15px; text-align: center; min-width: 80px; }
         .date-box span { display: block; font-size: 0.7rem; color: #666; }
         .date-box b { font-size: 1.2rem; color: #333; }
         .main-logo { width: 70px; height: 70px; border-radius: 15px; object-fit: contain; }
 
-        /* الترحيب الجديد */
         .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.6; }
-        .welcome-msg div { font-size: 0.95rem; color: #444; }
         .v-family { color: var(--danger); font-weight: bold; }
-        .u-name-highlight { color: var(--main); font-weight: bold; font-size: 1.1rem; display: block; margin: 5px 0; }
+        .u-name-highlight { color: var(--main); font-weight: bold; font-size: 1.1rem; display: block; margin-top: 5px; }
 
-        /* شريط التقدم */
-        .progress-bar-container { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 20px; }
+        .progress-bar-container { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 20px; position: relative; }
         .progress-fill-consumed { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s; }
         
-        /* البيانات والعداد */
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         .data-label { font-size: 0.7rem; color: #888; }
@@ -65,7 +59,6 @@
         <div class="data-row"><div><span class="data-label">تاريخ النهاية</span><div class="data-value" id="dEnd">--</div></div></div>
         <div class="data-row"><div><span class="data-label">اسم المستخدم</span><div class="data-value" id="vUser">--</div></div></div>
         <div class="data-row"><div><span class="data-label">الرقم السري</span><div class="data-value" id="vPass">--</div></div></div>
-        
         <div class="timer-grid" id="timerGrid"></div>
     </div>
 
@@ -88,11 +81,11 @@
 
     async function load() {
         const name = new URLSearchParams(window.location.search).get('name');
-        if(!name) return;
         const res = await fetch(DB_URL);
         const data = await res.json();
         
-        if(data.logo) document.getElementById('userLogo').src = data.logo;
+        // جلب اللوقو المخصص من السحابة
+        if(data && data.logo) document.getElementById('userLogo').src = data.logo;
 
         const user = (data.clients || []).find(u => u.name === name);
         if(user) {
@@ -109,7 +102,6 @@
                 document.getElementById('barConsumed').style.width = cp + "%";
                 if(r <= 0) document.getElementById('statusText').innerText = "منتهي";
                 
-                // عداد الوقت
                 const sec=Math.floor(r/1000), min=Math.floor(sec/60), hr=Math.floor(min/60), day=Math.floor(hr/24);
                 const units = [['ثانية', sec%60], ['دقيقة', min%60], ['ساعة', hr%24], ['يوم', day%30], ['شهر', Math.floor(day/30)]];
                 document.getElementById('timerGrid').innerHTML = r > 0 ? units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('') : "";
