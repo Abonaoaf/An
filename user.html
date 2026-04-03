@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بطاقة اشتراك فولتشر 🦅</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --p: #1a202c; --s: #38a169; --d: #e53e3e; --bg: #f7fafc; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; text-align: center; }
+        .card { background: white; border-radius: 25px; padding: 30px; max-width: 450px; margin: auto; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #eee; }
+        .logo { font-size: 3rem; margin-bottom: 10px; }
+        .progress { height: 15px; background: #eee; border-radius: 10px; margin: 20px 0; overflow: hidden; position: relative; }
+        .fill { height: 100%; background: linear-gradient(to left, var(--s), #82d616); transition: 1s; float: right; }
+        .timer { display: flex; justify-content: center; gap: 8px; direction: ltr; margin: 20px 0; }
+        .unit { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 15px; min-width: 50px; }
+        .unit b { display: block; color: #3182ce; font-size: 1.2rem; }
+        .info-box { background: #f1f5f9; padding: 15px; border-radius: 15px; margin-top: 15px; text-align: right; }
+        .btn-app { background: var(--p); color: white; padding: 12px; border-radius: 12px; display: block; text-decoration: none; margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card" id="main">
+    <div class="logo">🦅</div>
+    <h2 id="userName">جاري التحميل...</h2>
+    <div id="status"></div>
+    <div class="progress"><div id="bar" class="fill"></div></div>
+    <div class="timer" id="timer"></div>
+    
+    <div class="info-box">
+        <div><b>اسم المستخدم:</b> <span id="u"></span></div>
+        <div><b>كلمة السر:</b> <span id="p"></span></div>
+    </div>
+    
+    <a href="#" id="appLink" class="btn-app"><i class="fas fa-download"></i> تحميل التطبيق المعتمد</a>
+</div>
+
+<script>
+    const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    
+    async function loadUser() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetName = urlParams.get('name'); // يجلب الاسم من الرابط
+        
+        if(!targetName) { document.body.innerHTML = "<h1>عذراً، الرابط غير صحيح</h1>"; return; }
+
+        const r = await fetch(DB);
+        const d = await r.json();
+        const user = d.clients.find(c => c.name === targetName);
+
+        if(user) {
+            document.getElementById('userName').innerText = user.name;
+            document.getElementById('u').innerText = user.cu;
+            document.getElementById('p').innerText = user.ck;
+            document.getElementById('appLink').href = user.cl;
+            
+            updateTimer(user.cs, user.ce);
+            setInterval(() => updateTimer(user.cs, user.ce), 1000);
+        } else {
+            document.getElementById('userName').innerText = "المشترك غير موجود";
+        }
+    }
+
+    function updateTimer(s, e) {
+        const now = new Date().getTime(), start = new Date(s).getTime(), end = new Date(e).getTime();
+        const remain = end - now;
+        let p = ((remain) / (end - start)) * 100; p = Math.max(0, Math.min(100, p));
+        
+        document.getElementById('bar').style.width = p + "%";
+        
+        if (remain <= 0) {
+            document.getElementById('timer').innerHTML = "<h3 style='color:red'>الاشتراك منتهي</h3>";
+            return;
+        }
+
+        const sc = Math.floor(remain/1000), mn = Math.floor(sc/60), hr = Math.floor(mn/60), dy = Math.floor(hr/24);
+        document.getElementById('timer').innerHTML = `
+            <div class="unit"><b>${dy}</b><span>يوم</span></div>
+            <div class="unit"><b>${hr%24}</b><span>ساعة</span></div>
+            <div class="unit"><b>${mn%60}</b><span>دقيقة</span></div>
+            <div class="unit"><b>${sc%60}</b><span>ثانية</span></div>`;
+    }
+    loadUser();
+</script>
+</body>
+</html>
