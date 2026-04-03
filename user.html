@@ -3,109 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بطاقة اشتراك فولتشر 🦅</title>
+    <title>اشتراك فولتشر السحابي 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --p: #1a202c; --s: #38a169; --d: #e53e3e; --bg: #f7fafc; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .card { background: white; border-radius: 30px; padding: 35px; width: 100%; max-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid #eee; text-align: center; }
-        .logo { font-size: 4rem; margin-bottom: 10px; }
-        .user-name { color: #2d3748; font-size: 1.8rem; margin: 10px 0; }
-        .progress-container { height: 14px; background: #edf2f7; border-radius: 10px; margin: 25px 0; overflow: hidden; position: relative; }
-        .progress-fill { height: 100%; background: linear-gradient(to left, #48bb78, #38a169); transition: 1s linear; float: right; }
-        .timer { display: flex; justify-content: center; gap: 8px; direction: ltr; margin: 20px 0; }
-        .unit { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 15px; min-width: 55px; }
-        .unit b { display: block; color: #3182ce; font-size: 1.3rem; }
-        .unit span { font-size: 0.7rem; color: #718096; font-weight: bold; }
-        .details { background: #f1f5f9; padding: 20px; border-radius: 20px; margin-top: 20px; text-align: right; }
-        .details div { margin-bottom: 10px; font-size: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
-        .btn-download { background: #1a202c; color: white; padding: 15px; border-radius: 15px; display: block; text-decoration: none; margin-top: 20px; font-weight: bold; transition: 0.3s; }
+        :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+        .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
+        
+        /* قسم التاريخ العلوي */
+        .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
+        .date-box { background: #fff; border: 1px solid #ddd; border-radius: 15px; padding: 10px 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .date-box span { display: block; font-size: 0.8rem; color: #666; }
+        .date-box b { font-size: 1.4rem; color: #333; }
+        
+        /* اسم العميل وشريط الحالة */
+        .user-header { text-align: center; padding: 20px; }
+        .user-header h2 { margin: 10px 0; font-size: 1.3rem; color: #333; }
+        .status-bar { height: 10px; background: #eee; border-radius: 10px; margin: 10px 20px; overflow: hidden; }
+        .fill { height: 100%; background: linear-gradient(to left, var(--success), #a8e063); transition: 1s linear; float: right; }
+        .status-text { color: var(--success); font-size: 0.8rem; font-weight: bold; margin-bottom: 15px; display: block; }
+
+        /* بيانات الاشتراك */
+        .data-section { padding: 0 20px; }
+        .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
+        .data-label { font-size: 0.75rem; color: #888; display: block; margin-bottom: 2px; }
+        .data-value { font-size: 0.95rem; color: #333; font-weight: bold; word-break: break-all; }
+        .copy-btn { color: var(--main); cursor: pointer; font-size: 1.1rem; padding: 5px; }
+
+        /* العد التنازلي */
+        .countdown-title { font-size: 0.7rem; color: #999; margin-top: 15px; }
+        .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px 0; direction: ltr; }
+        .t-box { background: #fff; border: 1px solid #eef; border-radius: 10px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .t-box b { display: block; color: var(--main); font-size: 1.1rem; }
+        .t-box span { font-size: 0.6rem; color: #aaa; }
+
+        /* الأزرار الملونة */
+        .action-btns { padding: 20px; }
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; border: none; color: white; font-weight: bold; margin-bottom: 10px; cursor: pointer; text-decoration: none; text-align: center; font-size: 0.9rem; }
+        .btn-store { background: #5e4cc1; }
+        .btn-support { background: #2ecc71; }
+        .btn-telegram { background: #0088cc; }
     </style>
 </head>
 <body>
 
-<div class="card" id="userCard">
-    <div class="logo">🦅</div>
-    <div id="loading">جاري جلب بيانات اشتراكك...</div>
-    
-    <div id="content" style="display:none;">
-        <h2 class="user-name" id="nameDisplay"></h2>
-        <div class="progress-container"><div id="bar" class="progress-fill"></div></div>
-        <div class="timer" id="timerDisplay"></div>
-        
-        <div class="details">
-            <div><b><i class="fas fa-user"></i> المستخدم:</b> <span id="uDisplay"></span></div>
-            <div><b><i class="fas fa-key"></i> كلمة السر:</b> <span id="pDisplay"></span></div>
+<div class="card">
+    <div class="top-info">
+        <div class="date-box">
+            <span id="dayName"></span>
+            <b id="dayNum"></b>
+            <span id="monthName"></span>
         </div>
-        
-        <a href="#" id="linkDisplay" class="btn-download"><i class="fas fa-cloud-download-alt"></i> تحميل التطبيق</a>
+        <img src="https://cdn-icons-png.flaticon.com/512/5359/5359051.png" width="60" alt="vulture">
+    </div>
+
+    <div class="user-header">
+        <h2>مرحباً: <span id="userName">...</span></h2>
+        <div class="status-bar"><div id="bar" class="fill"></div></div>
+        <span class="status-text">✅ اشتراك ساري ومفعل</span>
+    </div>
+
+    <div class="data-section">
+        <div class="data-row">
+            <div><span class="data-label">تاريخ البداية</span><div class="data-value" id="dStart">--</div></div>
+        </div>
+        <div class="data-row">
+            <div><span class="data-label">تاريخ النهاية</span><div class="data-value" id="dEnd">--</div></div>
+        </div>
+        <div class="data-row">
+            <div><span class="data-label">الجوال</span><div class="data-value" id="vPhone">--</div></div>
+            <i class="far fa-copy copy-btn" onclick="copyText('vPhone')"></i>
+        </div>
+        <div class="data-row">
+            <div><span class="data-label">اسم المستخدم</span><div class="data-value" id="vUser">--</div></div>
+            <i class="far fa-copy copy-btn" onclick="copyText('vUser')"></i>
+        </div>
+        <div class="data-row">
+            <div><span class="data-label">كلمة السر</span><div class="data-value" id="vPass">--</div></div>
+            <i class="far fa-copy copy-btn" onclick="copyText('vPass')"></i>
+        </div>
+        <div class="data-row">
+            <div><span class="data-label">رابط الدخول</span><div class="data-value" id="vLink" style="font-size: 0.7rem;">--</div></div>
+            <i class="far fa-copy copy-btn" onclick="copyText('vLink')"></i>
+        </div>
+
+        <center class="countdown-title">الوقت المتبقي لانتهاء الاشتراك</center>
+        <div class="timer-grid" id="timerGrid">
+            </div>
+    </div>
+
+    <div class="action-btns">
+        <a href="#" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
+        <a href="https://wa.me/9665XXXXXXXX" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
+        <a href="#" class="btn btn-telegram"><i class="fab fa-telegram-plane"></i> تابعنا على قناة فولتشر</a>
     </div>
 </div>
 
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
 
-    async function fetchUserData() {
-        // الحصول على الاسم من الرابط (مثال: user.html?name=احمد)
-        const params = new URLSearchParams(window.location.search);
-        const nameFromUrl = params.get('name');
+    // تحديث التاريخ العلوي
+    const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    const now = new Date();
+    document.getElementById('dayName').innerText = days[now.getDay()];
+    document.getElementById('dayNum').innerText = now.getDate();
+    document.getElementById('monthName').innerText = months[now.getMonth()];
 
-        if (!nameFromUrl) {
-            document.getElementById('loading').innerHTML = "<b style='color:red'>رابط غير صالح!</b>";
-            return;
-        }
+    async function loadUser() {
+        const params = new URLSearchParams(window.location.search);
+        const targetName = params.get('name');
+        
+        if(!targetName) return;
 
         try {
             const res = await fetch(DB_URL);
             const data = await res.json();
-            const allUsers = data.clients || [];
-            
-            // البحث عن العميل بالاسم
-            const user = allUsers.find(u => u.name === nameFromUrl);
+            const user = (data.clients || []).find(u => u.name === targetName);
 
-            if (user) {
-                showUser(user);
-            } else {
-                document.getElementById('loading').innerHTML = "<b style='color:red'>المشترك غير موجود في السحابة</b>";
+            if(user) {
+                document.getElementById('userName').innerText = user.name;
+                document.getElementById('dStart').innerText = user.cs;
+                document.getElementById('dEnd').innerText = user.ce;
+                document.getElementById('vPhone').innerText = user.cp;
+                document.getElementById('vUser').innerText = user.cu;
+                document.getElementById('vPass').innerText = user.ck;
+                document.getElementById('vLink').innerText = user.cl;
+
+                const update = () => {
+                    const time = calcTime(user.cs, user.ce);
+                    document.getElementById('bar').style.width = time.p + "%";
+                    document.getElementById('timerGrid').innerHTML = time.html;
+                };
+                update(); setInterval(update, 1000);
             }
-        } catch (e) {
-            document.getElementById('loading').innerHTML = "فشل الاتصال بالسحابة";
-        }
+        } catch(e) { console.error("Error connecting to cloud"); }
     }
 
-    function showUser(user) {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('content').style.display = 'block';
-        document.getElementById('nameDisplay').innerText = user.name;
-        document.getElementById('uDisplay').innerText = user.cu;
-        document.getElementById('pDisplay').innerText = user.ck;
-        document.getElementById('linkDisplay').href = user.cl;
+    function calcTime(s, e) {
+        const now = new Date().getTime(), start = new Date(s).getTime(), end = new Date(e).getTime();
+        const remain = end - now;
+        let p = (remain / (end - start)) * 100;
+        p = Math.max(0, Math.min(100, p));
+        
+        if (remain <= 0) return { p: 0, html: "<h3 style='grid-column: span 5; color:red;'>منتهي</h3>" };
+        
+        const sec = Math.floor(remain/1000), min = Math.floor(sec/60), hr = Math.floor(min/60), day = Math.floor(hr/24);
+        const mo = Math.floor(day/30);
 
-        const update = () => {
-            const now = new Date().getTime(), start = new Date(user.cs).getTime(), end = new Date(user.ce).getTime();
-            const remain = end - now;
-            let percent = ((remain) / (end - start)) * 100;
-            percent = Math.max(0, Math.min(100, percent));
-            
-            document.getElementById('bar').style.width = percent + "%";
-
-            if (remain <= 0) {
-                document.getElementById('timerDisplay').innerHTML = "<h3 style='color:red'>الاشتراك منتهي ❌</h3>";
-                return;
-            }
-
-            const s = Math.floor(remain/1000), m = Math.floor(s/60), h = Math.floor(m/60), d = Math.floor(h/24);
-            document.getElementById('timerDisplay').innerHTML = `
-                <div class="unit"><b>${d}</b><span>يوم</span></div>
-                <div class="unit"><b>${h%24}</b><span>ساعة</span></div>
-                <div class="unit"><b>${m%60}</b><span>دقيقة</span></div>
-                <div class="unit"><b>${s%60}</b><span>ثانية</span></div>`;
-        };
-        update();
-        setInterval(update, 1000);
+        const units = [['ثانية', sec%60], ['دقيقة', min%60], ['ساعة', hr%24], ['يوم', day%30], ['شهر', mo]];
+        const html = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
+        return { p, html };
     }
 
-    fetchUserData();
+    function copyText(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text);
+        alert("تم النسخ بنجاح!");
+    }
+
+    loadUser();
 </script>
 </body>
 </html>
