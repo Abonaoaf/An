@@ -9,29 +9,37 @@
         :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; min-height: 100vh; }
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
+        
+        /* القسم العلوي */
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { background: #fff; border: 1px solid #ddd; border-radius: 15px; padding: 8px 15px; text-align: center; }
+        .date-box { background: #fff; border: 1px solid #ddd; border-radius: 15px; padding: 8px 15px; text-align: center; min-width: 80px; }
         .date-box span { display: block; font-size: 0.7rem; color: #666; }
         .date-box b { font-size: 1.2rem; color: #333; }
-        .user-header { text-align: center; padding: 15px; }
-        .status-container { margin: 15px 20px; text-align: right; }
-        .status-label { font-size: 0.75rem; font-weight: bold; color: #555; margin-bottom: 5px; display: block; }
-        .progress-bar-container { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; position: relative; }
-        .progress-fill-consumed { height: 100%; background: var(--danger); width: 0%; transition: 0.5s linear; float: right; border-radius: 0 10px 10px 0; }
+        .main-logo { width: 70px; height: 70px; border-radius: 15px; object-fit: contain; }
+
+        /* الترحيب الجديد */
+        .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.6; }
+        .welcome-msg div { font-size: 0.95rem; color: #444; }
+        .v-family { color: var(--danger); font-weight: bold; }
+        .u-name-highlight { color: var(--main); font-weight: bold; font-size: 1.1rem; display: block; margin: 5px 0; }
+
+        /* شريط التقدم */
+        .progress-bar-container { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 20px; }
+        .progress-fill-consumed { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s; }
+        
+        /* البيانات والعداد */
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
-        .data-label { font-size: 0.7rem; color: #888; display: block; }
-        .data-value { font-size: 0.9rem; color: #333; font-weight: bold; word-break: break-all; }
-        .copy-icon { color: var(--main); cursor: pointer; padding: 5px; }
+        .data-label { font-size: 0.7rem; color: #888; }
+        .data-value { font-size: 0.85rem; font-weight: bold; }
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px 0; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eef; border-radius: 10px; padding: 8px 2px; text-align: center; }
         .t-box b { display: block; color: var(--main); font-size: 1rem; }
-        .t-box span { font-size: 0.55rem; color: #aaa; }
+
         .action-btns { padding: 20px; }
-        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; border: none; color: white; font-weight: bold; margin-bottom: 10px; cursor: pointer; text-decoration: none; text-align: center; font-size: 0.9rem; transition: 0.3s; }
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.9rem; }
         .btn-store { background: #5e4cc1; }
         .btn-support { background: #2ecc71; }
-        .btn-whatsapp-link { background: #075E54; }
     </style>
 </head>
 <body>
@@ -39,78 +47,76 @@
 <div class="card">
     <div class="top-info">
         <div class="date-box"><span id="dayName"></span><b id="dayNum"></b><span id="monthName"></span></div>
-        <img src="https://cdn-icons-png.flaticon.com/512/5359/5359051.png" width="50">
+        <img id="userLogo" src="https://cdn-icons-png.flaticon.com/512/5359/5359051.png" class="main-logo">
     </div>
 
-    <div class="user-header">
-        <h2 style="font-size:1.1rem;">مرحباً: <span id="userName">...</span></h2>
-        <div class="status-container">
-            <span class="status-label">حالة الاشتراك: <span id="statusText" style="color:var(--success)">ساري</span></span>
-            <div class="progress-bar-container"><div id="barConsumed" class="progress-fill-consumed"></div></div>
-        </div>
+    <div class="welcome-msg">
+        <div>سعدنا بانضمامك معنا في <span class="v-family">أسرة فولتشر</span></div>
+        <div>مرحباً بك معنا 🤝 <span id="userName" class="u-name-highlight">...</span></div>
+    </div>
+
+    <div class="status-container" style="padding: 0 20px; text-align: right;">
+        <span style="font-size: 0.75rem; font-weight: bold;">حالة الاشتراك: <span id="statusText" style="color:var(--success)">ساري</span></span>
+        <div class="progress-bar-container"><div id="barConsumed" class="progress-fill-consumed"></div></div>
     </div>
 
     <div class="data-section">
         <div class="data-row"><div><span class="data-label">تاريخ البداية</span><div class="data-value" id="dStart">--</div></div></div>
         <div class="data-row"><div><span class="data-label">تاريخ النهاية</span><div class="data-value" id="dEnd">--</div></div></div>
-        <div class="data-row"><div><span class="data-label">الجوال</span><div class="data-value" id="vPhone">--</div></div><i class="far fa-copy copy-icon" onclick="copy('vPhone')"></i></div>
-        <div class="data-row"><div><span class="data-label">اسم المستخدم</span><div class="data-value" id="vUser">--</div></div><i class="far fa-copy copy-icon" onclick="copy('vUser')"></i></div>
-        <div class="data-row"><div><span class="data-label">الرقم السري</span><div class="data-value" id="vPass">--</div></div><i class="far fa-copy copy-icon" onclick="copy('vPass')"></i></div>
-        <div class="data-row"><div><span class="data-label">رابط الدخول</span><div class="data-value" id="vLink" style="font-size:0.75rem;">--</div></div><i class="far fa-copy copy-icon" onclick="copy('vLink')"></i></div>
+        <div class="data-row"><div><span class="data-label">اسم المستخدم</span><div class="data-value" id="vUser">--</div></div></div>
+        <div class="data-row"><div><span class="data-label">الرقم السري</span><div class="data-value" id="vPass">--</div></div></div>
         
         <div class="timer-grid" id="timerGrid"></div>
     </div>
 
     <div class="action-btns">
         <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
-        <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-whatsapp-link"><i class="fas fa-bullhorn"></i> قناة فولتشر بالواتساب</a>
         <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
     </div>
 </div>
 
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    
+    // التاريخ
+    const d = new Date();
     const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
     const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-    const now = new Date();
-    document.getElementById('dayName').innerText = days[now.getDay()];
-    document.getElementById('dayNum').innerText = now.getDate();
-    document.getElementById('monthName').innerText = months[now.getMonth()];
+    document.getElementById('dayName').innerText = days[d.getDay()];
+    document.getElementById('dayNum').innerText = d.getDate();
+    document.getElementById('monthName').innerText = months[d.getMonth()];
 
     async function load() {
-        const p = new URLSearchParams(window.location.search);
-        const name = p.get('name');
+        const name = new URLSearchParams(window.location.search).get('name');
         if(!name) return;
         const res = await fetch(DB_URL);
         const data = await res.json();
+        
+        if(data.logo) document.getElementById('userLogo').src = data.logo;
+
         const user = (data.clients || []).find(u => u.name === name);
         if(user) {
             document.getElementById('userName').innerText = user.name;
             document.getElementById('dStart').innerText = user.cs;
             document.getElementById('dEnd').innerText = user.ce;
-            document.getElementById('vPhone').innerText = user.cp;
             document.getElementById('vUser').innerText = user.cu;
             document.getElementById('vPass').innerText = user.ck;
-            document.getElementById('vLink').innerText = user.cl;
+            
             const up = () => {
-                const t = calc(user.cs, user.ce);
-                document.getElementById('barConsumed').style.width = t.cp + "%";
-                if(t.r <= 0) document.getElementById('statusText').innerText = "منتهي";
-                document.getElementById('timerGrid').innerHTML = t.h;
+                const n = new Date().getTime(), st = new Date(user.cs).getTime(), en = new Date(user.ce).getTime();
+                const r = en - n, tot = en - st;
+                let cp = Math.max(0, Math.min(100, ((n - st) / tot) * 100));
+                document.getElementById('barConsumed').style.width = cp + "%";
+                if(r <= 0) document.getElementById('statusText').innerText = "منتهي";
+                
+                // عداد الوقت
+                const sec=Math.floor(r/1000), min=Math.floor(sec/60), hr=Math.floor(min/60), day=Math.floor(hr/24);
+                const units = [['ثانية', sec%60], ['دقيقة', min%60], ['ساعة', hr%24], ['يوم', day%30], ['شهر', Math.floor(day/30)]];
+                document.getElementById('timerGrid').innerHTML = r > 0 ? units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('') : "";
             };
             up(); setInterval(up, 1000);
         }
     }
-    function calc(s, e) {
-        const n = new Date().getTime(), st = new Date(s).getTime(), en = new Date(e).getTime();
-        const tot = en - st, cons = n - st, r = en - n;
-        let cp = Math.max(0, Math.min(100, (cons / tot) * 100));
-        if(r<=0) return {cp:100, r:0, h:"<b style='grid-column:span 5; color:red'>منتهي ❌</b>"};
-        const sec=Math.floor(r/1000), min=Math.floor(sec/60), hr=Math.floor(min/60), day=Math.floor(hr/24), mo=Math.floor(day/30);
-        const units = [['ثانية', sec%60], ['دقيقة', min%60], ['ساعة', hr%24], ['يوم', day%30], ['شهر', mo]];
-        return {cp, r, h: units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('')};
-    }
-    function copy(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("تم النسخ!"); }
     load();
 </script>
 </body>
