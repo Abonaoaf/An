@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر تطبيقات فولتشر 🦅</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; max-width: 600px; margin: auto; }
+        .app-card { background: white; border-radius: 20px; padding: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: center; }
+        .app-card img { width: 80px; height: 80px; border-radius: 18px; object-fit: cover; margin-bottom: 10px; border: 1px solid #eee; }
+        .app-name { font-weight: bold; display: block; margin-bottom: 5px; color: #333; }
+        .app-code { background: #f1f5f9; padding: 5px; border-radius: 8px; font-size: 0.8rem; color: #4a4ae2; font-weight: bold; }
+        .btn-dl { background: #1a202c; color: white; text-decoration: none; display: block; padding: 10px; border-radius: 10px; margin-top: 10px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <h2 style="color:#1a202c;">🦅 متجر فولتشر</h2>
+    <div class="grid" id="storeGrid">جاري تحميل التطبيقات...</div>
+
+<script>
+    const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    async function loadStore() {
+        const r = await fetch(DB_URL);
+        const d = await r.json();
+        const apps = d.apps || [];
+        document.getElementById('storeGrid').innerHTML = apps.map(a => `
+            <div class="app-card">
+                <img src="${a.img || 'https://via.placeholder.com/80'}">
+                <span class="app-name">${a.name}</span>
+                <div class="app-code">كود: ${a.ad}</div>
+                <a href="${a.al}" class="btn-dl">تحميل مباشر</a>
+            </div>
+        `).join('');
+    }
+    loadStore();
+</script>
+</body>
+</html>
