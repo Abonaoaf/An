@@ -11,40 +11,44 @@
         .header { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .container { padding: 20px; max-width: 1200px; margin: auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .u-card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .u-card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
         .u-name { color: var(--link); font-weight: bold; font-size: 1.1rem; }
         .prog-mini { height: 10px; background: var(--s); border-radius: 5px; overflow: hidden; margin: 10px 0; position: relative; }
         .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s; }
-        .btn { padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin: 2px; }
+        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 10px; }
+        .btn { padding: 8px 5px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
         .btn-link { background: #ebf8ff; color: var(--link); border: 1px solid #bee3f8; }
+        .btn-edit { background: #f0fff4; color: var(--s); border: 1px solid #c6f6d5; }
         .btn-del { background: #fff5f5; color: var(--d); border: 1px solid #fed7d7; }
-        .logo-section { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #ddd; text-align: center; }
         .modal { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 2px dashed var(--link); }
         input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .logo-section { background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #ddd; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <button class="btn btn-link" style="font-size: 1rem;" onclick="toggleAdd()">+ إضافة مشترك</button>
+    <button class="btn btn-link" style="font-size: 1rem; padding: 10px 20px;" onclick="prepareAdd()">+ إضافة مشترك</button>
     <h3 style="margin:0;">إدارة فولتشر 🦅</h3>
 </div>
 
 <div class="container">
     <div class="logo-section">
-        <b>تحديث لوقو المنصة من الاستوديو:</b><br><br>
+        <b>تحديث لوقو المنصة من الاستوديو:</b><br>
         <input type="file" id="logoFile" accept="image/*" style="width: auto;">
-        <button class="btn btn-link" onclick="saveLogo()">حفظ اللوقو للسحابة</button>
+        <button class="btn btn-link" onclick="saveLogo()">حفظ اللوقو</button>
     </div>
 
     <div id="addForm" class="modal" style="display:none;">
+        <h3 id="formTitle">إضافة مشترك جديد</h3>
+        <input type="hidden" id="editIndex">
         <input type="text" id="cn" placeholder="اسم العميل">
         <input type="text" id="cp" placeholder="رقم الجوال">
         <input type="text" id="cu" placeholder="اسم المستخدم">
         <input type="text" id="ck" placeholder="الرقم السري">
         <input type="text" id="cl" placeholder="رابط الدخول">
         <div style="display:flex; gap:5px;"><input type="date" id="cs" title="البداية"><input type="date" id="ce" title="النهاية"></div>
-        <button class="btn btn-link" style="width:100%; padding:15px;" onclick="addClient()">حفظ وإرسال للسحابة</button>
+        <button id="saveBtn" class="btn btn-link" style="width:100%; padding:15px; margin-top:10px;" onclick="saveClient()">حفظ البيانات في السحابة</button>
     </div>
 
     <div class="grid" id="clientGrid"></div>
@@ -69,11 +73,62 @@
             <div class="u-card">
                 <span class="u-name">${c.name}</span>
                 <div class="prog-mini"><div class="fill-red" style="width: ${p}%"></div></div>
-                <div style="font-size:0.8rem; color:#666;">النهاية: ${c.ce}</div>
-                <button class="btn btn-link" onclick="copyLink('${c.name}')">نسخ رابط العميل</button>
-                <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
+                <div style="font-size:0.75rem; color:#666;">النهاية: ${c.ce}</div>
+                <div class="actions">
+                    <button class="btn btn-link" onclick="copyLink('${c.name}')">الرابط</button>
+                    <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
+                    <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
+                </div>
             </div>`;
         }).join('');
+    }
+
+    function editClient(index) {
+        const c = cloudData.clients[index];
+        document.getElementById('editIndex').value = index;
+        document.getElementById('cn').value = c.name;
+        document.getElementById('cp').value = c.cp;
+        document.getElementById('cu').value = c.cu;
+        document.getElementById('ck').value = c.ck;
+        document.getElementById('cl').value = c.cl;
+        document.getElementById('cs').value = c.cs;
+        document.getElementById('ce').value = c.ce;
+        
+        document.getElementById('formTitle').innerText = "تعديل بيانات العميل: " + c.name;
+        document.getElementById('addForm').style.display = 'block';
+        window.scrollTo(0,0);
+    }
+
+    function prepareAdd() {
+        document.getElementById('editIndex').value = "";
+        document.getElementById('cn').value = "";
+        document.getElementById('cp').value = "";
+        document.getElementById('cu').value = "";
+        document.getElementById('ck').value = "";
+        document.getElementById('cl').value = "";
+        document.getElementById('cs').value = "";
+        document.getElementById('ce').value = "";
+        document.getElementById('formTitle').innerText = "إضافة مشترك جديد";
+        document.getElementById('addForm').style.display = 'block';
+    }
+
+    async function saveClient() {
+        const idx = document.getElementById('editIndex').value;
+        const newData = {
+            name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce')
+        };
+
+        if(!cloudData.clients) cloudData.clients = [];
+
+        if(idx === "") {
+            cloudData.clients.push(newData);
+        } else {
+            cloudData.clients[idx] = newData;
+        }
+
+        await sync();
+        document.getElementById('addForm').style.display = 'none';
+        alert("تم الحفظ والمزامنة بنجاح ✅");
     }
 
     function saveLogo() {
@@ -93,22 +148,14 @@
         return Math.max(0, Math.min(100, ((n - st) / (en - st)) * 100));
     }
 
-    async function addClient() {
-        if(!cloudData.clients) cloudData.clients = [];
-        cloudData.clients.push({name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce')});
-        await sync();
-        toggleAdd();
-    }
-
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); load(); }
     function copyLink(name) {
         const link = window.location.href.replace('index.html','') + 'user.html?name=' + encodeURIComponent(name);
         navigator.clipboard.writeText(link);
         alert("تم نسخ الرابط!");
     }
-    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); } }
+    async function delClient(i) { if(confirm("هل تريد حذف هذا العميل نهائياً؟")) { cloudData.clients.splice(i,1); await sync(); } }
     function v(id) { return document.getElementById(id).value; }
-    function toggleAdd() { const f = document.getElementById('addForm'); f.style.display = f.style.display==='none'?'block':'none'; }
     load();
 </script>
 </body>
