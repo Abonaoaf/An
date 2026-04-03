@@ -3,117 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة فولتشر السحابي 🦅</title>
+    <title>لوحة الإدارة السحابية 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --p: #1a202c; --s: #38a169; --d: #e53e3e; --bg: #f7fafc; --link: #3182ce; }
+        :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #3182ce; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
-        .header { background: var(--p); color: white; text-align: center; padding: 30px; border-bottom: 5px solid var(--link); }
-        .nav { display: flex; justify-content: center; gap: 10px; margin-top: -20px; }
-        .btn-nav { background: white; border: none; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .btn-nav.active { background: var(--link); color: white; }
-        .container { max-width: 600px; margin: 30px auto; padding: 0 15px; }
-        .card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .info-row { display: flex; justify-content: space-between; background: #f8fafc; padding: 10px; border-radius: 10px; margin-top: 8px; border: 1px solid #eee; align-items: center; }
-        input, textarea { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn-save { background: var(--s); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-copy-user { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; padding: 8px; width: 100%; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .del-btn { color: var(--d); cursor: pointer; background: none; border: none; }
+        .header { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .container { padding: 20px; max-width: 1200px; margin: auto; }
+        
+        /* تصميم الشبكة (Grid) للكروت */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        
+        /* كرت العميل الصغير */
+        .u-card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .u-name { color: var(--link); font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; display: block; }
+        .u-info { font-size: 0.8rem; color: #666; margin-bottom: 10px; }
+        
+        /* شريط التقدم "الأكول" الصغير */
+        .prog-mini { height: 8px; background: var(--s); border-radius: 5px; overflow: hidden; margin: 10px 0; position: relative; }
+        .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s; }
+        
+        /* الأزرار */
+        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 10px; }
+        .btn { padding: 8px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: bold; transition: 0.2s; }
+        .btn-link { background: #ebf8ff; color: var(--link); border: 1px solid #bee3f8; }
+        .btn-edit { background: #f0fff4; color: var(--s); border: 1px solid #c6f6d5; }
+        .btn-del { background: #fff5f5; color: var(--d); border: 1px solid #fed7d7; }
+        
+        /* نافذة الإضافة */
+        .modal { background: white; border-radius: 20px; padding: 25px; margin-bottom: 30px; border: 2px dashed var(--link); }
+        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .save-all { background: var(--s); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="header"><h1>لوحة تحكم فولتشر 🦅</h1></div>
-<div class="nav">
-    <button class="btn-nav active" id="bn-c" onclick="tab('c')">المشتركين</button>
-    <button class="btn-nav" id="bn-m" onclick="tab('m')">المتجر</button>
+<div class="header">
+    <button class="btn btn-edit" style="font-size: 1rem;" onclick="toggleAdd()">+ إضافة مشترك</button>
+    <h3 style="margin:0;"><i class="fas fa-cloud"></i> الإدارة السحابية</h3>
 </div>
 
 <div class="container">
-    <div id="c-sec">
-        <div class="card">
-            <h3>+ إضافة مشترك جديد</h3>
-            <input type="text" id="cn" placeholder="اسم العميل (يجب أن يكون فريداً)">
-            <input type="text" id="cp" placeholder="رقم الجوال">
-            <input type="text" id="cu" placeholder="اسم المستخدم">
-            <input type="text" id="ck" placeholder="الرقم السري">
-            <input type="text" id="cl" placeholder="رابط التطبيق الخاص به">
-            <div style="display:flex; gap:5px;"><input type="date" id="cs" title="البداية"><input type="date" id="ce" title="النهاية"></div>
-            <button class="btn-save" onclick="add('c')">حفظ في السحابة</button>
-        </div>
-        <div id="clist"></div>
+    <div id="addForm" class="modal" style="display:none;">
+        <input type="text" id="cn" placeholder="اسم العميل">
+        <input type="text" id="cp" placeholder="رقم الجوال">
+        <input type="text" id="cu" placeholder="اسم المستخدم">
+        <input type="text" id="ck" placeholder="الرقم السري">
+        <input type="text" id="cl" placeholder="رابط الدخول">
+        <div style="display:flex; gap:5px;"><input type="date" id="cs" title="البداية"><input type="date" id="ce" title="النهاية"></div>
+        <button class="save-all" onclick="addClient()">حفظ المشترك في السحابة</button>
     </div>
 
-    <div id="m-sec" style="display:none;">
-        <div class="card">
-            <h3>+ إضافة تطبيق للمتجر</h3>
-            <input type="file" id="ai" accept="image/*">
-            <input type="text" id="an" placeholder="اسم التطبيق">
-            <input type="text" id="ad" placeholder="كود دونلودر">
-            <textarea id="at" placeholder="وصف التطبيق"></textarea>
-            <button class="btn-save" onclick="add('m')" style="background:var(--link)">نشر في المتجر</button>
-        </div>
-        <div id="alist"></div>
-    </div>
+    <div class="grid" id="clientGrid"></div>
 </div>
 
 <script>
     const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
-    let cloud = { clients: [], apps: [] };
+    let cloudData = { clients: [], apps: [] };
 
     async function load() {
         const r = await fetch(DB);
         const d = await r.json();
-        if (d) cloud = { clients: d.clients || [], apps: d.apps || [] };
+        if (d) cloudData = { clients: d.clients || [], apps: d.apps || [] };
         render();
     }
 
     function render() {
-        const cl = document.getElementById('clist');
-        cl.innerHTML = cloud.clients.map((c, i) => `
-            <div class="card">
-                <div style="display:flex; justify-content:space-between;"><b>👤 ${c.name}</b><button class="del-btn" onclick="del('c',${i})"><i class="fas fa-trash"></i></button></div>
-                <div class="info-row"><span>ينتهي في: ${c.ce}</span></div>
-                <button class="btn-copy-user" onclick="copyUserLink('${c.name}')">
-                    <i class="fas fa-link"></i> نسخ رابط العميل للإرسال
-                </button>
-            </div>`).join('');
+        const grid = document.getElementById('clientGrid');
+        grid.innerHTML = cloudData.clients.map((c, i) => {
+            const p = calcProg(c.cs, c.ce);
+            return `
+            <div class="u-card">
+                <span class="u-name">${c.name}</span>
+                <div class="u-info">الجوال: ${c.cp} | النهاية: ${c.ce}</div>
+                
+                <div class="prog-mini">
+                    <div class="fill-red" style="width: ${p}%"></div>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn btn-link" onclick="copyL('${c.name}')"><i class="fas fa-link"></i> الرابط</button>
+                    <button class="btn btn-edit" onclick="editI(${i})"><i class="fas fa-edit"></i> تعديل</button>
+                    <button class="btn btn-del" onclick="delI(${i})"><i class="fas fa-trash"></i> حذف</button>
+                </div>
+            </div>`;
+        }).join('');
     }
 
-    function copyUserLink(name) {
-        // هذا السطر يولد الرابط تلقائياً بناءً على موقعك الحالي
-        const base = window.location.href.replace('index.html', '');
-        const userLink = `${base}user.html?name=${encodeURIComponent(name)}`;
-        navigator.clipboard.writeText(userLink);
-        alert("تم نسخ رابط العميل بنجاح! يمكنك الآن إرساله له عبر الواتساب.");
+    function calcProg(s, e) {
+        const n = new Date().getTime(), st = new Date(s).getTime(), en = new Date(e).getTime();
+        const cons = n - st, tot = en - st;
+        let perc = (cons / tot) * 100;
+        return Math.max(0, Math.min(100, perc));
     }
 
-    async function add(t) {
-        if(t==='c') cloud.clients.push({name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce')});
-        else {
-            const f = document.getElementById('ai').files[0];
-            if(f) {
-                const r = new FileReader(); r.onloadend = async () => {
-                    cloud.apps.push({name:v('an'), ad:v('ad'), at:v('at'), img: r.result}); await sync();
-                }; r.readAsDataURL(f); return;
-            }
-        }
+    async function addClient() {
+        cloudData.clients.push({
+            name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce')
+        });
         await sync();
+        toggleAdd();
     }
 
     async function sync() {
-        await fetch(DB, { method: 'PUT', body: JSON.stringify(cloud) });
-        alert("تم الحفظ والمزامنة ✅"); load();
+        await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) });
+        load();
     }
 
-    async function del(t, i) { if(confirm("حذف؟")) { if(t==='c') cloud.clients.splice(i,1); else cloud.apps.splice(i,1); await sync(); } }
-    function v(id) { return document.getElementById(id).value; }
-    function tab(t) {
-        document.getElementById('c-sec').style.display = t==='c'?'block':'none';
-        document.getElementById('m-sec').style.display = t==='m'?'block':'none';
-        document.getElementById('bn-c').classList.toggle('active', t==='c');
-        document.getElementById('bn-m').classList.toggle('active', t==='m');
+    function copyL(name) {
+        const link = window.location.href.replace('index.html','') + 'user.html?name=' + encodeURIComponent(name);
+        navigator.clipboard.writeText(link);
+        alert("تم نسخ رابط العميل!");
     }
+
+    async function delI(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); } }
+    function v(id) { return document.getElementById(id).value; }
+    function toggleAdd() { const f = document.getElementById('addForm'); f.style.display = f.style.display==='none'?'block':'none'; }
+    
     load();
 </script>
 </body>
