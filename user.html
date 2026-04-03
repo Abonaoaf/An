@@ -10,19 +10,21 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; min-height: 100vh; }
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         
-        /* القسم العلوي والتاريخ */
+        /* الهيدر والتاريخ */
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
         .date-box { background: #fff; border: 1px solid #ddd; border-radius: 15px; padding: 8px 15px; text-align: center; min-width: 80px; }
         .date-box span { display: block; font-size: 0.7rem; color: #666; }
         .date-box b { font-size: 1.2rem; color: #333; }
         .main-logo { width: 70px; height: 70px; border-radius: 15px; object-fit: contain; }
 
-        /* رسالة الترحيب */
-        .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.6; }
-        .v-family { color: var(--danger); font-weight: bold; }
-        .u-name-highlight { color: var(--main); font-weight: bold; font-size: 1.1rem; display: block; margin-top: 5px; }
+        /* رسالة الترحيب المنسقة - أسرة فولتشر في سطر والترحيب في سطر */
+        .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.8; }
+        .welcome-text { font-size: 1rem; color: #444; }
+        .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
+        .u-line { font-size: 1rem; color: #444; margin-top: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .u-name-highlight { color: var(--main); font-weight: bold; font-size: 1.1rem; }
 
-        /* شريط التقدم */
+        /* شريط الحالة والتقدم */
         .status-container { padding: 0 20px; text-align: right; }
         .progress-bar-container { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 0; position: relative; }
         .progress-fill-consumed { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s; }
@@ -34,9 +36,9 @@
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
         .copy-btn { color: var(--main); cursor: pointer; padding: 5px; font-size: 1rem; }
 
-        /* العداد */
+        /* عداد الوقت */
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px 0; direction: ltr; }
-        .t-box { background: #fff; border: 1px solid #eef; border-radius: 10px; padding: 8px 2px; text-align: center; }
+        .t-box { background: #fff; border: 1px solid #eef; border-radius: 10px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
         .t-box b { display: block; color: var(--main); font-size: 1rem; }
         .t-box span { font-size: 0.55rem; color: #aaa; }
 
@@ -57,8 +59,13 @@
     </div>
 
     <div class="welcome-msg">
-        <div>سعدنا بانضمامك معنا في <span class="v-family">أسرة فولتشر</span></div>
-        <div>مرحباً بك معنا 🤝 <span id="userName" class="u-name-highlight">...</span></div>
+        <div class="welcome-text">
+            سعدنا بانضمامك معنا في
+            <span class="v-family">أسرة فولتشر 🦅</span>
+        </div>
+        <div class="u-line">
+            مرحباً بك معنا 🤝 <span id="userName" class="u-name-highlight">جاري التحميل...</span>
+        </div>
     </div>
 
     <div class="status-container">
@@ -86,8 +93,6 @@
 
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
-    
-    // ضبط التاريخ
     const d = new Date();
     const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
     const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
@@ -101,9 +106,7 @@
         try {
             const res = await fetch(DB_URL);
             const data = await res.json();
-            
             if(data && data.logo) document.getElementById('userLogo').src = data.logo;
-
             const user = (data.clients || []).find(u => u.name === name);
             if(user) {
                 document.getElementById('userName').innerText = user.name;
@@ -123,16 +126,15 @@
                         document.getElementById('statusText').innerText = "منتهي";
                         document.getElementById('statusText').style.color = "red";
                     }
-                    
                     const sec=Math.floor(r/1000), min=Math.floor(sec/60), hr=Math.floor(min/60), day=Math.floor(hr/24);
                     const units = [['ثانية', sec%60], ['دقيقة', min%60], ['ساعة', hr%24], ['يوم', day%30], ['شهر', Math.floor(day/30)]];
                     document.getElementById('timerGrid').innerHTML = r > 0 ? units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('') : "";
                 };
                 up(); setInterval(up, 1000);
             }
-        } catch(e) { console.error("Cloud connection failed"); }
+        } catch(e) { console.error("Error loading data"); }
     }
-    function copy(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("تم النسخ!"); }
+    function copy(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("تم النسخ بنجاح ✅"); }
     load();
 </script>
 </body>
