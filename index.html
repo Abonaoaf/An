@@ -10,7 +10,6 @@
         :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
-        /* حماية الدخول */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
         #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; }
         #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
@@ -24,22 +23,27 @@
         .section { display: none; }
         .section.active { display: block; }
 
-        /* كروت المشتركين (المستقرة) */
+        /* نبض وتوهج رقم الأيام المتبقية */
+        @keyframes dayGlow {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--d); }
+            50% { transform: scale(1.15); text-shadow: 0 0 10px var(--d); opacity: 0.9; }
+        }
+        .days-highlight { color: var(--d); font-weight: 900; display: inline-block; animation: dayGlow 1.2s infinite ease-in-out; }
+
+        /* شريط التقدم ثابت */
+        .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 12px 0; border: 1px solid #eee; }
+        .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s linear; }
+
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
         
-        @keyframes strongPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-        .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 12px 0; animation: strongPulse 1.2s infinite ease-in-out; }
-        .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s; }
-
         .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
         input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
         
-        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; }
+        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; }
 
-        /* كروت المتجر المربعة المحدثة */
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; }
         .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
         .drag-handle { position: absolute; top: 12px; left: 12px; cursor: grab; color: #cbd5e0; font-size: 1.2rem; }
@@ -49,18 +53,18 @@
 
 <div id="loginOverlay">
     <i class="fas fa-user-shield" style="font-size: 4rem; margin-bottom: 20px;"></i>
-    <h2>دخول إدارة فولتشر 🦅</h2>
+    <h2>إدارة فولتشر 🦅</h2>
     <input type="password" id="passInput" placeholder="كلمة المرور">
     <button onclick="checkPass()">دخول</button>
 </div>
 
 <div id="adminApp" style="display:none;">
     <div class="header">
-        <b style="font-size: 1.2rem;">لوحة تحكم فولتشر 🦅</b>
+        <b>لوحة تحكم فولتشر 🦅</b>
         <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('clients', this)"><i class="fas fa-users"></i> المشتركين</button>
-            <button class="tab-btn" onclick="switchTab('store', this)"><i class="fas fa-store"></i> المتجر</button>
-            <button class="tab-btn" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> الإعدادات</button>
+            <button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>
+            <button class="tab-btn" onclick="switchTab('store', this)">المتجر</button>
+            <button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات</button>
         </div>
     </div>
 
@@ -92,17 +96,13 @@
                 <textarea id="at" placeholder="وصف التطبيق"></textarea>
                 <button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>
             </div>
-            
-            <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px;" onclick="saveOrder()">
-                <i class="fas fa-save"></i> حفظ ترتيب التطبيقات الحالي
-            </button>
-
+            <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px;" onclick="saveOrder()"><i class="fas fa-save"></i> حفظ الترتيب الحالي</button>
             <div class="grid" id="appList"></div>
         </div>
 
         <div id="settings" class="section">
             <div class="modal" style="text-align:center;">
-                <h3>تحديث شعار المنصة (اللوقو)</h3>
+                <h3>تحديث الشعار (اللوقو)</h3>
                 <input type="file" id="logoFile" accept="image/*">
                 <button class="btn btn-main" onclick="saveLogo()">رفع اللوقو الآن 🚀</button>
             </div>
@@ -131,13 +131,15 @@
         renderApps();
     }
 
-    // استعادة رندر العملاء بكامل حقوله وأزراره
     function renderClients() {
         const grid = document.getElementById('clientGrid');
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
             const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
             return `<div class="card">
-                <div style="display:flex; justify-content:space-between;"><b>${c.name}</b> <span style="color:var(--d); font-weight:bold;">${days} يوم</span></div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <b>${c.name}</b> 
+                    <span class="days-highlight">${days} يوم</span>
+                </div>
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
@@ -157,9 +159,9 @@
                 <img src="${a.img || ''}">
                 <div style="text-align:center; font-weight:bold; font-size:0.9rem;">${a.name}</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px;">
-                    <button class="btn btn-view" onclick="viewApp(${i})" title="عرض"><i class="fas fa-eye"></i></button>
-                    <button class="btn btn-edit" onclick="editApp(${i})" title="تعديل"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-del" onclick="delApp(${i})" title="حذف"><i class="fas fa-trash"></i></button>
+                    <button class="btn btn-view" onclick="viewApp(${i})"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-edit" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-del" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
         `).join('');
@@ -191,7 +193,6 @@
             if(idx==="") cloudData.apps.push(a); else cloudData.apps[idx]=a;
             await sync(); load();
             ['an','ad','al','at','editAppIndex'].forEach(id=>document.getElementById(id).value="");
-            document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
         };
         if(file) { const r=new FileReader(); r.onload=()=>doSave(r.result); r.readAsDataURL(file); } else doSave();
     }
