@@ -3,88 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم فولتشر 🦅</title>
+    <title>لوحة تحكم فولتشر الشاملة 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        
+        /* شاشة الحماية */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; transition: 0.5s; }
-        #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; margin-bottom: 10px; }
-        #loginOverlay button { padding: 12px 30px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; cursor: pointer; }
+        #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 10px; }
+        #loginOverlay button { padding: 12px 30px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
+
         .header { background: white; padding: 10px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
         .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
-        .tab-btn { padding: 10px 15px; border-radius: 12px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; }
+        .tab-btn { padding: 10px 15px; border-radius: 12px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
         .tab-btn.active { background: var(--link); color: white; border-color: var(--link); }
+
         .container { padding: 20px; max-width: 1200px; margin: auto; }
         .section { display: none; }
         .section.active { display: block; }
+
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 10px 0; }
-        .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        .days-badge { color: var(--d); font-weight: 900; animation: pulse 1.5s infinite; }
+        .card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
+        
+        /* شريط التقدم: الأخضر خلفية والأحمر يزحف */
+        .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 10px 0; position: relative; }
+        .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s ease; border-radius: 0 10px 10px 0; }
+
+        @keyframes pulseAdmin { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .days-badge { color: var(--d); font-weight: 900; font-size: 1rem; animation: pulseAdmin 1.5s infinite ease-in-out; display: inline-block; }
+
         .modal { background: #fff; border-radius: 20px; padding: 20px; margin-bottom: 25px; border: 2px dashed #cbd5e0; }
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn { padding: 8px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; font-size: 0.75rem; color: white; }
-        .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
-        .btn-main { background: var(--link); width: 100%; padding: 12px; margin-top: 10px; }
-        .btn-cancel { background: #edf2f7; color: #4a5568; width: 100%; margin-top: 5px; border: 1px solid #cbd5e0; }
-        .app-item { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #eee; }
-        .app-item img { width: 55px; height: 55px; border-radius: 12px; }
+        
+        .btn { padding: 8px 10px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; font-size: 0.75rem; color: white; }
+        .btn-view { background: var(--view); }
+        .btn-edit { background: var(--s); }
+        .btn-link { background: var(--link); }
+        .btn-del { background: var(--d); }
+        
+        .btn-main { background: var(--link); width: 100%; padding: 12px; margin-top: 10px; font-size: 0.9rem; }
+        .btn-cancel { background: #edf2f7; color: #4a5568; width: 100%; margin-top: 5px; border: 1px solid #cbd5e0; font-size: 0.9rem; }
+
+        .app-item { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 15px; border: 1px solid #eee; margin-bottom: 10px; }
+        .app-item img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; }
     </style>
 </head>
 <body>
-<div id="loginOverlay"><h2>دخول الإدارة الآمن</h2><input type="password" id="passInput" placeholder="أدخل كلمة المرور"><button onclick="checkPass()">فتح اللوحة 🦅</button></div>
+
+<div id="loginOverlay">
+    <i class="fas fa-user-shield" style="font-size: 4rem; margin-bottom: 20px;"></i>
+    <h2>دخول الإدارة الآمن</h2>
+    <input type="password" id="passInput" placeholder="أدخل كلمة المرور">
+    <button onclick="checkPass()">فتح اللوحة 🦅</button>
+</div>
+
 <div id="adminApp" style="display:none;">
-    <div class="header"><b>إدارة فولتشر الشاملة 🦅</b>
+    <div class="header">
+        <div style="font-weight:bold; color:var(--p);">إدارة فولتشر الشاملة 🦅</div>
         <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>
-            <button class="tab-btn" onclick="switchTab('store', this)">المتجر</button>
-            <button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات</button>
+            <button class="tab-btn active" onclick="switchTab('clients', this)"><i class="fas fa-users"></i> المشتركين</button>
+            <button class="tab-btn" onclick="switchTab('store', this)"><i class="fas fa-store"></i> المتجر</button>
+            <button class="tab-btn" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> الإعدادات</button>
         </div>
     </div>
+
     <div class="container">
         <div id="clients" class="section active">
-            <div class="modal"><h3 id="clientFormTitle">إضافة مشترك جديد</h3><input type="hidden" id="editClientIndex"><input type="text" id="cn" placeholder="اسم العميل"><input type="text" id="cp" placeholder="رقم الجوال"><input type="text" id="cu" placeholder="اسم المستخدم"><input type="text" id="ck" placeholder="الرقم السري"><input type="text" id="cl" placeholder="رابط الدخول"><div style="display:flex; gap:5px;"><input type="date" id="cs"><input type="date" id="ce"></div><button class="btn btn-main" onclick="saveClient()">حفظ في السحابة</button><button id="cancelBtn" class="btn btn-cancel" style="display:none;" onclick="clearF('client')">إلغاء</button></div>
+            <div class="modal">
+                <h3 id="clientFormTitle">إضافة مشترك جديد</h3>
+                <input type="hidden" id="editClientIndex">
+                <input type="text" id="cn" placeholder="اسم العميل">
+                <input type="text" id="cp" placeholder="رقم الجوال">
+                <input type="text" id="cu" placeholder="اسم المستخدم">
+                <input type="text" id="ck" placeholder="الرقم السري">
+                <input type="text" id="cl" placeholder="رابط الدخول">
+                <div style="display:flex; gap:5px;"><input type="date" id="cs" title="تاريخ البداية"><input type="date" id="ce" title="تاريخ النهاية"></div>
+                <button class="btn btn-main" onclick="saveClient()">حفظ في السحابة</button>
+                <button id="cancelBtn" class="btn btn-cancel" style="display:none;" onclick="clearF('client')">إلغاء التعديل والرجوع</button>
+            </div>
             <div class="grid" id="clientGrid"></div>
         </div>
+
         <div id="store" class="section">
-            <div class="modal"><h3>+ إضافة تطبيق</h3><input type="hidden" id="editAppIndex"><input type="file" id="appIcon" accept="image/*"><input type="text" id="an" placeholder="الاسم"><input type="text" id="ad" placeholder="الداونلودر"><input type="text" id="al" placeholder="الرابط"><textarea id="at" placeholder="الوصف"></textarea><button class="btn btn-main" onclick="saveApp()">حفظ</button></div>
+            <div class="modal">
+                <h3 id="appFormTitle">+ إضافة تطبيق للمتجر</h3>
+                <input type="hidden" id="editAppIndex">
+                <input type="file" id="appIcon" accept="image/*">
+                <input type="text" id="an" placeholder="اسم التطبيق">
+                <input type="text" id="ad" placeholder="كود دونلودر">
+                <input type="text" id="al" placeholder="رابط التحميل المباشر">
+                <textarea id="at" placeholder="وصف التطبيق"></textarea>
+                <button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر</button>
+                <button id="cancelAppBtn" class="btn btn-cancel" style="display:none;" onclick="clearF('app')">إلغاء والرجوع</button>
+            </div>
             <div id="appList"></div>
         </div>
-        <div id="settings" class="section"><div class="card"><h3>اللوقو</h3><input type="file" id="logoFile"><button class="btn btn-main" onclick="saveLogo()">رفع</button></div></div>
+
+        <div id="settings" class="section">
+            <div class="card" style="text-align:center;">
+                <h3>تحديث لوقو المنصة</h3>
+                <input type="file" id="logoFile" accept="image/*">
+                <button class="btn btn-main" onclick="saveLogo()">رفع اللوقو للسحابة</button>
+            </div>
+        </div>
     </div>
 </div>
+
 <script>
     const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     const MASTER_PASS = "Aztlg1512";
     let cloudData = { clients: [], apps: [], logo: "" };
-    function checkPass() { if(document.getElementById('passInput').value === MASTER_PASS) { document.getElementById('loginOverlay').style.top = "-100%"; document.getElementById('adminApp').style.display = "block"; load(); } else alert("خطأ!"); }
-    async function load() { const r = await fetch(DB); cloudData = await r.json() || {clients:[], apps:[], logo:""}; renderClients(); renderApps(); }
-    function switchTab(id, btn) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
-    function renderClients() {
-        const grid = document.getElementById('clientGrid'); grid.innerHTML = '';
-        (cloudData.clients || []).forEach((c, i) => {
-            const now = new Date().getTime(), st = new Date(c.cs).getTime(), en = new Date(c.ce).getTime();
-            const total = en - st, used = now - st;
-            let percent = Math.max(0, Math.min(100, (used / total) * 100));
-            const days = Math.max(0, Math.ceil((en - now) / (1000*60*60*24)));
-            grid.innerHTML += `<div class="card"><div style="display:flex; justify-content:space-between;"><b>${c.name}</b><span class="days-badge">${days} يوم</span></div><div class="prog-mini"><div class="fill-red" style="width:${percent}%"></div></div><div style="font-size:0.7rem; margin-bottom:10px;">النهاية: ${c.ce}</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;"><button class="btn btn-view" onclick="viewClient(${i})">عرض</button><button class="btn btn-edit" onclick="editClient(${i})">تعديل</button><button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button><button class="btn btn-del" onclick="delClient(${i})">حذف</button></div></div>`;
-        });
+
+    function checkPass() {
+        if(document.getElementById('passInput').value === MASTER_PASS) {
+            document.getElementById('loginOverlay').style.top = "-100%";
+            document.getElementById('adminApp').style.display = "block";
+            load();
+        } else { alert("كلمة المرور خاطئة!"); }
     }
-    function viewClient(i) { const c = cloudData.clients[i]; alert(`الاسم: ${c.name}\nالجوال: ${c.cp}\nالمستخدم: ${c.cu}\nالسر: ${c.ck}\nالنهاية: ${c.ce}`); }
-    async function saveClient() { const idx = document.getElementById('editClientIndex').value; const d = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') }; if(!cloudData.clients) cloudData.clients=[]; if(idx==="") cloudData.clients.push(d); else cloudData.clients[idx]=d; await sync(); clearF('client'); }
-    function renderApps() { const list = document.getElementById('appList'); list.innerHTML = (cloudData.apps || []).map((a, i) => `<div class="app-item"><img src="${a.img||''}"><b>${a.name}</b><button class="btn btn-edit" onclick="editApp(${i})">تعديل</button></div>`).join(''); }
-    async function saveApp() { const idx=v('editAppIndex'), file=document.getElementById('appIcon').files[0]; const p=async(img)=>{ const d={name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img:img||(idx!==""?cloudData.apps[idx].img:"")}; if(!cloudData.apps) cloudData.apps=[]; if(idx==="") cloudData.apps.push(d); else cloudData.apps[idx]=d; await sync(); clearF('app'); }; if(file){const r=new FileReader(); r.onload=()=>p(r.result); r.readAsDataURL(file);}else p(); }
+
+    async function load() {
+        const r = await fetch(DB);
+        const d = await r.json();
+        if (d) cloudData = d;
+        renderClients();
+        renderApps();
+    }
+
+    function switchTab(id, btn) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    function renderClients() {
+        const grid = document.getElementById('clientGrid');
+        grid.innerHTML = (cloudData.clients || []).map((c, i) => {
+            const now = new Date().getTime();
+            const st = new Date(c.cs).getTime();
+            const en = new Date(c.ce).getTime();
+            
+            // حسبة التآكل (المنقضي / الإجمالي)
+            const total = en - st;
+            const consumed = now - st;
+            let percentConsumed = Math.max(0, Math.min(100, (consumed / total) * 100));
+            
+            const daysLeft = Math.max(0, Math.ceil((en - now) / (1000 * 60 * 60 * 24)));
+            
+            return `<div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <b>${c.name}</b>
+                    <span class="days-badge">${daysLeft} يوم</span>
+                </div>
+                <div class="prog-mini">
+                    <div class="fill-red" style="width:${percentConsumed}%"></div>
+                </div>
+                <div style="font-size:0.7rem; color:#666; margin-bottom:10px;">ينتهي في: ${c.ce}</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                    <button class="btn btn-view" onclick="viewClient(${i})"><i class="fas fa-eye"></i> عرض</button>
+                    <button class="btn btn-edit" onclick="editClient(${i})"><i class="fas fa-edit"></i> تعديل</button>
+                    <button class="btn btn-link" onclick="copyL('${c.name}')"><i class="fas fa-link"></i> الرابط</button>
+                    <button class="btn btn-del" onclick="delClient(${i})"><i class="fas fa-trash"></i> حذف</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function viewClient(i) {
+        const c = cloudData.clients[i];
+        alert(`بيانات العميل: ${c.name}\n\nالجوال: ${c.cp}\nالمستخدم: ${c.cu}\nكلمة السر: ${c.ck}\nالبداية: ${c.cs}\nالنهاية: ${c.ce}\nالرابط: ${c.cl}`);
+    }
+
+    async function saveClient() {
+        const idx = document.getElementById('editClientIndex').value;
+        const d = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };
+        if(!cloudData.clients) cloudData.clients = [];
+        if(idx === "") cloudData.clients.push(d); else cloudData.clients[idx] = d;
+        await sync();
+        clearF('client');
+    }
+
+    function renderApps() {
+        const list = document.getElementById('appList');
+        list.innerHTML = (cloudData.apps || []).map((a, i) => `
+            <div class="app-item">
+                <img src="${a.img || ''}">
+                <div style="flex:1; text-align:right;"><b>${a.name}</b></div>
+                <button class="btn btn-edit" style="width:auto; margin:0 2px;" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-del" style="width:auto; margin:0 2px;" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
+            </div>
+        `).join('');
+    }
+
+    async function saveApp() {
+        const idx = document.getElementById('editAppIndex').value;
+        const file = document.getElementById('appIcon').files[0];
+        const process = async (img) => {
+            const d = { name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img: img || (idx!==""?cloudData.apps[idx].img:"") };
+            if(!cloudData.apps) cloudData.apps = [];
+            if(idx==="") cloudData.apps.push(d); else cloudData.apps[idx]=d;
+            await sync(); clearF('app');
+        };
+        if(file) { const r=new FileReader(); r.onload=()=>process(r.result); r.readAsDataURL(file); } else process();
+    }
+
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); load(); }
-    function copyL(n) { navigator.clipboard.writeText(window.location.href.replace('index.html','')+'user.html?name='+encodeURIComponent(n)); alert("تم!"); }
-    function editClient(i) { const c=cloudData.clients[i]; document.getElementById('editClientIndex').value=i; ['cn','cp','cu','ck','cl','cs','ce'].forEach(id=>document.getElementById(id).value=c[id]||""); document.getElementById('cancelBtn').style.display="block"; window.scrollTo(0,0); }
-    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); } }
+    
+    function copyL(name) {
+        const link = window.location.href.replace('index.html','') + 'user.html?name=' + encodeURIComponent(name);
+        navigator.clipboard.writeText(link); alert("تم نسخ الرابط بنجاح!");
+    }
+
+    function editClient(i) {
+        const c = cloudData.clients[i]; document.getElementById('editClientIndex').value = i;
+        ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        document.getElementById('clientFormTitle').innerText = "تعديل: " + c.name;
+        document.getElementById('cancelBtn').style.display = "block";
+        window.scrollTo(0,0);
+    }
+
+    function editApp(i) {
+        const a = cloudData.apps[i]; document.getElementById('editAppIndex').value = i;
+        ['an','ad','al','at'].forEach(id => document.getElementById(id).value = a[id] || "");
+        document.getElementById('appFormTitle').innerText = "تعديل تطبيق: " + a.name;
+        document.getElementById('cancelAppBtn').style.display = "block";
+        window.scrollTo(0,0);
+    }
+
+    async function delClient(i) { if(confirm("حذف العميل؟")) { cloudData.clients.splice(i,1); await sync(); } }
+    async function delApp(i) { if(confirm("حذف التطبيق؟")) { cloudData.apps.splice(i,1); await sync(); } }
     function v(id) { return document.getElementById(id).value; }
-    function clearF(t) { if(t==='client') { ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cancelBtn').style.display="none"; } }
-    function saveLogo() { const f=document.getElementById('logoFile').files[0], r=new FileReader(); r.onload=async()=>{ cloudData.logo=r.result; await sync(); }; r.readAsDataURL(f); }
+    
+    function clearF(t) { 
+        if(t==='client') { 
+            ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); 
+            document.getElementById('clientFormTitle').innerText="إضافة مشترك جديد";
+            document.getElementById('cancelBtn').style.display = "none";
+        } else { 
+            ['an','ad','al','at','editAppIndex'].forEach(id=>document.getElementById(id).value=""); 
+            document.getElementById('appFormTitle').innerText="+ إضافة تطبيق جديد"; 
+            document.getElementById('cancelAppBtn').style.display = "none";
+        } 
+    }
+    
+    function saveLogo() {
+        const file = document.getElementById('logoFile').files[0];
+        const r = new FileReader(); r.onload=async()=>{ cloudData.logo=r.result; await sync(); alert("تم تحديث اللوقو!"); };
+        r.readAsDataURL(file);
+    }
 </script>
 </body>
 </html>
-
