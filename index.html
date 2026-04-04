@@ -10,11 +10,9 @@
         :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
-        /* حماية الدخول */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
         #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; }
         #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        #loginOverlay button:hover { background: white; color: var(--link); }
 
         .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
         .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
@@ -25,18 +23,15 @@
         .section { display: none; }
         .section.active { display: block; }
 
-        /* حركة التوهج والنبض للرقم المتبقي فقط */
         @keyframes dayGlow {
             0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--d); }
             50% { transform: scale(1.15); text-shadow: 0 0 10px var(--d); opacity: 0.9; }
         }
         .days-highlight { color: var(--d); font-weight: 900; display: inline-block; animation: dayGlow 1.2s infinite ease-in-out; }
 
-        /* شريط التقدم ثابت تماماً */
         .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 12px 0; border: 1px solid #eee; }
         .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s linear; }
 
-        /* الكروت والشبكة */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
         
@@ -47,10 +42,14 @@
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; }
 
-        /* كروت المتجر المربعة */
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; }
-        .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; background: #f9f9f9; }
+        .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
         .drag-handle { position: absolute; top: 12px; left: 12px; cursor: grab; color: #cbd5e0; font-size: 1.2rem; }
+
+        /* ستايل شريط التحكم في الحجم */
+        .size-control { margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 15px; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        .preview-box { border: 1px dashed #ddd; padding: 10px; display: inline-block; border-radius: 15px; margin-top: 10px; background: white; }
     </style>
 </head>
 <body>
@@ -64,11 +63,11 @@
 
 <div id="adminApp" style="display:none;">
     <div class="header">
-        <b style="font-size: 1.2rem;">لوحة تحكم فولتشر 🦅</b>
+        <b>لوحة تحكم فولتشر 🦅</b>
         <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('clients', this)"><i class="fas fa-users"></i> المشتركين</button>
-            <button class="tab-btn" onclick="switchTab('store', this)"><i class="fas fa-store"></i> المتجر</button>
-            <button class="tab-btn" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> الإعدادات</button>
+            <button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>
+            <button class="tab-btn" onclick="switchTab('store', this)">المتجر</button>
+            <button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات</button>
         </div>
     </div>
 
@@ -101,19 +100,29 @@
                 <button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>
                 <button id="cancelAppBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none; margin-top:5px;" onclick="clearAppForm()">إلغاء التعديل</button>
             </div>
-            
-            <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px; box-shadow: 0 4px 15px rgba(94, 76, 193, 0.3);" onclick="saveOrder()">
-                <i class="fas fa-save"></i> حفظ ترتيب التطبيقات الحالي
-            </button>
-
+            <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px;" onclick="saveOrder()"><i class="fas fa-save"></i> حفظ الترتيب الحالي</button>
             <div class="grid" id="appList"></div>
         </div>
 
         <div id="settings" class="section">
             <div class="modal" style="text-align:center;">
-                <h3>تحديث الشعار (اللوقو)</h3>
-                <input type="file" id="logoFile" accept="image/*">
-                <button class="btn btn-main" onclick="saveLogo()">رفع الشعار الآن 🚀</button>
+                <h3>تنسيق شعار فولتشر 🦅</h3>
+                
+                <div class="size-control">
+                    <label>رفع الشعار الجديد:</label>
+                    <input type="file" id="logoFile" accept="image/*" onchange="previewNewLogo(this)">
+                </div>
+
+                <div class="size-control">
+                    <label>تحكم في حجم الشعار: <b id="sizeVal">70</b>px</label>
+                    <input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)">
+                </div>
+
+                <div class="preview-box">
+                    <img id="currentLogoPreview" src="" style="width:70px; object-fit: contain;">
+                </div>
+                
+                <button class="btn btn-main" onclick="saveSettings()">حفظ التعديلات النهائية 🚀</button>
             </div>
         </div>
     </div>
@@ -122,7 +131,7 @@
 <script>
     const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     const MASTER_PASS = "Aztlg1512";
-    let cloudData = { clients: [], apps: [], logo: "" };
+    let cloudData = { clients: [], apps: [], logo: "", logoSize: "70" };
 
     function checkPass() {
         if(document.getElementById('passInput').value === MASTER_PASS) {
@@ -136,19 +145,49 @@
         const r = await fetch(DB);
         const d = await r.json();
         if (d) cloudData = d;
+        
+        // ضبط اللوقو والحجم في المعاينة عند التحميل
+        if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;
+        if(cloudData.logoSize) {
+            document.getElementById('logoSize').value = cloudData.logoSize;
+            updateLogoPreview(cloudData.logoSize);
+        }
+
         renderClients();
         renderApps();
     }
 
-    /* قسم المشتركين: الرقم ينبض والشريط ثابت */
+    /* وظائف الإعدادات */
+    function updateLogoPreview(val) {
+        document.getElementById('sizeVal').innerText = val;
+        document.getElementById('currentLogoPreview').style.width = val + "px";
+    }
+
+    function previewNewLogo(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result;
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    async function saveSettings() {
+        const size = document.getElementById('logoSize').value;
+        const logoSrc = document.getElementById('currentLogoPreview').src;
+        cloudData.logo = logoSrc;
+        cloudData.logoSize = size;
+        await sync();
+        alert("تم حفظ الشعار والحجم الجديد بنجاح! ✅");
+    }
+
+    /* المشتركين */
     function renderClients() {
         const grid = document.getElementById('clientGrid');
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
             const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
             return `<div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <b>${c.name}</b> 
-                    <span class="days-highlight">${days} يوم</span>
+                    <b>${c.name}</b> <span class="days-highlight">${days} يوم</span>
                 </div>
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
@@ -161,7 +200,7 @@
         }).join('');
     }
 
-    /* قسم المتجر: تطبيقات مربعة مع ترتيب وعرض */
+    /* المتجر */
     function renderApps() {
         const list = document.getElementById('appList');
         list.innerHTML = (cloudData.apps || []).map((a, i) => `
@@ -170,20 +209,18 @@
                 <img src="${a.img || ''}">
                 <div style="text-align:center; font-weight:bold; font-size:0.9rem;">${a.name}</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px;">
-                    <button class="btn btn-view" onclick="viewApp(${i})" title="عرض التفاصيل"><i class="fas fa-eye"></i></button>
-                    <button class="btn btn-edit" onclick="editApp(${i})" title="تعديل"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-del" onclick="delApp(${i})" title="حذف"><i class="fas fa-trash"></i></button>
+                    <button class="btn btn-view" onclick="viewApp(${i})"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-edit" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-del" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
         `).join('');
-        // تفعيل السحب والترتيب
         new Sortable(list, { animation: 150, handle: '.drag-handle' });
     }
 
-    /* وظائف المتجر */
     function viewApp(i) {
         const a = cloudData.apps[i];
-        alert(`تطبيق: ${a.name}\n\nكود دونلودر: ${a.ad || '-'}\nرابط التحميل: ${a.al || '-'}\nوصف: ${a.at || '-'}`);
+        alert(`تطبيق: ${a.name}\n\nكود: ${a.ad || '-'}\nرابط: ${a.al || '-'}\nوصف: ${a.at || '-'}`);
     }
 
     function editApp(i) {
@@ -221,10 +258,9 @@
         let newArr = [];
         items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
         cloudData.apps = newArr;
-        await sync(); alert("تم حفظ الترتيب الجديد بنجاح! ✅"); load();
+        await sync(); alert("تم حفظ الترتيب!"); load();
     }
 
-    /* وظائف المشتركين */
     async function saveClient() {
         const idx = document.getElementById('editClientIndex').value;
         const c = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };
@@ -248,22 +284,13 @@
         document.getElementById('cancelBtn').style.display = "none";
     }
 
-    /* وظائف الإعدادات والمزامنة */
-    async function saveLogo() {
-        const file = document.getElementById('logoFile').files[0];
-        if(!file) return;
-        const r = new FileReader();
-        r.onload = async () => { cloudData.logo = r.result; await sync(); alert("تم تحديث الشعار!"); };
-        r.readAsDataURL(file);
-    }
-
     function copyL(name) {
         const url = window.location.href.replace('index.html', 'user.html') + '?name=' + encodeURIComponent(name);
         navigator.clipboard.writeText(url); alert("تم نسخ رابط العميل!");
     }
 
-    async function delClient(i) { if(confirm("حذف المشترك؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
-    async function delApp(i) { if(confirm("حذف التطبيق؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
+    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
+    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
     function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
