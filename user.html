@@ -21,7 +21,7 @@
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
         .u-name-highlight { color: var(--main); font-weight: bold; font-size: 1.1rem; }
 
-        /* نبض قوي وإشعاع خفيف لرقم الأيام (742) */
+        /* نبض قوي وإشعاع خفيف لرقم الأيام العلوي فقط */
         @keyframes strongGlow {
             0% { transform: scale(1); text-shadow: 0 0 2px var(--danger); }
             50% { transform: scale(1.2); text-shadow: 0 0 10px var(--danger); }
@@ -36,10 +36,10 @@
             margin: 0 5px;
         }
 
-        /* نبض خفيف جداً وهادئ لأرقام العد التنازلي بالأسفل */
+        /* نبض خفيف جداً لأرقام العداد بالأسفل */
         @keyframes lightPulse {
             0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 0.9; }
         }
 
         .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
@@ -52,16 +52,17 @@
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
         .copy-btn { color: var(--main); cursor: pointer; padding: 5px; font-size: 1.1rem; }
 
-        /* تنسيق المربعات والنبض الخفيف للأرقام فقط */
+        /* العداد الخماسي */
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
         .t-box b { 
             display: block; 
             color: var(--danger); 
             font-size: 1.1rem; 
-            animation: lightPulse 2s infinite ease-in-out; /* نبض خفيف وهادئ */
+            animation: lightPulse 2s infinite ease-in-out; 
         }
-        .t-box span { font-size: 0.6rem; color: #aaa; }
+        /* رفع درجة لون العبارات (ثانية، دقيقة، إلخ) لتكون أوضح */
+        .t-box span { font-size: 0.6rem; color: #777; font-weight: 600; }
 
         .action-btns { padding: 15px 20px; }
         .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; }
