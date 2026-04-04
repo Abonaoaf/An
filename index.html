@@ -7,12 +7,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
-        :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; }
+        :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; transition: 0.5s; }
-        #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; }
-        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
+        /* حماية الدخول */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
+        #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        #loginOverlay button:hover { background: white; color: var(--link); }
 
         .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
         .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
@@ -23,85 +25,89 @@
         .section { display: none; }
         .section.active { display: block; }
 
+        /* كروت المشتركين */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
         
-        .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 12px 0; }
+        /* النبضة القوية لشريط التقدم */
+        @keyframes strongPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+        .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 12px 0; animation: strongPulse 1.2s infinite ease-in-out; }
         .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s; }
-
-        .days-badge { color: var(--d); font-weight: 900; font-size: 1.1rem; animation: pulse 1.5s infinite; display: inline-block; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
         .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
         input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
         
-        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; }
+        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; font-size: 0.8rem; }
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; }
 
-        /* ستايل قائمة التطبيقات القابلة للترتيب */
-        .app-item { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 18px; border: 1px solid #eee; margin-bottom: 12px; cursor: default; }
-        .app-item img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; }
-        .drag-handle { cursor: grab; color: #ccc; padding: 10px; font-size: 1.2rem; }
+        /* قائمة التطبيقات القابلة للترتيب */
+        .app-item { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 18px; border: 1px solid #eee; margin-bottom: 12px; }
+        .app-item img { width: 55px; height: 55px; border-radius: 15px; object-fit: cover; }
+        .drag-handle { cursor: grab; color: #ccc; padding: 10px; font-size: 1.3rem; }
         .drag-handle:active { cursor: grabbing; }
-        .sortable-ghost { opacity: 0.4; background: #ebf4ff; border: 2px dashed var(--link); }
+        .sortable-ghost { opacity: 0.3; background: #e2e8f0; }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
     <i class="fas fa-user-shield" style="font-size: 4rem; margin-bottom: 20px;"></i>
-    <h2>دخول الإدارة 🦅</h2>
-    <input type="password" id="passInput" placeholder="كلمة المرور">
-    <button onclick="checkPass()">دخول</button>
+    <h2>دخول إدارة فولتشر الآمن 🦅</h2>
+    <input type="password" id="passInput" placeholder="أدخل كلمة المرور">
+    <button onclick="checkPass()">فتح اللوحة</button>
 </div>
 
 <div id="adminApp" style="display:none;">
     <div class="header">
-        <b>إدارة فولتشر 🦅</b>
+        <b style="font-size: 1.2rem;">لوحة تحكم فولتشر 🦅</b>
         <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>
-            <button class="tab-btn" onclick="switchTab('store', this)">المتجر</button>
+            <button class="tab-btn active" onclick="switchTab('clients', this)"><i class="fas fa-users"></i> المشتركين</button>
+            <button class="tab-btn" onclick="switchTab('store', this)"><i class="fas fa-store"></i> المتجر</button>
         </div>
     </div>
 
     <div class="container">
         <div id="clients" class="section active">
             <div class="modal">
-                <h3 id="clientFormTitle">إضافة مشترك</h3>
+                <h3 id="clientFormTitle" style="margin-top:0;">إضافة مشترك جديد</h3>
                 <input type="hidden" id="editClientIndex">
                 <input type="text" id="cn" placeholder="اسم العميل">
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
                 <input type="text" id="cl" placeholder="رابط الدخول">
-                <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
-                <button class="btn btn-main" onclick="saveClient()">حفظ المشترك ☁️</button>
+                <div style="display:flex; gap:8px;">
+                    <input type="date" id="cs" title="تاريخ البداية">
+                    <input type="date" id="ce" title="تاريخ النهاية">
+                </div>
+                <button class="btn btn-main" onclick="saveClient()">حفظ البيانات في السحابة ☁️</button>
+                <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
             </div>
             <div class="grid" id="clientGrid"></div>
         </div>
 
         <div id="store" class="section">
             <div class="modal">
-                <h3 id="appFormTitle">+ إضافة تطبيق</h3>
+                <h3 id="appFormTitle" style="margin-top:0;">+ إضافة تطبيق للمتجر</h3>
                 <input type="hidden" id="editAppIndex">
                 <input type="file" id="appIcon" accept="image/*">
                 <input type="text" id="an" placeholder="اسم التطبيق">
                 <input type="text" id="ad" placeholder="كود دونلودر">
-                <input type="text" id="al" placeholder="رابط التحميل">
-                <textarea id="at" placeholder="الوصف"></textarea>
-                <button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ التطبيق ✨</button>
+                <input type="text" id="al" placeholder="رابط التحميل المباشر">
+                <textarea id="at" placeholder="وصف التطبيق"></textarea>
+                <button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>
             </div>
             
-            <div style="background:#fff3cd; padding:10px; border-radius:10px; margin-bottom:15px; font-size:0.8rem; border:1px solid #ffeeba;">
-                💡 <b>تلميح:</b> اسحب التطبيقات من النقاط <i class="fas fa-grip-lines"></i> لترتيبها، ثم اضغط حفظ الترتيب.
+            <div style="background:#e8f4fd; padding:12px; border-radius:15px; margin-bottom:15px; border:1px solid #bee3f8; font-size:0.85rem;">
+                💡 <b>ميزة الترتيب:</b> اسحب التطبيق من مقبض النقاط <i class="fas fa-grip-lines"></i> لتحريكه، ثم اضغط على زر الحفظ بالأسفل.
             </div>
-            
-            <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px;" onclick="saveNewOrder()">
-                <i class="fas fa-save"></i> حفظ الترتيب الجديد نهائياً
-            </button>
 
             <div id="appList"></div>
+
+            <button class="btn btn-main" style="background:#5e4cc1; position: sticky; bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);" onclick="saveNewOrder()">
+                <i class="fas fa-save"></i> حفظ الترتيب الجديد للمتجر
+            </button>
         </div>
     </div>
 </div>
@@ -116,7 +122,7 @@
             document.getElementById('loginOverlay').style.display = "none";
             document.getElementById('adminApp').style.display = "block";
             load();
-        } else { alert("خطأ!"); }
+        } else { alert("كلمة المرور غير صحيحة!"); }
     }
 
     async function load() {
@@ -132,10 +138,12 @@
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
             const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
             return `<div class="card">
-                <b>${c.name}</b> <span class="days-badge">${days} يوم</span>
+                <div style="display:flex; justify-content:space-between;"><b>${c.name}</b> <span style="color:var(--d); font-weight:bold;">${days} يوم</span></div>
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
+                    <button class="btn btn-link" onclick="copyClientLink('${c.name}')">رابط</button>
+                    <button class="btn btn-view" onclick="alert('مستخدم: ${c.cu}\\nكلمة سر: ${c.ck}')">بيانات</button>
                     <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
                 </div>
             </div>`;
@@ -147,44 +155,75 @@
         list.innerHTML = (cloudData.apps || []).map((a, i) => `
             <div class="app-item" data-id="${i}">
                 <div class="drag-handle"><i class="fas fa-grip-lines"></i></div>
-                <img src="${a.img || ''}">
+                <img src="${a.img || 'https://via.placeholder.com/50'}">
                 <div style="flex:1"><b>${a.name}</b></div>
-                <button class="btn btn-del" style="padding:5px 10px" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
+                <button class="btn btn-edit" style="width:auto; margin-left:5px;" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-del" style="width:auto;" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
             </div>
         `).join('');
 
-        // تفعيل خاصية السحب والترتيب
-        new Sortable(list, {
-            animation: 150,
-            handle: '.drag-handle',
-            ghostClass: 'sortable-ghost'
-        });
+        new Sortable(list, { animation: 150, handle: '.drag-handle', ghostClass: 'sortable-ghost' });
     }
 
-    // وظيفة حفظ الترتيب الجديد
     async function saveNewOrder() {
         const listItems = document.querySelectorAll('#appList .app-item');
-        let newAppsOrder = [];
+        let newOrder = [];
         listItems.forEach(item => {
-            const originalIndex = item.getAttribute('data-id');
-            newAppsOrder.push(cloudData.apps[originalIndex]);
+            const oldIdx = item.getAttribute('data-id');
+            newOrder.push(cloudData.apps[oldIdx]);
         });
-        cloudData.apps = newAppsOrder;
+        cloudData.apps = newOrder;
         await sync();
-        alert("تم حفظ ترتيب التطبيقات الجديد بنجاح! ✅");
+        alert("تم حفظ الترتيب الجديد بنجاح! ✅");
+        renderApps();
+    }
+
+    async function saveClient() {
+        const idx = document.getElementById('editClientIndex').value;
+        const c = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };
+        if(!cloudData.clients) cloudData.clients = [];
+        if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
+        await sync(); clearClientForm(); load();
     }
 
     async function saveApp() {
         const idx = document.getElementById('editAppIndex').value;
         const file = document.getElementById('appIcon').files[0];
-        const process = async (img) => {
-            const d = { name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img: img || (idx!==""?cloudData.apps[idx].img:"") };
+        const doSave = async (img) => {
+            const a = { name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img: img || (idx!==""?cloudData.apps[idx].img:"") };
             if(!cloudData.apps) cloudData.apps = [];
-            if(idx==="") cloudData.apps.push(d); else cloudData.apps[idx]=d;
-            await sync(); renderApps();
+            if(idx==="") cloudData.apps.push(a); else cloudData.apps[idx]=a;
+            await sync(); load();
             ['an','ad','al','at','editAppIndex'].forEach(id=>document.getElementById(id).value="");
         };
-        if(file) { const r=new FileReader(); r.onload=()=>process(r.result); r.readAsDataURL(file); } else process();
+        if(file) { const r=new FileReader(); r.onload=()=>doSave(r.result); r.readAsDataURL(file); } else doSave();
+    }
+
+    function editClient(i) {
+        const c = cloudData.clients[i]; document.getElementById('editClientIndex').value = i;
+        ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        document.getElementById('clientFormTitle').innerText = "تعديل بيانات: " + c.name;
+        document.getElementById('cancelBtn').style.display = "block";
+    }
+
+    function editApp(i) {
+        const a = cloudData.apps[i]; document.getElementById('editAppIndex').value = i;
+        ['an','ad','al','at'].forEach(id => document.getElementById(id).value = a[id] || "");
+        document.getElementById('appFormTitle').innerText = "تعديل: " + a.name;
+    }
+
+    async function delClient(i) { if(confirm("حذف العميل؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
+    async function delApp(i) { if(confirm("حذف التطبيق؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
+    
+    function copyClientLink(name) {
+        const url = window.location.href.replace('index.html', 'user.html') + '?name=' + encodeURIComponent(name);
+        navigator.clipboard.writeText(url); alert("تم نسخ رابط العميل بنجاح!");
+    }
+
+    function clearClientForm() {
+        ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value="");
+        document.getElementById('clientFormTitle').innerText = "إضافة مشترك جديد";
+        document.getElementById('cancelBtn').style.display = "none";
     }
 
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
@@ -192,11 +231,8 @@
     function switchTab(id, btn) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
+        document.getElementById(id).classList.add('active'); btn.classList.add('active');
     }
-    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); renderApps(); } }
-    load();
 </script>
 </body>
 </html>
