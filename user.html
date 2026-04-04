@@ -21,20 +21,14 @@
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
         .u-name-highlight { color: var(--main); font-weight: bold; font-size: 1.1rem; }
 
-        /* نبضة قوية جداً كما طلبت */
         @keyframes strongPulse { 
             0% { transform: scale(1); opacity: 1; } 
             50% { transform: scale(1.3); opacity: 0.8; color: #ff0000; } 
             100% { transform: scale(1); opacity: 1; } 
         }
         .days-pulse { 
-            display: inline-block; 
-            color: var(--danger); 
-            font-size: 1.4rem; 
-            font-weight: 900; 
-            animation: strongPulse 1s infinite ease-in-out; 
-            text-shadow: 0 0 8px rgba(220, 53, 69, 0.4);
-            margin: 0 5px;
+            display: inline-block; color: var(--danger); font-size: 1.4rem; font-weight: 900; 
+            animation: strongPulse 1s infinite ease-in-out; text-shadow: 0 0 8px rgba(220, 53, 69, 0.4); margin: 0 5px;
         }
 
         .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
@@ -42,7 +36,6 @@
         .progress-bar-container { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 20px; position: relative; }
         .progress-fill-consumed { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s linear; }
 
-        /* بيانات الاشتراك - جميع الحقول */
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         .data-label { font-size: 0.7rem; color: #888; }
@@ -94,8 +87,8 @@
 
     <div class="action-btns">
         <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
-        <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i>  قبل الحدث بالواتساب</a>
-        <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> هنا تطبيقاتك المفضلة </a>
+        <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة قبل الحدث بالواتساب</a>
+        <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
     </div>
 </div>
 
@@ -119,7 +112,6 @@
         try {
             const res = await fetch(DB_URL);
             const data = await res.json();
-            
             if(data.logo) document.getElementById('userLogo').src = data.logo;
 
             const user = (data.clients || []).find(u => u.name === targetName);
@@ -130,7 +122,6 @@
                     const now = new Date().getTime();
                     const end = new Date(user.ce).getTime();
                     const timeLeft = end - now;
-                    
                     const daysLeft = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
                     document.getElementById('daysCount').innerText = daysLeft;
 
@@ -143,22 +134,21 @@
                         const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
                         document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
                     } else {
-                        document.getElementById('timerGrid').innerHTML = "<b style='color:red; width:100%; text-align:center;'>انتهى الاشتراكك</b>";
+                        document.getElementById('timerGrid').innerHTML = "<b style='color:red; width:100%; text-align:center;'>انتهى الاشتراك</b>";
                     }
                 };
 
                 updateUI();
                 setInterval(updateUI, 1000);
 
-                // استعادة جميع الحقول السبعة (البداية، النهاية، الجوال، المستخدم، السر، الرابط)
+                // الترتيب المطلوب: الجوال، المستخدم، الرقم السري، الرابط، البداية، النهاية
                 const fields = [
-            
                     ['الجوال', user.cp || '--'],
                     ['اسم المستخدم', user.cu || '--'],
-                    ['كلمة السر', user.ck || '--']
-                    ['رابط الدخول', user.cl || '--']
-                    ['تاريخ بدايتك معنا', user.cs || '--'],
-                    ['تاريخ ناية اشتراكك', user.ce || '--'],
+                    ['الرقم السري', user.ck || '--'],
+                    ['رابط الدخول', user.cl || '--'],
+                    ['تاريخ البداية', user.cs || '--'],
+                    ['تاريخ النهاية', user.ce || '--']
                 ];
                 
                 document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
