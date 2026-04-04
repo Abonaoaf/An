@@ -12,8 +12,8 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
-        #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; }
-        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
+        #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
 
         .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
         .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
@@ -34,30 +34,20 @@
         .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
         
         .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
-        input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-family: inherit; }
+        input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
         
-        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; text-align: center; text-decoration: none; display: inline-block;}
+        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block;}
-        /* زر حفظ الصورة المميز */
-        .btn-save-img { background: #f59e0b; color: white; width: 100%; padding: 12px; font-size: 0.9rem; margin-top: 10px; display: block; border-radius: 12px; border: none; font-weight: bold; cursor: pointer;}
+        .btn-save-img { background: #f59e0b; color: white; width: 100%; padding: 12px; font-size: 0.9rem; margin-top: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer;}
 
-        /* --- نافذة عرض بيانات العميل (المودال) --- */
-        #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
-        /* الكتلة التي سيتم تصويرها */
-        .view-card-container { background: white; width: 90%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: slideUp 0.3s ease-out; position: relative; }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .view-header { background: var(--link); color: white; padding: 20px; text-align: center; position: relative; }
+        #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+        .view-card-container { background: white; width: 90%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; }
+        .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
         .view-body { padding: 20px; background: white; }
-        .view-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; display: flex; justify-content: space-between; align-items: flex-start; }
-        .view-row:last-child { border: none; }
-        .v-label { font-size: 0.75rem; color: var(--soft-red); font-weight: bold; text-align: right; }
-        .v-text { font-size: 0.9rem; color: #333; font-weight: bold; word-break: break-all; text-align: left; flex: 1; margin-right: 15px; font-family: 'Consolas', monospace; } /* خط مونو للبيانات */
-        .close-view { position: absolute; top: 15px; left: 15px; color: white; cursor: pointer; font-size: 1.2rem; z-index: 10; }
-        
-        /* العلامة المائية لفولتشر داخل الصورة */
-        .watermark { position: absolute; bottom: 10px; right: 10px; font-size: 0.6rem; color: #eee; font-weight: bold; }
+        .view-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; display: flex; justify-content: space-between; }
+        .v-label { font-size: 0.75rem; color: var(--soft-red); font-weight: bold; }
+        .v-text { font-size: 0.9rem; color: #333; font-weight: bold; text-align: left; flex: 1; margin-right: 15px; }
 
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; }
         .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
@@ -75,27 +65,23 @@
 
 <div id="viewModal">
     <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-        
         <div style="width: 90%; max-width: 400px; margin-bottom: 10px; display: flex; gap: 10px;">
-            <button class="btn btn-main" style="background:var(--d); margin:0;" onclick="closeView()"><i class="fas fa-times"></i> إغلاق</button>
-            <button id="saveImgBtn" class="btn-save-img" style="margin:0;" onclick="saveCardAsImage()"><i class="fas fa-file-download"></i> حفظ للأسوديو</button>
+            <button class="btn btn-main" style="background:var(--d); margin:0;" onclick="closeView()">إغلاق</button>
+            <button id="saveImgBtn" class="btn-save-img" style="margin:0;" onclick="saveCardAsImage()">حفظ للأسوديو</button>
         </div>
-
         <div class="view-card-container" id="captureTarget">
             <div class="view-header">
-                <h3 id="v_title" style="margin:0; font-size: 1.1rem;">بطاقة بيانات المشترك</h3>
-                <small style="opacity:0.8">فولتشر 🦅</small>
+                <h3 id="v_title" style="margin:0">بيانات المشترك</h3>
+                <small>فولتشر 🦅</small>
             </div>
-            <div class="view-body" id="v_content">
-                </div>
-            <div class="watermark">VULTURE 2026</div>
+            <div class="view-body" id="v_content"></div>
         </div>
     </div>
 </div>
 
 <div id="adminApp" style="display:none;">
     <div class="header">
-        <b style="font-size: 1.2rem;">لوحة تحكم فولتشر 🦅</b>
+        <b>لوحة تحكم فولتشر 🦅</b>
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>
             <button class="tab-btn" onclick="switchTab('store', this)">المتجر</button>
@@ -158,21 +144,28 @@
     const MASTER_PASS = "Aztlg1512";
     let cloudData = { clients: [], apps: [], logo: "", logoSize: "70" };
 
-    function checkPass() {
-        if(document.getElementById('passInput').value === MASTER_PASS) {
+    async function checkPass() {
+        const pass = document.getElementById('passInput').value;
+        if(pass === MASTER_PASS) {
             document.getElementById('loginOverlay').style.display = "none";
             document.getElementById('adminApp').style.display = "block";
-            load();
+            await load(); // تحميل البيانات بعد فتح اللوحة
         } else { alert("كلمة المرور غير صحيحة!"); }
     }
 
     async function load() {
-        const r = await fetch(DB);
-        const d = await r.json();
-        if (d) cloudData = d;
-        if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;
-        if(cloudData.logoSize) { document.getElementById('logoSize').value = cloudData.logoSize; updateLogoPreview(cloudData.logoSize); }
-        renderClients(); renderApps();
+        try {
+            const r = await fetch(DB);
+            const d = await r.json();
+            if (d) {
+                cloudData = d;
+                if(!cloudData.clients) cloudData.clients = [];
+                if(!cloudData.apps) cloudData.apps = [];
+                if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;
+                if(cloudData.logoSize) { document.getElementById('logoSize').value = cloudData.logoSize; updateLogoPreview(cloudData.logoSize); }
+                renderClients(); renderApps();
+            }
+        } catch(e) { console.log("بيانات السحابة فارغة حالياً."); }
     }
 
     function renderClients() {
@@ -194,112 +187,45 @@
         }).join('');
     }
 
-    /* وظائف نافذة عرض البيانات (المودال) */
     function openView(i) {
         const c = cloudData.clients[i];
         document.getElementById('v_title').innerText = c.name;
-        const fields = [
-            ['اسم المشترك', c.name],
-            ['رقم الجوال', c.cp],
-            ['اسم المستخدم', c.cu],
-            ['الرقم السري', c.ck],
-            ['تاريخ الانتهاء', c.ce]
-        ];
-        
-        document.getElementById('v_content').innerHTML = fields.map(f => `
-            <div class="view-row">
-                <div class="v-label">${f[0]}</div>
-                <div class="v-text">${f[1] || '--'}</div>
-            </div>
-        `).join('');
-        
+        const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['الرقم السري', c.ck],['تاريخ الانتهاء', c.ce]];
+        document.getElementById('v_content').innerHTML = fields.map(f => `<div class="view-row"><div class="v-label">${f[0]}</div><div class="v-text">${f[1] || '--'}</div></div>`).join('');
         document.getElementById('viewModal').style.display = 'flex';
     }
 
     function closeView() { document.getElementById('viewModal').style.display = 'none'; }
 
-    /* الوظيفة السحرية الجديدة: تحويل البطاقة لصورة وحفظها للأستوديو */
     function saveCardAsImage() {
         const target = document.getElementById('captureTarget');
-        const btn = document.getElementById('saveImgBtn');
-        const clientName = document.getElementById('v_title').innerText;
-
-        // تغيير نص الزر مؤقتاً
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحويل...';
-        btn.style.opacity = '0.7';
-        btn.disabled = true;
-
-        // استخدام مكتبة html2canvas لالتقاط الصورة
-        html2canvas(target, {
-            scale: 3, // جودة عالية جداً (3 أضعاف)
-            useCORS: true, // للسماح بتحميل الصور من روابط خارجية إذا وجدت
-            backgroundColor: "#ffffff", // خلفية بيضاء نقية
-            borderRadius: 25 // الحفاظ على الزوايا المنحنية
-        }).then(canvas => {
-            // تحويل الـ Canvas إلى رابط صورة PNG
-            const imageParams = canvas.toDataURL("image/png");
-            
-            // إنشاء عنصر تحميل وهمي
-            const createLink = document.createElement('a');
-            createLink.href = imageParams;
-            createLink.download = `Vulture_${clientName}.png`; // اسم الملف
-            
-            // محاكاة الضغط لتحميل الصورة
-            document.body.appendChild(createLink);
-            createLink.click();
-            document.body.removeChild(createLink);
-
-            // إعادة الزر لوضعه الطبيعي
-            btn.innerHTML = '<i class="fas fa-check"></i> تم الحفظ!';
-            btn.style.background = '#28a745';
-            
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-file-download"></i> حفظ للأسوديو';
-                btn.style.background = '#f59e0b';
-                btn.style.opacity = '1';
-                btn.disabled = false;
-            }, 2000);
-
-        }).catch(err => {
-            console.error("خطأ في التحويل:", err);
-            alert("فشل تحويل البطاقة لصورة. تأكد من تحديث المتصفح.");
-            btn.innerHTML = '<i class="fas fa-file-download"></i> حفظ للأسوديو';
-            btn.style.opacity = '1';
-            btn.disabled = false;
+        html2canvas(target, {scale: 3}).then(canvas => {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL("image/png");
+            link.download = `Vulture_Card.png`;
+            link.click();
         });
     }
 
-    /* باقي الوظائف السليمة (بدون أي أذى 🦅) */
     function copyL(name) {
-        let baseUrl = window.location.href.split('?')[0];
-        if (baseUrl.endsWith('index.html')) baseUrl = baseUrl.replace('index.html', 'user.html');
-        else if (baseUrl.endsWith('/')) baseUrl += 'user.html';
-        else baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/") + 1) + "user.html";
-        const finalUrl = baseUrl + '?name=' + encodeURIComponent(name);
-        navigator.clipboard.writeText(finalUrl); alert("تم نسخ رابط العميل!");
+        let baseUrl = window.location.href.split('?')[0].replace('index.html', 'user.html');
+        if (!baseUrl.includes('user.html')) baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/") + 1) + "user.html";
+        navigator.clipboard.writeText(baseUrl + '?name=' + encodeURIComponent(name));
+        alert("تم نسخ رابط العميل!");
     }
 
     async function saveClient() {
         const idx = document.getElementById('editClientIndex').value;
         const c = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };
-        if(!cloudData.clients) cloudData.clients = [];
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
         await sync(); clearClientForm(); load();
     }
 
+    function clearClientForm() { ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cancelBtn').style.display="none"; }
     function editClient(i) {
-        const c = cloudData.clients[i];
-        document.getElementById('editClientIndex').value = i;
+        const c = cloudData.clients[i]; document.getElementById('editClientIndex').value = i;
         ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
-        document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
-        document.getElementById('cancelBtn').style.display = "block";
-        window.scrollTo(0,0);
-    }
-
-    function clearClientForm() {
-        ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value="");
-        document.getElementById('clientTitle').innerText = "إضافة مشترك جديد";
-        document.getElementById('cancelBtn').style.display = "none";
+        document.getElementById('cancelBtn').style.display = "block"; window.scrollTo(0,0);
     }
 
     function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
@@ -314,12 +240,11 @@
                 <img src="${a.img || ''}">
                 <div style="text-align:center; font-weight:bold; font-size:0.9rem;">${a.name}</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px;">
-                    <button class="btn btn-view" onclick="alert('تطبيق: ${a.name}\\nكود: ${a.ad}\\nرابط: ${a.al}')"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-view" onclick="alert('كود: ${a.ad}')"><i class="fas fa-eye"></i></button>
                     <button class="btn btn-edit" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
                     <button class="btn btn-del" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
                 </div>
-            </div>
-        `).join('');
+            </div>`).join('');
         new Sortable(list, { animation: 150, handle: '.drag-handle' });
     }
 
@@ -328,15 +253,33 @@
         const file = document.getElementById('appIcon').files[0];
         const doSave = async (img) => {
             const a = { name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img: img || (idx!==""?cloudData.apps[idx].img:"") };
-            if(!cloudData.apps) cloudData.apps = [];
             if(idx==="") cloudData.apps.push(a); else cloudData.apps[idx]=a;
             await sync(); load(); clearAppForm();
         };
         if(file) { const r=new FileReader(); r.onload=()=>doSave(r.result); r.readAsDataURL(file); } else doSave();
     }
 
+    async function saveOrder() {
+        const items = document.querySelectorAll('#appList .app-card');
+        let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
+        cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); load();
+    }
+
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
     function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active'); btn.classList.add('active');
+    }
+    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
+    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
+    function clearAppForm() { ['an','ad','al','at','editAppIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cancelAppBtn').style.display="none"; }
+    function editApp(i) {
+        const a = cloudData.apps[i]; document.getElementById('editAppIndex').value = i;
+        ['an','ad','al','at'].forEach(id => document.getElementById(id).value = a[id] || "");
+        document.getElementById('cancelAppBtn').style.display = "block"; window.scrollTo(0,0);
+    }
+</script>
+</body>
+</html>
