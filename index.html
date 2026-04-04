@@ -42,12 +42,13 @@
         .btn-save-img { background: #f59e0b; color: white; width: 100%; padding: 12px; font-size: 0.9rem; margin-top: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer;}
 
         #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
-        .view-card-container { background: white; width: 90%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; }
+        .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; }
         .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
-        .view-body { padding: 20px; background: white; }
-        .view-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; display: flex; justify-content: space-between; }
-        .v-label { font-size: 0.75rem; color: var(--soft-red); font-weight: bold; }
-        .v-text { font-size: 0.9rem; color: #333; font-weight: bold; text-align: left; flex: 1; margin-right: 15px; }
+        .view-body { padding: 15px 20px; background: white; }
+        .view-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .view-row:last-child { border: none; }
+        .v-label { font-size: 0.7rem; color: var(--soft-red); font-weight: bold; min-width: 90px; text-align: right; }
+        .v-text { font-size: 0.85rem; color: #333; font-weight: bold; text-align: left; flex: 1; word-break: break-all; }
 
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; }
         .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
@@ -65,13 +66,13 @@
 
 <div id="viewModal">
     <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-        <div style="width: 90%; max-width: 400px; margin-bottom: 10px; display: flex; gap: 10px;">
+        <div style="width: 95%; max-width: 400px; margin-bottom: 10px; display: flex; gap: 10px;">
             <button class="btn btn-main" style="background:var(--d); margin:0;" onclick="closeView()">إغلاق</button>
             <button id="saveImgBtn" class="btn-save-img" style="margin:0;" onclick="saveCardAsImage()">حفظ للأسوديو</button>
         </div>
         <div class="view-card-container" id="captureTarget">
             <div class="view-header">
-                <h3 id="v_title" style="margin:0">بيانات المشترك</h3>
+                <h3 id="v_title" style="margin:0; font-size: 1.1rem;">بيانات المشترك</h3>
                 <small>فولتشر 🦅</small>
             </div>
             <div class="view-body" id="v_content"></div>
@@ -145,11 +146,10 @@
     let cloudData = { clients: [], apps: [], logo: "", logoSize: "70" };
 
     async function checkPass() {
-        const pass = document.getElementById('passInput').value;
-        if(pass === MASTER_PASS) {
+        if(document.getElementById('passInput').value === MASTER_PASS) {
             document.getElementById('loginOverlay').style.display = "none";
             document.getElementById('adminApp').style.display = "block";
-            await load(); // تحميل البيانات بعد فتح اللوحة
+            await load();
         } else { alert("كلمة المرور غير صحيحة!"); }
     }
 
@@ -165,7 +165,7 @@
                 if(cloudData.logoSize) { document.getElementById('logoSize').value = cloudData.logoSize; updateLogoPreview(cloudData.logoSize); }
                 renderClients(); renderApps();
             }
-        } catch(e) { console.log("بيانات السحابة فارغة حالياً."); }
+        } catch(e) { console.log("خطأ في التحميل."); }
     }
 
     function renderClients() {
@@ -187,11 +187,25 @@
         }).join('');
     }
 
+    /* تحديث وظيفة العرض لتشمل الحقول السبعة كاملة */
     function openView(i) {
         const c = cloudData.clients[i];
         document.getElementById('v_title').innerText = c.name;
-        const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['الرقم السري', c.ck],['تاريخ الانتهاء', c.ce]];
-        document.getElementById('v_content').innerHTML = fields.map(f => `<div class="view-row"><div class="v-label">${f[0]}</div><div class="v-text">${f[1] || '--'}</div></div>`).join('');
+        const fields = [
+            ['اسم المشترك', c.name],
+            ['رقم الجوال', c.cp],
+            ['اسم المستخدم', c.cu],
+            ['الرقم السري', c.ck],
+            ['رابط الدخول', c.cl],
+            ['تاريخ البداية', c.cs],
+            ['تاريخ الانتهاء', c.ce]
+        ];
+        document.getElementById('v_content').innerHTML = fields.map(f => `
+            <div class="view-row">
+                <div class="v-label">${f[0]}</div>
+                <div class="v-text">${f[1] || '--'}</div>
+            </div>
+        `).join('');
         document.getElementById('viewModal').style.display = 'flex';
     }
 
@@ -221,11 +235,11 @@
         await sync(); clearClientForm(); load();
     }
 
-    function clearClientForm() { ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cancelBtn').style.display="none"; }
+    function clearClientForm() { ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cancelBtn').style.display="none"; document.getElementById('clientTitle').innerText="إضافة مشترك جديد";}
     function editClient(i) {
         const c = cloudData.clients[i]; document.getElementById('editClientIndex').value = i;
         ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
-        document.getElementById('cancelBtn').style.display = "block"; window.scrollTo(0,0);
+        document.getElementById('cancelBtn').style.display = "block"; document.getElementById('clientTitle').innerText="تعديل بيانات: " + c.name; window.scrollTo(0,0);
     }
 
     function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
