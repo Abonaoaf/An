@@ -49,8 +49,8 @@
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         
-        /* رفع درجة لون عناوين الحقول (الجوال، المستخدم، إلخ) */
-        .data-label { font-size: 0.75rem; color: #555; font-weight: 600; margin-bottom: 2px; display: block; }
+        /* جعل عناوين الحقول أحمر فاتحاً وخفيفاً */
+        .data-label { font-size: 0.75rem; color: #ffcccc; font-weight: 600; margin-bottom: 2px; display: block; }
         
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
         .copy-btn { color: var(--main); cursor: pointer; padding: 5px; font-size: 1.1rem; }
@@ -64,10 +64,11 @@
             font-size: 1.1rem; 
             animation: lightPulse 2s infinite ease-in-out; 
         }
-        .t-box span { font-size: 0.6rem; color: #777; font-weight: 600; }
+        /* لون عبارات العداد أحمر فاتح */
+        .t-box span { font-size: 0.6rem; color: #ffcccc; font-weight: 600; }
 
         .action-btns { padding: 15px 20px; }
-        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; }
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; transition: 0.3s; }
         .btn-store { background: #5e4cc1; }
         .btn-support { background: var(--success); }
         .btn-wa-channel { background: var(--wa); }
