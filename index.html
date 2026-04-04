@@ -10,7 +10,7 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
         /* شاشة الحماية */
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; transition: 0.5s; }
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
         #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 10px; }
         #loginOverlay button { padding: 12px 30px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
 
@@ -26,7 +26,7 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
         
-        /* شريط التقدم: الأخضر خلفية والأحمر يزحف */
+        /* شريط التقدم المعتمد على الأيام المتبقية */
         .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 10px 0; position: relative; }
         .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s ease; border-radius: 0 10px 10px 0; }
 
@@ -117,7 +117,7 @@
 
     function checkPass() {
         if(document.getElementById('passInput').value === MASTER_PASS) {
-            document.getElementById('loginOverlay').style.top = "-100%";
+            document.getElementById('loginOverlay').style.display = "none";
             document.getElementById('adminApp').style.display = "block";
             load();
         } else { alert("كلمة المرور خاطئة!"); }
@@ -142,23 +142,24 @@
         const grid = document.getElementById('clientGrid');
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
             const now = new Date().getTime();
-            const st = new Date(c.cs).getTime();
             const en = new Date(c.ce).getTime();
             
-            // حسبة التآكل (المنقضي / الإجمالي)
-            const total = en - st;
-            const consumed = now - st;
-            let percentConsumed = Math.max(0, Math.min(100, (consumed / total) * 100));
+            // حساب الأيام المتبقية
+            const timeLeft = en - now;
+            const daysLeft = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
             
-            const daysLeft = Math.max(0, Math.ceil((en - now) / (1000 * 60 * 60 * 24)));
+            // الحسبة المطلوبة: إذا كان باقي سنة (365 يوم) الشريط أخضر كامل
+            // كلما قل عن 365، زاد اللون الأحمر
+            const maxComparisonDays = 365;
+            let redPercent = Math.max(0, Math.min(100, 100 - (daysLeft / maxComparisonDays * 100)));
             
             return `<div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <b>${c.name}</b>
                     <span class="days-badge">${daysLeft} يوم</span>
                 </div>
-                <div class="prog-mini">
-                    <div class="fill-red" style="width:${percentConsumed}%"></div>
+                <div class="prog-mini" style="background: var(--s);">
+                    <div class="fill-red" style="width:${redPercent}%"></div>
                 </div>
                 <div style="font-size:0.7rem; color:#666; margin-bottom:10px;">ينتهي في: ${c.ce}</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
