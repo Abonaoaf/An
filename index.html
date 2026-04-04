@@ -24,20 +24,24 @@
         .section.active { display: block; }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
         
+        /* شريط التقدم */
         .prog-mini { height: 10px; background: var(--s); border-radius: 5px; overflow: hidden; margin: 10px 0; position: relative; }
         .fill-red { height: 100%; background: var(--d); float: right; }
 
+        /* تأثير النبض للأيام في اللوحة */
+        @keyframes pulseAdmin { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .days-badge { color: var(--d); font-weight: 900; font-size: 1rem; animation: pulseAdmin 1.5s infinite ease-in-out; display: inline-block; }
+
         .modal { background: #fff; border-radius: 20px; padding: 20px; margin-bottom: 25px; border: 2px dashed #cbd5e0; }
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn { padding: 8px 10px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; font-size: 0.75rem; color: white; }
         
-        /* ألوان الأزرار الأربعة */
-        .btn-view { background: var(--view); } /* رمادي للعرض */
-        .btn-edit { background: var(--s); } /* أخضر للتعديل */
-        .btn-link { background: var(--link); } /* أزرق للرابط */
-        .btn-del { background: var(--d); } /* أحمر للحذف */
+        .btn { padding: 8px 10px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; font-size: 0.75rem; color: white; }
+        .btn-view { background: var(--view); }
+        .btn-edit { background: var(--s); }
+        .btn-link { background: var(--link); }
+        .btn-del { background: var(--d); }
         
         .btn-main { background: var(--link); width: 100%; padding: 12px; margin-top: 10px; font-size: 0.9rem; }
         .btn-cancel { background: #edf2f7; color: #4a5568; width: 100%; margin-top: 5px; border: 1px solid #cbd5e0; font-size: 0.9rem; }
@@ -140,8 +144,13 @@
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
             const now = new Date().getTime(), st = new Date(c.cs).getTime(), en = new Date(c.ce).getTime();
             const p = Math.max(0, Math.min(100, ((now - st) / (en - st)) * 100));
+            const daysLeft = Math.max(0, Math.ceil((en - now) / (1000 * 60 * 60 * 24)));
+            
             return `<div class="card">
-                <b>${c.name}</b>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <b>${c.name}</b>
+                    <span class="days-badge">${daysLeft} يوم</span>
+                </div>
                 <div class="prog-mini"><div class="fill-red" style="width:${p}%"></div></div>
                 <div style="font-size:0.7rem; color:#666; margin-bottom:10px;">النهاية: ${c.ce}</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
@@ -154,7 +163,6 @@
         }).join('');
     }
 
-    // وظيفة العرض الجديدة
     function viewClient(i) {
         const c = cloudData.clients[i];
         alert(`بيانات العميل: ${c.name}\n\nالجوال: ${c.cp}\nالمستخدم: ${c.cu}\nكلمة السر: ${c.ck}\nالبداية: ${c.cs}\nالنهاية: ${c.ce}\nالرابط: ${c.cl}`);
