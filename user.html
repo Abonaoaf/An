@@ -38,18 +38,19 @@
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         
-        /* عناوين الحقول: أحمر وردي هادئ */
+        /* عناوين الحقول وأيقونات النسخ بنفس درجة اللون */
         .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; margin-bottom: 2px; display: block; }
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
-        
-        /* أيقونة النسخ: تم توحيد اللون مع العناوين بناءً على طلبك */
-        .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; font-size: 1.1rem; transition: 0.2s; }
-        .copy-btn:active { transform: scale(0.8); opacity: 0.7; }
+        .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; font-size: 1.1rem; }
 
-        /* العداد الخماسي */
+        /* العداد الخماسي: توحيد لون الأرقام مع البقية */
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-        .t-box b { display: block; color: var(--danger); font-size: 1.1rem; animation: lightPulse 2s infinite ease-in-out; }
+        
+        /* الأرقام بنفس درجة f87171 بناءً على طلبك */
+        .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; animation: lightPulse 2s infinite ease-in-out; }
+        
+        /* الكلمات باللون الأسود كما اتفقنا */
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
         .action-btns { padding: 15px 20px; }
