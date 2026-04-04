@@ -26,11 +26,10 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
         
-        /* شريط التقدم */
-        .prog-mini { height: 10px; background: var(--s); border-radius: 5px; overflow: hidden; margin: 10px 0; position: relative; }
-        .fill-red { height: 100%; background: var(--d); float: right; }
+        /* شريط التقدم الأكول */
+        .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 10px 0; position: relative; }
+        .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s ease; border-radius: 0 10px 10px 0; }
 
-        /* تأثير النبض للأيام في اللوحة */
         @keyframes pulseAdmin { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         .days-badge { color: var(--d); font-weight: 900; font-size: 1rem; animation: pulseAdmin 1.5s infinite ease-in-out; display: inline-block; }
 
@@ -142,17 +141,26 @@
     function renderClients() {
         const grid = document.getElementById('clientGrid');
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
-            const now = new Date().getTime(), st = new Date(c.cs).getTime(), en = new Date(c.ce).getTime();
-            const p = Math.max(0, Math.min(100, ((now - st) / (en - st)) * 100));
-            const daysLeft = Math.max(0, Math.ceil((en - now) / (1000 * 60 * 60 * 24)));
+            const now = new Date().getTime();
+            const en = new Date(c.ce).getTime();
+            const st = new Date(c.cs).getTime();
+            
+            const totalDuration = en - st;
+            const timeLeft = en - now;
+            
+            // نسبة الأيام المتبقية (أخضر) والمنقضية (أحمر)
+            let percentConsumed = Math.max(0, Math.min(100, ((now - st) / totalDuration) * 100));
+            const daysLeft = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
             
             return `<div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <b>${c.name}</b>
                     <span class="days-badge">${daysLeft} يوم</span>
                 </div>
-                <div class="prog-mini"><div class="fill-red" style="width:${p}%"></div></div>
-                <div style="font-size:0.7rem; color:#666; margin-bottom:10px;">النهاية: ${c.ce}</div>
+                <div class="prog-mini">
+                    <div class="fill-red" style="width:${percentConsumed}%"></div>
+                </div>
+                <div style="font-size:0.7rem; color:#666; margin-bottom:10px;">ينتهي في: ${c.ce}</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
                     <button class="btn btn-view" onclick="viewClient(${i})"><i class="fas fa-eye"></i> عرض</button>
                     <button class="btn btn-edit" onclick="editClient(${i})"><i class="fas fa-edit"></i> تعديل</button>
