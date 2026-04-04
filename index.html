@@ -33,6 +33,10 @@
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
         .btn { padding: 10px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; }
         .btn-main { background: var(--link); color: white; width: 100%; margin-top: 10px; }
+        
+        /* زر الإلغاء الجديد */
+        .btn-cancel { background: #edf2f7; color: #4a5568; width: 100%; margin-top: 5px; border: 1px solid #cbd5e0; }
+        
         .btn-del { background: #fff5f5; color: var(--d); border: 1px solid #fed7d7; }
         .btn-edit { background: #f0fff4; color: var(--s); border: 1px solid #c6f6d5; }
 
@@ -71,6 +75,7 @@
                 <input type="text" id="cl" placeholder="رابط الدخول">
                 <div style="display:flex; gap:5px;"><input type="date" id="cs" title="البداية"><input type="date" id="ce" title="النهاية"></div>
                 <button class="btn btn-main" onclick="saveClient()">حفظ في السحابة</button>
+                <button id="cancelBtn" class="btn btn-cancel" style="display:none;" onclick="clearF('client')">إلغاء التعديل والرجوع</button>
             </div>
             <div class="grid" id="clientGrid"></div>
         </div>
@@ -85,6 +90,7 @@
                 <input type="text" id="al" placeholder="رابط التحميل المباشر">
                 <textarea id="at" placeholder="وصف التطبيق"></textarea>
                 <button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر</button>
+                <button id="cancelAppBtn" class="btn btn-cancel" style="display:none;" onclick="clearF('app')">إلغاء والرجوع</button>
             </div>
             <div id="appList"></div>
         </div>
@@ -189,18 +195,33 @@
         const c = cloudData.clients[i]; document.getElementById('editClientIndex').value = i;
         ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
         document.getElementById('clientFormTitle').innerText = "تعديل: " + c.name;
+        document.getElementById('cancelBtn').style.display = "block"; // إظهار زر الإلغاء
+        window.scrollTo(0,0);
     }
 
     function editApp(i) {
         const a = cloudData.apps[i]; document.getElementById('editAppIndex').value = i;
         ['an','ad','al','at'].forEach(id => document.getElementById(id).value = a[id] || "");
         document.getElementById('appFormTitle').innerText = "تعديل تطبيق: " + a.name;
+        document.getElementById('cancelAppBtn').style.display = "block"; // إظهار زر الإلغاء
+        window.scrollTo(0,0);
     }
 
     async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); } }
     async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); } }
     function v(id) { return document.getElementById(id).value; }
-    function clearF(t) { if(t==='client') { ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('clientFormTitle').innerText="إضافة مشترك جديد"; } else { ['an','ad','al','at','editAppIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('appFormTitle').innerText="+ إضافة تطبيق جديد"; } }
+    
+    function clearF(t) { 
+        if(t==='client') { 
+            ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); 
+            document.getElementById('clientFormTitle').innerText="إضافة مشترك جديد";
+            document.getElementById('cancelBtn').style.display = "none"; // إخفاء الزر بعد المسح
+        } else { 
+            ['an','ad','al','at','editAppIndex'].forEach(id=>document.getElementById(id).value=""); 
+            document.getElementById('appFormTitle').innerText="+ إضافة تطبيق جديد"; 
+            document.getElementById('cancelAppBtn').style.display = "none";
+        } 
+    }
     
     function saveLogo() {
         const file = document.getElementById('logoFile').files[0];
