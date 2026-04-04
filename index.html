@@ -2,240 +2,113 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم فولتشر الشاملة 🦅</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>لوحة تحكم فولتشر 🦅</title>
     <style>
-        :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #3182ce; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
-        
-        /* الهيدر والتبويبات */
-        .header { background: white; padding: 10px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
-        .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
-        .tab-btn { padding: 10px 15px; border-radius: 12px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
-        .tab-btn.active { background: var(--link); color: white; border-color: var(--link); }
-
-        .container { padding: 20px; max-width: 1200px; margin: auto; }
-        .section { display: none; animation: fadeIn 0.3s; }
-        .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* الكروت والشبكة */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        
-        .prog-mini { height: 10px; background: var(--s); border-radius: 5px; overflow: hidden; margin: 10px 0; position: relative; }
-        .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s; }
-
-        .modal { background: #fff; border-radius: 20px; padding: 20px; margin-bottom: 25px; border: 2px dashed #cbd5e0; }
-        input, textarea { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn { padding: 10px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; }
-        .btn-main { background: var(--link); color: white; width: 100%; margin-top: 10px; }
-        .btn-del { background: #fff5f5; color: var(--d); border: 1px solid #fed7d7; }
-        .btn-edit { background: #f0fff4; color: var(--s); border: 1px solid #c6f6d5; }
-
-        /* تنسيق المتجر */
-        .app-item { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 15px; border: 1px solid #eee; margin-bottom: 10px; }
-        .app-item img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; border: 1px solid #f0f0f0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; padding: 20px; text-align: center; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        input, button { padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #ddd; width: 80%; }
+        button { background: #4a4ae2; color: white; cursor: pointer; font-weight: bold; width: auto; padding: 10px 30px; }
+        .client-card { border: 1px solid #eee; padding: 15px; margin: 10px 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; background: #fff; }
+        .btn-del { background: #dc3545; }
+        .btn-copy { background: #28a745; }
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #4a4ae2; display: flex; justify-content: center; align-items: center; z-index: 1000; flex-direction: column; color: white; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div style="font-weight:bold; color:var(--p);">إدارة فولتشر الشاملة 🦅</div>
-    <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('clients', this)"><i class="fas fa-users"></i> المشتركين</button>
-        <button class="tab-btn" onclick="switchTab('store', this)"><i class="fas fa-store"></i> المتجر</button>
-        <button class="tab-btn" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> الإعدادات</button>
-    </div>
+<div id="loginOverlay">
+    <h2>🦅 لوحة تحكم فولتشر</h2>
+    <input type="password" id="passInput" placeholder="أدخل كلمة المرور للدخول">
+    <button onclick="checkPass()">دخول</button>
 </div>
 
-<div class="container">
-    
-    <div id="clients" class="section active">
-        <div class="modal">
-            <h3 id="clientFormTitle">إضافة مشترك جديد</h3>
-            <input type="hidden" id="editClientIndex">
-            <input type="text" id="cn" placeholder="اسم العميل">
-            <input type="text" id="cp" placeholder="رقم الجوال">
-            <input type="text" id="cu" placeholder="اسم المستخدم">
-            <input type="text" id="ck" placeholder="الرقم السري">
-            <input type="text" id="cl" placeholder="رابط الدخول">
-            <div style="display:flex; gap:5px;"><input type="date" id="cs" title="البداية"><input type="date" id="ce" title="النهاية"></div>
-            <button class="btn btn-main" onclick="saveClient()">حفظ في السحابة</button>
-        </div>
-        <div class="grid" id="clientGrid"></div>
-    </div>
+<div class="container" id="mainContent" style="display:none;">
+    <h2>إضافة مشترك جديد</h2>
+    <input type="text" id="n" placeholder="اسم العميل (بالضبط كما في الرابط)">
+    <input type="date" id="cs" title="تاريخ البداية">
+    <input type="date" id="ce" title="تاريخ النهاية">
+    <input type="text" id="cp" placeholder="رقم الجوال">
+    <input type="text" id="cu" placeholder="اسم المستخدم">
+    <input type="text" id="ck" placeholder="كلمة السر">
+    <input type="text" id="cl" placeholder="رابط الدخول">
+    <button onclick="add()">إضافة العميل</button>
 
-    <div id="store" class="section">
-        <div class="modal">
-            <h3 id="appFormTitle">+ إضافة تطبيق جديد</h3>
-            <input type="hidden" id="editAppIndex">
-            <div style="font-size:0.8rem; color:var(--link); margin-bottom:5px;">اختر أيقونة التطبيق:</div>
-            <input type="file" id="appIcon" accept="image/*">
-            <input type="text" id="an" placeholder="اسم التطبيق">
-            <input type="text" id="ad" placeholder="كود دونلودر">
-            <input type="text" id="al" placeholder="رابط التحميل المباشر">
-            <textarea id="at" placeholder="وصف قصير للتطبيق"></textarea>
-            <button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ التطبيق في المتجر</button>
-        </div>
-        <div id="appList"></div>
-    </div>
-
-    <div id="settings" class="section">
-        <div class="card" style="text-align:center;">
-            <h3>لوقو المنصة الرئيسي</h3>
-            <input type="file" id="logoFile" accept="image/*">
-            <button class="btn btn-main" onclick="saveLogo()">تحديث لوقو السحابة</button>
-        </div>
-    </div>
+    <hr>
+    <h3>المشتركون الحاليون</h3>
+    <div id="list"></div>
 </div>
 
 <script>
-    const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
-    let cloudData = { clients: [], apps: [], logo: "" };
+    const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    const MASTER_PASS = "Aztlg1512"; // كلمة المرور الخاصة بك
 
-    async function load() {
-        const r = await fetch(DB);
-        const d = await r.json();
-        if (d) cloudData = d;
-        renderClients();
-        renderApps();
-    }
-
-    function switchTab(id, btn) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
-    }
-
-    // --- إدارة العملاء ---
-    function renderClients() {
-        const grid = document.getElementById('clientGrid');
-        grid.innerHTML = (cloudData.clients || []).map((c, i) => {
-            const p = calcProg(c.cs, c.ce);
-            return `<div class="card">
-                <b class="u-name">${c.name}</b>
-                <div class="prog-mini"><div class="fill-red" style="width:${p}%"></div></div>
-                <div style="font-size:0.75rem; margin-bottom:8px;">ينتهي: ${c.ce}</div>
-                <div style="display:flex; gap:4px;">
-                    <button class="btn btn-edit" style="flex:1" onclick="editClient(${i})">تعديل</button>
-                    <button class="btn btn-main" style="flex:1; margin:0;" onclick="copyL('${c.name}')">الرابط</button>
-                    <button class="btn btn-del" onclick="delClient(${i})"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>`;
-        }).join('');
-    }
-
-    async function saveClient() {
-        const idx = document.getElementById('editClientIndex').value;
-        const data = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };
-        if(!cloudData.clients) cloudData.clients = [];
-        if(idx === "") cloudData.clients.push(data); else cloudData.clients[idx] = data;
-        await sync();
-        clearClientForm();
-    }
-
-    // --- إدارة المتجر (التعديل الجديد) ---
-    function renderApps() {
-        const list = document.getElementById('appList');
-        list.innerHTML = (cloudData.apps || []).map((a, i) => `
-            <div class="app-item">
-                <img src="${a.img || ''}">
-                <div style="flex:1; text-align:right;">
-                    <b style="color:var(--link)">${a.name}</b><br><small>كود: ${a.ad}</small>
-                </div>
-                <div style="display:flex; gap:5px;">
-                    <button class="btn btn-edit" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-del" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function editApp(i) {
-        const a = cloudData.apps[i];
-        document.getElementById('editAppIndex').value = i;
-        document.getElementById('an').value = a.name;
-        document.getElementById('ad').value = a.ad;
-        document.getElementById('al').value = a.al;
-        document.getElementById('at').value = a.at;
-        document.getElementById('appFormTitle').innerText = "تعديل تطبيق: " + a.name;
-        window.scrollTo(0,0);
-    }
-
-    async function saveApp() {
-        const idx = document.getElementById('editAppIndex').value;
-        const file = document.getElementById('appIcon').files[0];
-        
-        const processSave = async (imgData) => {
-            const data = { name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img: imgData || (idx !== "" ? cloudData.apps[idx].img : "") };
-            if(!cloudData.apps) cloudData.apps = [];
-            if(idx === "") cloudData.apps.push(data); else cloudData.apps[idx] = data;
-            await sync();
-            clearAppForm();
-            alert("تم حفظ التطبيق بنجاح!");
-        };
-
-        if(file) {
-            const reader = new FileReader();
-            reader.onloadend = () => processSave(reader.result);
-            reader.readAsDataURL(file);
+    function checkPass() {
+        const input = document.getElementById('passInput').value;
+        if (input === MASTER_PASS) {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            load();
         } else {
-            processSave();
+            alert("كلمة المرور خاطئة!");
         }
     }
 
-    // --- وظائف عامة ---
-    async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); load(); }
-    
-    function saveLogo() {
-        const file = document.getElementById('logoFile').files[0];
-        const reader = new FileReader();
-        reader.onloadend = async () => { cloudData.logo = reader.result; await sync(); alert("تم تحديث اللوقو!"); };
-        if(file) reader.readAsDataURL(file);
+    async function load() {
+        try {
+            const res = await fetch(DB_URL);
+            const data = await res.json();
+            const listDiv = document.getElementById('list');
+            listDiv.innerHTML = '';
+            (data.clients || []).forEach((c, i) => {
+                listDiv.innerHTML += `
+                    <div class="client-card">
+                        <div>
+                            <b>${c.name}</b> - ينتهي في: ${c.ce}
+                        </div>
+                        <div>
+                            <button class="btn-copy" onclick="copyLink('${c.name}')">نسخ الرابط</button>
+                            <button class="btn-del" onclick="del(${i})">حذف</button>
+                        </div>
+                    </div>`;
+            });
+        } catch (e) { console.error("Error loading"); }
     }
 
-    function calcProg(s, e) {
-        const n = new Date().getTime(), st = new Date(s).getTime(), en = new Date(e).getTime();
-        return Math.max(0, Math.min(100, ((n - st) / (en - st)) * 100));
+    async function add() {
+        const newUser = {
+            name: document.getElementById('n').value,
+            cs: document.getElementById('cs').value,
+            ce: document.getElementById('ce').value,
+            cp: document.getElementById('cp').value,
+            cu: document.getElementById('cu').value,
+            ck: document.getElementById('ck').value,
+            cl: document.getElementById('cl').value
+        };
+        
+        const res = await fetch(DB_URL);
+        const data = await res.json() || { clients: [] };
+        data.clients = data.clients || [];
+        data.clients.push(newUser);
+
+        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(data) });
+        alert("تمت الإضافة!");
+        load();
     }
 
-    function copyL(name) {
-        const link = window.location.href.replace('index.html','') + 'user.html?name=' + encodeURIComponent(name);
-        navigator.clipboard.writeText(link); alert("تم نسخ رابط العميل!");
+    async function del(index) {
+        if(!confirm("هل أنت متأكد من الحذف؟")) return;
+        const res = await fetch(DB_URL);
+        const data = await res.json();
+        data.clients.splice(index, 1);
+        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(data) });
+        load();
     }
 
-    async function delClient(i) { if(confirm("حذف العميل؟")) { cloudData.clients.splice(i,1); await sync(); } }
-    async function delApp(i) { if(confirm("حذف التطبيق؟")) { cloudData.apps.splice(i,1); await sync(); } }
-    
-    function editClient(i) {
-        const c = cloudData.clients[i];
-        document.getElementById('editClientIndex').value = i;
-        document.getElementById('cn').value = c.name; document.getElementById('cp').value = c.cp;
-        document.getElementById('cu').value = c.cu; document.getElementById('ck').value = c.ck;
-        document.getElementById('cl').value = c.cl; document.getElementById('cs').value = c.cs;
-        document.getElementById('ce').value = c.ce;
-        document.getElementById('clientFormTitle').innerText = "تعديل: " + c.name;
-        window.scrollTo(0,0);
+    function copyLink(name) {
+        const link = `https://${window.location.hostname}/user.html?name=${encodeURIComponent(name)}`;
+        navigator.clipboard.writeText(link);
+        alert("تم نسخ رابط العميل!");
     }
-
-    function clearClientForm() {
-        document.getElementById('editClientIndex').value = "";
-        ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = "");
-        document.getElementById('clientFormTitle').innerText = "إضافة مشترك جديد";
-    }
-
-    function clearAppForm() {
-        document.getElementById('editAppIndex').value = "";
-        ['an','ad','al','at'].forEach(id => document.getElementById(id).value = "");
-        document.getElementById('appIcon').value = "";
-        document.getElementById('appFormTitle').innerText = "+ إضافة تطبيق جديد";
-    }
-
-    function v(id) { return document.getElementById(id).value; }
-    load();
 </script>
 </body>
 </html>
