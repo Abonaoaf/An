@@ -21,26 +21,14 @@
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
         .u-name-highlight { color: var(--main); font-weight: bold; font-size: 1.1rem; }
 
-        /* نبض قوي وإشعاع خفيف لرقم الأيام العلوي فقط */
         @keyframes strongGlow {
             0% { transform: scale(1); text-shadow: 0 0 2px var(--danger); }
             50% { transform: scale(1.2); text-shadow: 0 0 10px var(--danger); }
             100% { transform: scale(1); text-shadow: 0 0 2px var(--danger); }
         }
-        .days-glow { 
-            display: inline-block; 
-            color: var(--danger); 
-            font-weight: 900; 
-            font-size: 1.3rem; 
-            animation: strongGlow 1.2s infinite ease-in-out; 
-            margin: 0 5px;
-        }
+        .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.3rem; animation: strongGlow 1.2s infinite ease-in-out; margin: 0 5px; }
 
-        /* نبض خفيف جداً لأرقام العداد بالأسفل */
-        @keyframes lightPulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.9; }
-        }
+        @keyframes lightPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.9; } }
 
         .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
         .prog-static { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 20px; position: relative; }
@@ -49,26 +37,21 @@
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         
-        /* جعل عناوين الحقول أحمر فاتحاً وخفيفاً */
-        .data-label { font-size: 0.75rem; color: #ffcccc; font-weight: 600; margin-bottom: 2px; display: block; }
+        /* تغميق اللون "تكة" واحدة ليصبح أحمر وردي واضح (Rose Red) */
+        .data-label { font-size: 0.75rem; color: #f87171; font-weight: 600; margin-bottom: 2px; display: block; }
         
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
         .copy-btn { color: var(--main); cursor: pointer; padding: 5px; font-size: 1.1rem; }
 
-        /* العداد الخماسي */
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-        .t-box b { 
-            display: block; 
-            color: var(--danger); 
-            font-size: 1.1rem; 
-            animation: lightPulse 2s infinite ease-in-out; 
-        }
-        /* لون عبارات العداد أحمر فاتح */
-        .t-box span { font-size: 0.6rem; color: #ffcccc; font-weight: 600; }
+        .t-box b { display: block; color: var(--danger); font-size: 1.1rem; animation: lightPulse 2s infinite ease-in-out; }
+        
+        /* نفس درجة اللون للعداد بالأسفل */
+        .t-box span { font-size: 0.6rem; color: #f87171; font-weight: 600; }
 
         .action-btns { padding: 15px 20px; }
-        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; transition: 0.3s; }
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; }
         .btn-store { background: #5e4cc1; }
         .btn-support { background: var(--success); }
         .btn-wa-channel { background: var(--wa); }
@@ -117,12 +100,10 @@
         const urlParams = new URLSearchParams(window.location.search);
         const targetName = urlParams.get('name');
         if(!targetName) return;
-
         try {
             const res = await fetch(DB_URL);
             const data = await res.json();
             if(data.logo) document.getElementById('userLogo').src = data.logo;
-
             const user = (data.clients || []).find(u => u.name === targetName);
             if(user) {
                 document.getElementById('userName').innerText = user.name;
@@ -133,7 +114,6 @@
                     const maxDays = 365;
                     let redPercent = Math.max(0, Math.min(100, 100 - (daysLeft / maxDays * 100)));
                     document.getElementById('barConsumed').style.width = redPercent + "%";
-                    
                     if(timeLeft > 0) {
                         const s=Math.floor(timeLeft/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
                         const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
