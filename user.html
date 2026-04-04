@@ -26,7 +26,7 @@
         /* تأثير النبض للعبارة */
         @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.7; }
+            50% { transform: scale(1.03); opacity: 0.8; }
             100% { transform: scale(1); opacity: 1; }
         }
         .status-pulse { 
@@ -36,6 +36,8 @@
             font-size: 0.85rem;
             animation: pulse 2s infinite ease-in-out; 
         }
+        /* رقم الأيام المتبقية باللون الأحمر */
+        .days-left { color: var(--danger); font-size: 1rem; margin-right: 5px; font-weight: 900; }
 
         .status-container { padding: 0 20px; text-align: right; }
         .progress-bar-container { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 0; position: relative; }
@@ -75,7 +77,7 @@
     </div>
 
     <div class="status-container">
-        <span class="status-pulse">✅ اشتراك ساري ومفعل</span>
+        <span class="status-pulse">✅ ساري ومفعل | باقي <span id="daysCount" class="days-left">0</span> يوم</span>
         <div class="progress-bar-container"><div id="barConsumed" class="progress-fill-consumed"></div></div>
     </div>
 
@@ -100,11 +102,11 @@
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     const d = new Date();
-    const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-    const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-    document.getElementById('dayName').innerText = days[d.getDay()];
+    const daysArr = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    const monthsArr = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    document.getElementById('dayName').innerText = daysArr[d.getDay()];
     document.getElementById('dayNum').innerText = d.getDate();
-    document.getElementById('monthName').innerText = months[d.getMonth()];
+    document.getElementById('monthName').innerText = monthsArr[d.getMonth()];
 
     async function load() {
         const name = new URLSearchParams(window.location.search).get('name');
@@ -124,14 +126,26 @@
                 document.getElementById('vLink').innerText = user.cl;
                 
                 const up = () => {
-                    const n = new Date().getTime(), st = new Date(user.cs).getTime(), en = new Date(user.ce).getTime();
-                    const r = en - n, tot = en - st;
-                    let cp = Math.max(0, Math.min(100, ((n - st) / tot) * 100));
-                    document.getElementById('barConsumed').style.width = cp + "%";
+                    const now = new Date().getTime(), st = new Date(user.cs).getTime(), en = new Date(user.ce).getTime();
+                    const diff = en - now, total = en - st;
                     
-                    const sec=Math.floor(r/1000), min=Math.floor(sec/60), hr=Math.floor(min/60), day=Math.floor(hr/24);
-                    const units = [['ثانية', sec%60], ['دقيقة', min%60], ['ساعة', hr%24], ['يوم', day%30], ['شهر', Math.floor(day/30)]];
-                    document.getElementById('timerGrid').innerHTML = r > 0 ? units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('') : "<b style='grid-column:span 5; color:red'>منتهي</b>";
+                    // حساب النسبة المئوية لشريط التقدم
+                    let consumedPercent = Math.max(0, Math.min(100, ((now - st) / total) * 100));
+                    document.getElementById('barConsumed').style.width = consumedPercent + "%";
+                    
+                    // حساب الأيام المتبقية للعرض بجانب العبارة
+                    const daysLeft = Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+                    document.getElementById('daysCount').innerText = daysLeft;
+
+                    if(diff <= 0) {
+                        document.querySelector('.status-pulse').innerHTML = "❌ الاشتراك منتهي";
+                        document.querySelector('.status-pulse').style.color = "red";
+                    }
+                    
+                    // تحديث مربعات الوقت التفصيلية
+                    const sec=Math.floor(diff/1000), min=Math.floor(sec/60), hr=Math.floor(min/60), dLeft=Math.floor(hr/24);
+                    const units = [['ثانية', sec%60], ['دقيقة', min%60], ['ساعة', hr%24], ['يوم', dLeft%30], ['شهر', Math.floor(dLeft/30)]];
+                    document.getElementById('timerGrid').innerHTML = diff > 0 ? units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('') : "";
                 };
                 up(); setInterval(up, 1000);
             }
