@@ -6,13 +6,14 @@
     <title>لوحة تحكم فولتشر الشاملة 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
         #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; }
-        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
 
         .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
         .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
@@ -35,21 +36,28 @@
         .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
         input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-family: inherit; }
         
-        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
+        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; text-align: center; text-decoration: none; display: inline-block;}
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
-        .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; }
+        .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block;}
+        /* زر حفظ الصورة المميز */
+        .btn-save-img { background: #f59e0b; color: white; width: 100%; padding: 12px; font-size: 0.9rem; margin-top: 10px; display: block; border-radius: 12px; border: none; font-weight: bold; cursor: pointer;}
 
-        /* --- نافذة عرض بيانات العميل المطورة --- */
-        #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
-        .view-card { background: white; width: 90%; max-width: 450px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: slideUp 0.3s ease-out; }
+        /* --- نافذة عرض بيانات العميل (المودال) --- */
+        #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
+        /* الكتلة التي سيتم تصويرها */
+        .view-card-container { background: white; width: 90%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: slideUp 0.3s ease-out; position: relative; }
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
         .view-header { background: var(--link); color: white; padding: 20px; text-align: center; position: relative; }
-        .view-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
-        .view-row { border-bottom: 1px solid #f0f0f0; padding: 12px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+        .view-body { padding: 20px; background: white; }
+        .view-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; display: flex; justify-content: space-between; align-items: flex-start; }
         .view-row:last-child { border: none; }
-        .v-label { font-size: 0.75rem; color: var(--soft-red); font-weight: bold; }
-        .v-text { font-size: 0.9rem; color: #333; font-weight: bold; word-break: break-all; text-align: left; flex: 1; margin-right: 15px; }
-        .close-view { position: absolute; top: 15px; left: 15px; color: white; cursor: pointer; font-size: 1.2rem; }
+        .v-label { font-size: 0.75rem; color: var(--soft-red); font-weight: bold; text-align: right; }
+        .v-text { font-size: 0.9rem; color: #333; font-weight: bold; word-break: break-all; text-align: left; flex: 1; margin-right: 15px; font-family: 'Consolas', monospace; } /* خط مونو للبيانات */
+        .close-view { position: absolute; top: 15px; left: 15px; color: white; cursor: pointer; font-size: 1.2rem; z-index: 10; }
+        
+        /* العلامة المائية لفولتشر داخل الصورة */
+        .watermark { position: absolute; bottom: 10px; right: 10px; font-size: 0.6rem; color: #eee; font-weight: bold; }
 
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; }
         .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
@@ -66,22 +74,28 @@
 </div>
 
 <div id="viewModal">
-    <div class="view-card">
-        <div class="view-header">
-            <i class="fas fa-times close-view" onclick="closeView()"></i>
-            <h3 id="v_title" style="margin:0">بيانات المشترك</h3>
+    <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+        
+        <div style="width: 90%; max-width: 400px; margin-bottom: 10px; display: flex; gap: 10px;">
+            <button class="btn btn-main" style="background:var(--d); margin:0;" onclick="closeView()"><i class="fas fa-times"></i> إغلاق</button>
+            <button id="saveImgBtn" class="btn-save-img" style="margin:0;" onclick="saveCardAsImage()"><i class="fas fa-file-download"></i> حفظ للأسوديو</button>
         </div>
-        <div class="view-body" id="v_content">
+
+        <div class="view-card-container" id="captureTarget">
+            <div class="view-header">
+                <h3 id="v_title" style="margin:0; font-size: 1.1rem;">بطاقة بيانات المشترك</h3>
+                <small style="opacity:0.8">فولتشر 🦅</small>
             </div>
-        <div style="padding: 15px;">
-            <button class="btn btn-main" onclick="closeView()">إغلاق النافذة</button>
+            <div class="view-body" id="v_content">
+                </div>
+            <div class="watermark">VULTURE 2026</div>
         </div>
     </div>
 </div>
 
 <div id="adminApp" style="display:none;">
     <div class="header">
-        <b>لوحة تحكم فولتشر 🦅</b>
+        <b style="font-size: 1.2rem;">لوحة تحكم فولتشر 🦅</b>
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>
             <button class="tab-btn" onclick="switchTab('store', this)">المتجر</button>
@@ -180,23 +194,21 @@
         }).join('');
     }
 
-    /* وظائف نافذة عرض البيانات المطورة */
+    /* وظائف نافذة عرض البيانات (المودال) */
     function openView(i) {
         const c = cloudData.clients[i];
-        document.getElementById('v_title').innerText = "بطاقة: " + c.name;
+        document.getElementById('v_title').innerText = c.name;
         const fields = [
-            ['الاسم الكامل', c.name, 'user'],
-            ['رقم الجوال', c.cp, 'phone'],
-            ['اسم المستخدم', c.cu, 'user-circle'],
-            ['الرقم السري', c.ck, 'lock'],
-            ['رابط الدخول', c.cl, 'link'],
-            ['بداية الاشتراك', c.cs, 'calendar-alt'],
-            ['نهاية الاشتراك', c.ce, 'calendar-check']
+            ['اسم المشترك', c.name],
+            ['رقم الجوال', c.cp],
+            ['اسم المستخدم', c.cu],
+            ['الرقم السري', c.ck],
+            ['تاريخ الانتهاء', c.ce]
         ];
         
         document.getElementById('v_content').innerHTML = fields.map(f => `
             <div class="view-row">
-                <div class="v-label"><i class="fas fa-${f[2]}"></i> ${f[0]}</div>
+                <div class="v-label">${f[0]}</div>
                 <div class="v-text">${f[1] || '--'}</div>
             </div>
         `).join('');
@@ -206,6 +218,58 @@
 
     function closeView() { document.getElementById('viewModal').style.display = 'none'; }
 
+    /* الوظيفة السحرية الجديدة: تحويل البطاقة لصورة وحفظها للأستوديو */
+    function saveCardAsImage() {
+        const target = document.getElementById('captureTarget');
+        const btn = document.getElementById('saveImgBtn');
+        const clientName = document.getElementById('v_title').innerText;
+
+        // تغيير نص الزر مؤقتاً
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحويل...';
+        btn.style.opacity = '0.7';
+        btn.disabled = true;
+
+        // استخدام مكتبة html2canvas لالتقاط الصورة
+        html2canvas(target, {
+            scale: 3, // جودة عالية جداً (3 أضعاف)
+            useCORS: true, // للسماح بتحميل الصور من روابط خارجية إذا وجدت
+            backgroundColor: "#ffffff", // خلفية بيضاء نقية
+            borderRadius: 25 // الحفاظ على الزوايا المنحنية
+        }).then(canvas => {
+            // تحويل الـ Canvas إلى رابط صورة PNG
+            const imageParams = canvas.toDataURL("image/png");
+            
+            // إنشاء عنصر تحميل وهمي
+            const createLink = document.createElement('a');
+            createLink.href = imageParams;
+            createLink.download = `Vulture_${clientName}.png`; // اسم الملف
+            
+            // محاكاة الضغط لتحميل الصورة
+            document.body.appendChild(createLink);
+            createLink.click();
+            document.body.removeChild(createLink);
+
+            // إعادة الزر لوضعه الطبيعي
+            btn.innerHTML = '<i class="fas fa-check"></i> تم الحفظ!';
+            btn.style.background = '#28a745';
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-file-download"></i> حفظ للأسوديو';
+                btn.style.background = '#f59e0b';
+                btn.style.opacity = '1';
+                btn.disabled = false;
+            }, 2000);
+
+        }).catch(err => {
+            console.error("خطأ في التحويل:", err);
+            alert("فشل تحويل البطاقة لصورة. تأكد من تحديث المتصفح.");
+            btn.innerHTML = '<i class="fas fa-file-download"></i> حفظ للأسوديو';
+            btn.style.opacity = '1';
+            btn.disabled = false;
+        });
+    }
+
+    /* باقي الوظائف السليمة (بدون أي أذى 🦅) */
     function copyL(name) {
         let baseUrl = window.location.href.split('?')[0];
         if (baseUrl.endsWith('index.html')) baseUrl = baseUrl.replace('index.html', 'user.html');
@@ -275,11 +339,4 @@
     function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active'); btn.classList.add('active');
-    }
-    async function delClient(i) { if(confirm("حذف المشترك؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
-    async function delApp(i) { if(confirm("حذف التطبيق؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
-</script>
-</body>
-</html>
+  
