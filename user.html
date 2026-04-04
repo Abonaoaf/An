@@ -13,10 +13,10 @@
         
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
         .date-box { border: 2px solid var(--danger); border-radius: 15px; padding: 8px 15px; text-align: center; min-width: 80px; }
-        .date-box b { font-size: 1.2rem; color: #333; }
-        .date-box span { display: block; font-size: 0.7rem; color: #666; }
+        .date-box b { font-size: 1.5rem; color: #333; display: block; line-height: 1; }
+        /* تنسيق اسم اليوم والشهر تحت الرقم */
+        .date-box span { display: block; font-size: 0.75rem; color: #666; margin-top: 5px; font-weight: bold; }
         
-        /* جعل الحجم الافتراضي مرن ليتم التحكم به عبر الجافاسكريبت */
         .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; transition: 0.3s ease; }
 
         .welcome-msg { padding: 15px 20px; text-align: center; }
@@ -60,7 +60,10 @@
 
 <div class="card">
     <div class="top-info">
-        <div class="date-box"><b id="dayNum"></b><span id="monthName"></span></div>
+        <div class="date-box">
+            <b id="dayNum"></b>
+            <span id="fullDateName"></span>
+        </div>
         <img id="userLogo" src="https://cdn-icons-png.flaticon.com/512/5359/5359051.png" class="main-logo">
     </div>
 
@@ -89,9 +92,14 @@
 
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    
+    // ضبط التاريخ بشكل كامل (اليوم + اسم اليوم + اسم الشهر)
     const d = new Date();
     document.getElementById('dayNum').innerText = d.getDate();
-    document.getElementById('monthName').innerText = d.toLocaleString('ar-SA', {month:'long'});
+    // عرض اسم اليوم مع اسم الشهر (مثال: السبت أبريل)
+    const dayName = d.toLocaleString('ar-SA', {weekday: 'long'});
+    const monthName = d.toLocaleString('ar-SA', {month: 'long'});
+    document.getElementById('fullDateName').innerText = dayName + " " + monthName;
 
     async function load() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -101,7 +109,6 @@
             const res = await fetch(DB_URL);
             const data = await res.json();
             
-            // تطبيق اللوقو والحجم القادم من السحابة
             if(data.logo) document.getElementById('userLogo').src = data.logo;
             if(data.logoSize) document.getElementById('userLogo').style.width = data.logoSize + "px";
 
