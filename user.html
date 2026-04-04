@@ -11,11 +11,12 @@
         
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         
+        /* تصميم مربع التاريخ المطور */
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { border: 2px solid var(--danger); border-radius: 15px; padding: 8px 15px; text-align: center; min-width: 80px; }
-        .date-box b { font-size: 1.5rem; color: #333; display: block; line-height: 1; }
-        /* تنسيق اسم اليوم والشهر تحت الرقم */
-        .date-box span { display: block; font-size: 0.75rem; color: #666; margin-top: 5px; font-weight: bold; }
+        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .date-box .day-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-bottom: 2px; }
+        .date-box b { font-size: 1.8rem; color: #333; line-height: 1; display: block; }
+        .date-box .month-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-top: 2px; }
         
         .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; transition: 0.3s ease; }
 
@@ -61,8 +62,9 @@
 <div class="card">
     <div class="top-info">
         <div class="date-box">
+            <span id="dayName" class="day-name"></span>
             <b id="dayNum"></b>
-            <span id="fullDateName"></span>
+            <span id="monthName" class="month-name"></span>
         </div>
         <img id="userLogo" src="https://cdn-icons-png.flaticon.com/512/5359/5359051.png" class="main-logo">
     </div>
@@ -93,13 +95,11 @@
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     
-    // ضبط التاريخ بشكل كامل (اليوم + اسم اليوم + اسم الشهر)
+    // ضبط التاريخ بالترتيب: اسم اليوم (فوق)، الرقم (وسط)، اسم الشهر (تحت)
     const d = new Date();
     document.getElementById('dayNum').innerText = d.getDate();
-    // عرض اسم اليوم مع اسم الشهر (مثال: السبت أبريل)
-    const dayName = d.toLocaleString('ar-SA', {weekday: 'long'});
-    const monthName = d.toLocaleString('ar-SA', {month: 'long'});
-    document.getElementById('fullDateName').innerText = dayName + " " + monthName;
+    document.getElementById('dayName').innerText = d.toLocaleString('ar-SA', {weekday: 'long'});
+    document.getElementById('monthName').innerText = d.toLocaleString('ar-SA', {month: 'long'});
 
     async function load() {
         const urlParams = new URLSearchParams(window.location.search);
