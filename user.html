@@ -15,15 +15,14 @@
         .date-box { border: 2px solid var(--danger); border-radius: 15px; padding: 8px 15px; text-align: center; min-width: 80px; }
         .date-box b { font-size: 1.2rem; color: #333; }
         .date-box span { display: block; font-size: 0.7rem; color: #666; }
-        .main-logo { width: 70px; height: 70px; border-radius: 15px; object-fit: contain; }
+        
+        /* جعل الحجم الافتراضي مرن ليتم التحكم به عبر الجافاسكريبت */
+        .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; transition: 0.3s ease; }
 
         .welcome-msg { padding: 15px 20px; text-align: center; }
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
-        
-        /* تعديل اسم العميل ليصبح باللون الأسود وبنفس السماكة */
         .u-name-highlight { color: #000000; font-weight: bold; font-size: 1.1rem; }
 
-        /* نبض قوي وإشعاع لرقم الأيام العلوي 742 */
         @keyframes strongGlow {
             0% { transform: scale(1); text-shadow: 0 0 2px var(--danger); }
             50% { transform: scale(1.2); text-shadow: 0 0 10px var(--danger); }
@@ -39,12 +38,10 @@
 
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
-        
         .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; margin-bottom: 2px; display: block; }
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
         .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; font-size: 1.1rem; }
 
-        /* العداد الخماسي */
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
         .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; animation: lightPulse 2s infinite ease-in-out; }
@@ -69,7 +66,7 @@
 
     <div class="welcome-msg">
         <div>سعدنا بانضمامك معنا في<span class="v-family">أسرة فولتشر 🦅</span></div>
-        <div style="margin-top:10px;">مرحــباً بـك 🤝 <span id="userName" class="u-name-highlight">...</span></div>
+        <div style="margin-top:10px;">مرحباً بك 🤝 <span id="userName" class="u-name-highlight">...</span></div>
     </div>
 
     <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
@@ -103,7 +100,11 @@
         try {
             const res = await fetch(DB_URL);
             const data = await res.json();
+            
+            // تطبيق اللوقو والحجم القادم من السحابة
             if(data.logo) document.getElementById('userLogo').src = data.logo;
+            if(data.logoSize) document.getElementById('userLogo').style.width = data.logoSize + "px";
+
             const user = (data.clients || []).find(u => u.name === targetName);
             if(user) {
                 document.getElementById('userName').innerText = user.name;
