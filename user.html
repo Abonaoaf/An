@@ -10,49 +10,44 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; min-height: 100vh; }
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); position: relative; }
         
-        /* الهيدر والتاريخ والتوقيع */
-        .top-info { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid #eee; gap: 10px; }
-        .date-box { background: #fff; border: 2px solid var(--danger); border-radius: 15px; padding: 8px 15px; text-align: center; min-width: 80px; box-shadow: 0 4px 8px rgba(220, 53, 69, 0.1); }
-        .date-box span { display: block; font-size: 0.7rem; color: #666; }
-        .date-box b { font-size: 1.2rem; color: #333; }
-        .main-logo { width: 70px; height: 70px; border-radius: 15px; object-fit: contain; flex-shrink: 0; }
+        /* الهيدر العلوي الموزع */
+        .top-info { display: flex; justify-content: space-between; align-items: center; padding: 25px 15px; border-bottom: 1px solid #eee; }
+        .date-box { background: #fff; border: 2px solid var(--danger); border-radius: 15px; padding: 8px 12px; text-align: center; min-width: 75px; box-shadow: 0 4px 8px rgba(220, 53, 69, 0.1); }
+        .date-box span { display: block; font-size: 0.65rem; color: #666; }
+        .date-box b { font-size: 1.1rem; color: #333; }
+        .main-logo { width: 65px; height: 65px; border-radius: 15px; object-fit: contain; }
         
-        /* توقيع الحقوق المضاف في المكان المحدد */
-        .copy-stamp { font-size: 0.65rem; color: #aaa; text-align: right; line-height: 1.4; flex: 1; margin-left: auto; }
+        /* توقيع الحقوق مع مسافة عن الخط */
+        .copy-stamp { font-size: 0.65rem; color: #aaa; text-align: right; line-height: 1.4; padding-right: 5px; }
 
-        /* رسالة الترحيب */
         .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.8; }
-        .welcome-text { font-size: 1rem; color: #444; }
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
-        .u-line { font-size: 1rem; color: #444; margin-top: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .u-line { font-size: 1rem; color: #444; margin-top: 10px; white-space: nowrap; }
         .u-name-highlight { color: var(--main); font-weight: bold; font-size: 1.1rem; }
 
-        /* تأثير النبض للأيام */
+        /* الأيام النابضة */
         @keyframes pulseRed { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         .days-pulse { display: inline-block; color: var(--danger); font-size: 1.1rem; font-weight: 900; margin: 0 5px; animation: pulseRed 1.5s infinite ease-in-out; }
         .status-static { color: #333; font-weight: bold; font-size: 0.85rem; }
 
-        /* شريط التقدم */
+        /* شريط التقدم الأكول (الأحمر يأكل الأخضر) */
         .status-container { padding: 0 20px; text-align: right; }
-        .progress-bar-container { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 0; position: relative; }
-        .progress-fill-consumed { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s; }
+        .progress-bar-container { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; position: relative; margin: 10px 0; }
+        .progress-fill-consumed { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s linear; border-radius: 0 10px 10px 0; }
         
-        /* بيانات الاشتراك */
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         .data-label { font-size: 0.7rem; color: #888; }
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
         .copy-btn { color: var(--main); cursor: pointer; padding: 5px; font-size: 1rem; }
 
-        /* العداد الخماسي */
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px 0; direction: ltr; }
-        .t-box { background: #fff; border: 1px solid #eef; border-radius: 10px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .t-box { background: #fff; border: 1px solid #eef; border-radius: 10px; padding: 8px 2px; text-align: center; }
         .t-box b { display: block; color: var(--main); font-size: 1rem; }
         .t-box span { font-size: 0.55rem; color: #aaa; }
 
-        /* الأزرار الملونة */
         .action-btns { padding: 20px; }
-        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.9rem; transition: 0.3s; }
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.9rem; }
         .btn-store { background: #5e4cc1; }
         .btn-support { background: var(--success); }
         .btn-wa-channel { background: var(--wa); }
@@ -62,10 +57,7 @@
 
 <div class="card">
     <div class="top-info">
-        <div class="copy-stamp">
-            أبو نواف<br>
-            الحقوق محفوظة 2026
-        </div>
+        <div class="copy-stamp">أبو نواف<br>الحقوق محفوظة 2026</div>
         <img id="userLogo" src="https://cdn-icons-png.flaticon.com/512/5359/5359051.png" class="main-logo">
         <div class="date-box">
             <span id="dayName"></span>
@@ -75,7 +67,7 @@
     </div>
 
     <div class="welcome-msg">
-        <div class="welcome-text">سعدنا بانضمامك معنا في<span class="v-family">أسرة فولتشر 🦅</span></div>
+        <div>سعدنا بانضمامك معنا في<span class="v-family">أسرة فولتشر 🦅</span></div>
         <div class="u-line">مرحباً بك معنا 🤝 <span id="userName" class="u-name-highlight">جاري التحميل...</span></div>
     </div>
 
@@ -130,20 +122,26 @@
                 const up = () => {
                     const now = new Date().getTime(), st = new Date(user.cs).getTime(), en = new Date(user.ce).getTime();
                     const r = en - now, tot = en - st;
-                    let cp = Math.max(0, Math.min(100, ((n = new Date().getTime(), st = new Date(user.cs).getTime(), en = new Date(user.ce).getTime()) - st) / (en - st) * 100));
-                    document.getElementById('barConsumed').style.width = cp + "%";
-                    const daysLeft = Math.max(0, Math.ceil(r / (1000 * 60 * 60 * 24)));
-                    document.getElementById('daysCount').innerText = daysLeft;
-                    if(r <= 0) { document.querySelector('.status-static').innerHTML = "❌ الاشتراك منتهي"; document.querySelector('.status-static').style.color = "red"; }
-                    const sec=Math.floor(r/1000), min=Math.floor(sec/60), hr=Math.floor(min/60), dLeft=Math.floor(hr/24);
-                    const units = [['ثانية', sec%60], ['دقيقة', min%60], ['ساعة', hr%24], ['يوم', dLeft%30], ['شهر', Math.floor(dLeft/30)]];
+                    
+                    // شريط التقدم: الأحمر يأكل الأخضر من اليمين
+                    let consP = Math.max(0, Math.min(100, ((now - st) / tot) * 100));
+                    document.getElementById('barConsumed').style.width = consP + "%";
+                    
+                    // عداد الأيام (إصلاح مشكلة الصفر)
+                    const dLeft = Math.max(0, Math.ceil(r / (1000 * 60 * 60 * 24)));
+                    document.getElementById('daysCount').innerText = dLeft;
+
+                    if(r <= 0) { document.querySelector('.status-static').innerHTML = "❌ منتهي"; }
+                    
+                    const sec=Math.floor(r/1000), min=Math.floor(sec/60), hr=Math.floor(min/60), dayL=Math.floor(hr/24);
+                    const units = [['ثانية', sec%60], ['دقيقة', min%60], ['ساعة', hr%24], ['يوم', dayL%30], ['شهر', Math.floor(dayL/30)]];
                     document.getElementById('timerGrid').innerHTML = r > 0 ? units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('') : "";
                 };
                 up(); setInterval(up, 1000);
             }
         } catch(e) { console.error("Error"); }
     }
-    function copy(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("تم النسخ بنجاح ✅"); }
+    function copy(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("تم النسخ!"); }
     load();
 </script>
 </body>
