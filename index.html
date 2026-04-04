@@ -7,12 +7,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
-        :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; --soft-red: #f87171; }
+        :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
+        /* حماية الدخول */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
         #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; }
-        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
+        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        #loginOverlay button:hover { background: white; color: var(--link); }
 
         .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
         .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
@@ -23,29 +25,31 @@
         .section { display: none; }
         .section.active { display: block; }
 
-        /* نبض وتوهج رقم الأيام المتبقية */
+        /* حركة التوهج والنبض للرقم المتبقي فقط */
         @keyframes dayGlow {
             0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--d); }
             50% { transform: scale(1.15); text-shadow: 0 0 10px var(--d); opacity: 0.9; }
         }
         .days-highlight { color: var(--d); font-weight: 900; display: inline-block; animation: dayGlow 1.2s infinite ease-in-out; }
 
-        /* شريط التقدم ثابت */
+        /* شريط التقدم ثابت تماماً */
         .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 12px 0; border: 1px solid #eee; }
         .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s linear; }
 
+        /* الكروت والشبكة */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
         
         .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
-        input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
+        input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-family: inherit; }
         
         .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; }
 
+        /* كروت المتجر المربعة */
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; }
-        .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
+        .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; background: #f9f9f9; }
         .drag-handle { position: absolute; top: 12px; left: 12px; cursor: grab; color: #cbd5e0; font-size: 1.2rem; }
     </style>
 </head>
@@ -60,11 +64,11 @@
 
 <div id="adminApp" style="display:none;">
     <div class="header">
-        <b>لوحة تحكم فولتشر 🦅</b>
+        <b style="font-size: 1.2rem;">لوحة تحكم فولتشر 🦅</b>
         <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>
-            <button class="tab-btn" onclick="switchTab('store', this)">المتجر</button>
-            <button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات</button>
+            <button class="tab-btn active" onclick="switchTab('clients', this)"><i class="fas fa-users"></i> المشتركين</button>
+            <button class="tab-btn" onclick="switchTab('store', this)"><i class="fas fa-store"></i> المتجر</button>
+            <button class="tab-btn" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> الإعدادات</button>
         </div>
     </div>
 
@@ -80,7 +84,7 @@
                 <input type="text" id="cl" placeholder="رابط الدخول">
                 <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
                 <button class="btn btn-main" onclick="saveClient()">حفظ البيانات في السحابة ☁️</button>
-                <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
+                <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none; margin-top:5px;" onclick="clearClientForm()">إلغاء التعديل</button>
             </div>
             <div class="grid" id="clientGrid"></div>
         </div>
@@ -95,8 +99,13 @@
                 <input type="text" id="al" placeholder="رابط التحميل المباشر">
                 <textarea id="at" placeholder="وصف التطبيق"></textarea>
                 <button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>
+                <button id="cancelAppBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none; margin-top:5px;" onclick="clearAppForm()">إلغاء التعديل</button>
             </div>
-            <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px;" onclick="saveOrder()"><i class="fas fa-save"></i> حفظ الترتيب الحالي</button>
+            
+            <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px; box-shadow: 0 4px 15px rgba(94, 76, 193, 0.3);" onclick="saveOrder()">
+                <i class="fas fa-save"></i> حفظ ترتيب التطبيقات الحالي
+            </button>
+
             <div class="grid" id="appList"></div>
         </div>
 
@@ -104,7 +113,7 @@
             <div class="modal" style="text-align:center;">
                 <h3>تحديث الشعار (اللوقو)</h3>
                 <input type="file" id="logoFile" accept="image/*">
-                <button class="btn btn-main" onclick="saveLogo()">رفع اللوقو الآن 🚀</button>
+                <button class="btn btn-main" onclick="saveLogo()">رفع الشعار الآن 🚀</button>
             </div>
         </div>
     </div>
@@ -120,7 +129,7 @@
             document.getElementById('loginOverlay').style.display = "none";
             document.getElementById('adminApp').style.display = "block";
             load();
-        } else { alert("كلمة المرور خطأ!"); }
+        } else { alert("كلمة المرور غير صحيحة!"); }
     }
 
     async function load() {
@@ -131,6 +140,7 @@
         renderApps();
     }
 
+    /* قسم المشتركين: الرقم ينبض والشريط ثابت */
     function renderClients() {
         const grid = document.getElementById('clientGrid');
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
@@ -151,6 +161,7 @@
         }).join('');
     }
 
+    /* قسم المتجر: تطبيقات مربعة مع ترتيب وعرض */
     function renderApps() {
         const list = document.getElementById('appList');
         list.innerHTML = (cloudData.apps || []).map((a, i) => `
@@ -159,18 +170,20 @@
                 <img src="${a.img || ''}">
                 <div style="text-align:center; font-weight:bold; font-size:0.9rem;">${a.name}</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px;">
-                    <button class="btn btn-view" onclick="viewApp(${i})"><i class="fas fa-eye"></i></button>
-                    <button class="btn btn-edit" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-del" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
+                    <button class="btn btn-view" onclick="viewApp(${i})" title="عرض التفاصيل"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-edit" onclick="editApp(${i})" title="تعديل"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-del" onclick="delApp(${i})" title="حذف"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
         `).join('');
+        // تفعيل السحب والترتيب
         new Sortable(list, { animation: 150, handle: '.drag-handle' });
     }
 
+    /* وظائف المتجر */
     function viewApp(i) {
         const a = cloudData.apps[i];
-        alert(`تطبيق: ${a.name}\n\nكود: ${a.ad || '-'}\nرابط: ${a.al || '-'}\nوصف: ${a.at || '-'}`);
+        alert(`تطبيق: ${a.name}\n\nكود دونلودر: ${a.ad || '-'}\nرابط التحميل: ${a.al || '-'}\nوصف: ${a.at || '-'}`);
     }
 
     function editApp(i) {
@@ -180,8 +193,15 @@
         document.getElementById('ad').value = a.ad || "";
         document.getElementById('al').value = a.al || "";
         document.getElementById('at').value = a.at || "";
-        document.getElementById('appTitle').innerText = "تعديل: " + a.name;
+        document.getElementById('appTitle').innerText = "تعديل تطبيق: " + a.name;
+        document.getElementById('cancelAppBtn').style.display = "block";
         window.scrollTo(0,0);
+    }
+
+    function clearAppForm() {
+        ['an','ad','al','at','editAppIndex'].forEach(id=>document.getElementById(id).value="");
+        document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
+        document.getElementById('cancelAppBtn').style.display = "none";
     }
 
     async function saveApp() {
@@ -191,8 +211,7 @@
             const a = { name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img: img || (idx!==""?cloudData.apps[idx].img:"") };
             if(!cloudData.apps) cloudData.apps = [];
             if(idx==="") cloudData.apps.push(a); else cloudData.apps[idx]=a;
-            await sync(); load();
-            ['an','ad','al','at','editAppIndex'].forEach(id=>document.getElementById(id).value="");
+            await sync(); load(); clearAppForm();
         };
         if(file) { const r=new FileReader(); r.onload=()=>doSave(r.result); r.readAsDataURL(file); } else doSave();
     }
@@ -202,9 +221,10 @@
         let newArr = [];
         items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
         cloudData.apps = newArr;
-        await sync(); alert("تم حفظ الترتيب!"); load();
+        await sync(); alert("تم حفظ الترتيب الجديد بنجاح! ✅"); load();
     }
 
+    /* وظائف المشتركين */
     async function saveClient() {
         const idx = document.getElementById('editClientIndex').value;
         const c = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };
@@ -217,7 +237,7 @@
         const c = cloudData.clients[i];
         document.getElementById('editClientIndex').value = i;
         ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
-        document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
+        document.getElementById('clientTitle').innerText = "تعديل بيانات: " + c.name;
         document.getElementById('cancelBtn').style.display = "block";
         window.scrollTo(0,0);
     }
@@ -228,20 +248,22 @@
         document.getElementById('cancelBtn').style.display = "none";
     }
 
+    /* وظائف الإعدادات والمزامنة */
     async function saveLogo() {
         const file = document.getElementById('logoFile').files[0];
+        if(!file) return;
         const r = new FileReader();
-        r.onload = async () => { cloudData.logo = r.result; await sync(); alert("تم تحديث اللوقو!"); };
+        r.onload = async () => { cloudData.logo = r.result; await sync(); alert("تم تحديث الشعار!"); };
         r.readAsDataURL(file);
     }
 
     function copyL(name) {
         const url = window.location.href.replace('index.html', 'user.html') + '?name=' + encodeURIComponent(name);
-        navigator.clipboard.writeText(url); alert("تم نسخ الرابط!");
+        navigator.clipboard.writeText(url); alert("تم نسخ رابط العميل!");
     }
 
-    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
-    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
+    async function delClient(i) { if(confirm("حذف المشترك؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
+    async function delApp(i) { if(confirm("حذف التطبيق؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
     function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
