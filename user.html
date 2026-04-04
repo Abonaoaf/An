@@ -17,7 +17,7 @@
         .date-box b { font-size: 1.2rem; color: #333; }
         .main-logo { width: 70px; height: 70px; border-radius: 15px; object-fit: contain; }
 
-        /* رسالة الترحيب المنسقة - أسرة فولتشر في سطر والترحيب في سطر */
+        /* رسالة الترحيب */
         .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.8; }
         .welcome-text { font-size: 1rem; color: #444; }
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
@@ -34,6 +34,10 @@
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         .data-label { font-size: 0.7rem; color: #888; }
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
+        
+        /* تمييز اسم المستخدم والرقم السري باللون الأحمر */
+        .red-value { color: var(--danger) !important; font-size: 1rem !important; }
+
         .copy-btn { color: var(--main); cursor: pointer; padding: 5px; font-size: 1rem; }
 
         /* عداد الوقت */
@@ -77,8 +81,8 @@
         <div class="data-row"><div><span class="data-label">تاريخ البداية</span><div class="data-value" id="dStart">--</div></div></div>
         <div class="data-row"><div><span class="data-label">تاريخ النهاية</span><div class="data-value" id="dEnd">--</div></div></div>
         <div class="data-row"><div><span class="data-label">الجوال</span><div class="data-value" id="vPhone">--</div></div><i class="far fa-copy copy-btn" onclick="copy('vPhone')"></i></div>
-        <div class="data-row"><div><span class="data-label">اسم المستخدم</span><div class="data-value" id="vUser">--</div></div><i class="far fa-copy copy-btn" onclick="copy('vUser')"></i></div>
-        <div class="data-row"><div><span class="data-label">كلمة السر</span><div class="data-value" id="vPass">--</div></div><i class="far fa-copy copy-btn" onclick="copy('vPass')"></i></div>
+        <div class="data-row"><div><span class="data-label">اسم المستخدم</span><div class="data-value red-value" id="vUser">--</div></div><i class="far fa-copy copy-btn" onclick="copy('vUser')"></i></div>
+        <div class="data-row"><div><span class="data-label">كلمة السر</span><div class="data-value red-value" id="vPass">--</div></div><i class="far fa-copy copy-btn" onclick="copy('vPass')"></i></div>
         <div class="data-row"><div><span class="data-label">رابط الدخول</span><div class="data-value" id="vLink" style="font-size:0.7rem;">--</div></div><i class="far fa-copy copy-btn" onclick="copy('vLink')"></i></div>
         
         <div class="timer-grid" id="timerGrid"></div>
