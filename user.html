@@ -11,11 +11,11 @@
         
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         
-        /* تصميم مربع التاريخ المطور */
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
         .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .date-box .day-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-bottom: 2px; }
-        .date-box b { font-size: 1.8rem; color: #333; line-height: 1; display: block; }
+        /* تغيير لون الرقم للدرجة المطلوبة #f87171 */
+        .date-box b { font-size: 1.8rem; color: #f87171; line-height: 1; display: block; }
         .date-box .month-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-top: 2px; }
         
         .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; transition: 0.3s ease; }
@@ -95,7 +95,6 @@
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     
-    // ضبط التاريخ بالترتيب: اسم اليوم (فوق)، الرقم (وسط)، اسم الشهر (تحت)
     const d = new Date();
     document.getElementById('dayNum').innerText = d.getDate();
     document.getElementById('dayName').innerText = d.toLocaleString('ar-SA', {weekday: 'long'});
