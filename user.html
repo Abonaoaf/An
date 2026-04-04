@@ -6,7 +6,7 @@
     <title>بطاقة اشتراك فولتشر 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; }
+        :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
@@ -29,7 +29,6 @@
         }
         .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.3rem; animation: strongGlow 1.2s infinite ease-in-out; margin: 0 5px; }
 
-        /* نبض خفيف لأرقام العداد السفلي */
         @keyframes lightPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.9; } }
 
         .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
@@ -40,20 +39,18 @@
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         
         /* عناوين الحقول: أحمر وردي هادئ */
-        .data-label { font-size: 0.75rem; color: #f87171; font-weight: 600; margin-bottom: 2px; display: block; }
-        
+        .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; margin-bottom: 2px; display: block; }
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
-        .copy-btn { color: var(--main); cursor: pointer; padding: 5px; font-size: 1.1rem; }
+        
+        /* أيقونة النسخ: تم توحيد اللون مع العناوين بناءً على طلبك */
+        .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; font-size: 1.1rem; transition: 0.2s; }
+        .copy-btn:active { transform: scale(0.8); opacity: 0.7; }
 
-        /* العداد الخماسي: الأرقام بالأحمر والكلمات بالأسود */
+        /* العداد الخماسي */
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-        
-        /* اللون الأحمر للأرقام مع النبض الهادئ */
         .t-box b { display: block; color: var(--danger); font-size: 1.1rem; animation: lightPulse 2s infinite ease-in-out; }
-        
-        /* اللون الأسود الصريح للكلمات (ثانية، دقيقة، إلخ) */
-        .t-box span { font-size: 0.6rem; color: #000000; font-weight: bold; }
+        .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
         .action-btns { padding: 15px 20px; }
         .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; }
