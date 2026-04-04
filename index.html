@@ -10,57 +10,64 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
         /* شاشة الحماية */
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
-        #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 10px; }
-        #loginOverlay button { padding: 12px 30px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; transition: 0.5s; }
+        #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        #loginOverlay button:hover { background: white; color: var(--link); }
 
-        .header { background: white; padding: 10px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
-        .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
-        .tab-btn { padding: 10px 15px; border-radius: 12px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
-        .tab-btn.active { background: var(--link); color: white; border-color: var(--link); }
+        .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
+        .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+        .tab-btn { padding: 10px 18px; border-radius: 12px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; font-size: 0.85rem; color: #555; }
+        .tab-btn.active { background: var(--link); color: white; border-color: var(--link); box-shadow: 0 4px 10px rgba(74, 74, 226, 0.2); }
 
         .container { padding: 20px; max-width: 1200px; margin: auto; }
         .section { display: none; }
         .section.active { display: block; }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
+        .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
         
-        /* شريط التقدم المعتمد على الأيام المتبقية */
-        .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 10px 0; position: relative; }
-        .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s ease; border-radius: 0 10px 10px 0; }
+        /* شريط التقدم: الأحمر يزحف ليغطي الأخضر */
+        .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 12px 0; position: relative; }
+        .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s ease-in-out; border-radius: 0 10px 10px 0; }
 
-        @keyframes pulseAdmin { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        .days-badge { color: var(--d); font-weight: 900; font-size: 1rem; animation: pulseAdmin 1.5s infinite ease-in-out; display: inline-block; }
+        /* النبضة القوية والمحسنة للأيام في اللوحة */
+        @keyframes strongPulseAdmin { 
+            0% { transform: scale(1); opacity: 1; } 
+            50% { transform: scale(1.3); opacity: 0.8; color: #ff0000; } 
+            100% { transform: scale(1); opacity: 1; } 
+        }
+        .days-badge { color: var(--d); font-weight: 900; font-size: 1.1rem; animation: strongPulseAdmin 1s infinite ease-in-out; display: inline-block; text-shadow: 0 0 5px rgba(220, 53, 69, 0.2); }
 
-        .modal { background: #fff; border-radius: 20px; padding: 20px; margin-bottom: 25px; border: 2px dashed #cbd5e0; }
-        input, textarea { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
+        input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 0.95rem; }
         
-        .btn { padding: 8px 10px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; font-size: 0.75rem; color: white; }
+        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; font-size: 0.8rem; color: white; transition: 0.3s; }
         .btn-view { background: var(--view); }
         .btn-edit { background: var(--s); }
         .btn-link { background: var(--link); }
         .btn-del { background: var(--d); }
+        .btn:hover { opacity: 0.8; transform: translateY(-2px); }
         
-        .btn-main { background: var(--link); width: 100%; padding: 12px; margin-top: 10px; font-size: 0.9rem; }
-        .btn-cancel { background: #edf2f7; color: #4a5568; width: 100%; margin-top: 5px; border: 1px solid #cbd5e0; font-size: 0.9rem; }
+        .btn-main { background: var(--link); width: 100%; padding: 14px; margin-top: 10px; font-size: 1rem; }
+        .btn-cancel { background: #edf2f7; color: #4a5568; width: 100%; margin-top: 8px; border: 1px solid #cbd5e0; font-size: 0.9rem; }
 
-        .app-item { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 15px; border: 1px solid #eee; margin-bottom: 10px; }
-        .app-item img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; }
+        .app-item { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 18px; border: 1px solid #eee; margin-bottom: 12px; }
+        .app-item img { width: 55px; height: 55px; border-radius: 15px; object-fit: cover; }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
     <i class="fas fa-user-shield" style="font-size: 4rem; margin-bottom: 20px;"></i>
-    <h2>دخول الإدارة الآمن</h2>
+    <h2 style="margin-bottom: 20px;">دخول الإدارة الآمن</h2>
     <input type="password" id="passInput" placeholder="أدخل كلمة المرور">
     <button onclick="checkPass()">فتح اللوحة 🦅</button>
 </div>
 
 <div id="adminApp" style="display:none;">
     <div class="header">
-        <div style="font-weight:bold; color:var(--p);">إدارة فولتشر الشاملة 🦅</div>
+        <div style="font-weight:bold; color:var(--p); font-size: 1.2rem;">إدارة فولتشر الشاملة 🦅</div>
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('clients', this)"><i class="fas fa-users"></i> المشتركين</button>
             <button class="tab-btn" onclick="switchTab('store', this)"><i class="fas fa-store"></i> المتجر</button>
@@ -71,15 +78,15 @@
     <div class="container">
         <div id="clients" class="section active">
             <div class="modal">
-                <h3 id="clientFormTitle">إضافة مشترك جديد</h3>
+                <h3 id="clientFormTitle" style="margin-top:0;">إضافة مشترك جديد</h3>
                 <input type="hidden" id="editClientIndex">
                 <input type="text" id="cn" placeholder="اسم العميل">
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
                 <input type="text" id="cl" placeholder="رابط الدخول">
-                <div style="display:flex; gap:5px;"><input type="date" id="cs" title="تاريخ البداية"><input type="date" id="ce" title="تاريخ النهاية"></div>
-                <button class="btn btn-main" onclick="saveClient()">حفظ في السحابة</button>
+                <div style="display:flex; gap:8px;"><input type="date" id="cs" title="تاريخ البداية"><input type="date" id="ce" title="تاريخ النهاية"></div>
+                <button class="btn btn-main" onclick="saveClient()">حفظ في السحابة ☁️</button>
                 <button id="cancelBtn" class="btn btn-cancel" style="display:none;" onclick="clearF('client')">إلغاء التعديل والرجوع</button>
             </div>
             <div class="grid" id="clientGrid"></div>
@@ -87,24 +94,24 @@
 
         <div id="store" class="section">
             <div class="modal">
-                <h3 id="appFormTitle">+ إضافة تطبيق للمتجر</h3>
+                <h3 id="appFormTitle" style="margin-top:0;">+ إضافة تطبيق للمتجر</h3>
                 <input type="hidden" id="editAppIndex">
                 <input type="file" id="appIcon" accept="image/*">
                 <input type="text" id="an" placeholder="اسم التطبيق">
                 <input type="text" id="ad" placeholder="كود دونلودر">
                 <input type="text" id="al" placeholder="رابط التحميل المباشر">
                 <textarea id="at" placeholder="وصف التطبيق"></textarea>
-                <button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر</button>
+                <button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>
                 <button id="cancelAppBtn" class="btn btn-cancel" style="display:none;" onclick="clearF('app')">إلغاء والرجوع</button>
             </div>
             <div id="appList"></div>
         </div>
 
         <div id="settings" class="section">
-            <div class="card" style="text-align:center;">
+            <div class="modal" style="text-align:center; border-style: solid;">
                 <h3>تحديث لوقو المنصة</h3>
                 <input type="file" id="logoFile" accept="image/*">
-                <button class="btn btn-main" onclick="saveLogo()">رفع اللوقو للسحابة</button>
+                <button class="btn btn-main" onclick="saveLogo()">رفع اللوقو الآن 🚀</button>
             </div>
         </div>
     </div>
@@ -148,21 +155,20 @@
             const timeLeft = en - now;
             const daysLeft = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
             
-            // الحسبة المطلوبة: إذا كان باقي سنة (365 يوم) الشريط أخضر كامل
-            // كلما قل عن 365، زاد اللون الأحمر
-            const maxComparisonDays = 365;
-            let redPercent = Math.max(0, Math.min(100, 100 - (daysLeft / maxComparisonDays * 100)));
+            // حسبة الشريط (المقياس الثابت 365 يوم)
+            const maxDays = 365;
+            let redPercent = Math.max(0, Math.min(100, 100 - (daysLeft / maxDays * 100)));
             
             return `<div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <b>${c.name}</b>
                     <span class="days-badge">${daysLeft} يوم</span>
                 </div>
-                <div class="prog-mini" style="background: var(--s);">
+                <div class="prog-mini">
                     <div class="fill-red" style="width:${redPercent}%"></div>
                 </div>
-                <div style="font-size:0.7rem; color:#666; margin-bottom:10px;">ينتهي في: ${c.ce}</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                <div style="font-size:0.75rem; color:#666; margin-bottom:12px;">تاريخ النهاية: ${c.ce}</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
                     <button class="btn btn-view" onclick="viewClient(${i})"><i class="fas fa-eye"></i> عرض</button>
                     <button class="btn btn-edit" onclick="editClient(${i})"><i class="fas fa-edit"></i> تعديل</button>
                     <button class="btn btn-link" onclick="copyL('${c.name}')"><i class="fas fa-link"></i> الرابط</button>
@@ -174,7 +180,7 @@
 
     function viewClient(i) {
         const c = cloudData.clients[i];
-        alert(`بيانات العميل: ${c.name}\n\nالجوال: ${c.cp}\nالمستخدم: ${c.cu}\nكلمة السر: ${c.ck}\nالبداية: ${c.cs}\nالنهاية: ${c.ce}\nالرابط: ${c.cl}`);
+        alert(`بيانات المشترك: ${c.name}\n\nالجوال: ${c.cp}\nالمستخدم: ${c.cu}\nكلمة السر: ${c.ck}\nالنهاية: ${c.ce}\nالرابط: ${c.cl}`);
     }
 
     async function saveClient() {
@@ -192,8 +198,8 @@
             <div class="app-item">
                 <img src="${a.img || ''}">
                 <div style="flex:1; text-align:right;"><b>${a.name}</b></div>
-                <button class="btn btn-edit" style="width:auto; margin:0 2px;" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-del" style="width:auto; margin:0 2px;" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
+                <button class="btn btn-edit" style="width:auto; margin:0 4px;" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-del" style="width:auto; margin:0 4px;" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
             </div>
         `).join('');
     }
@@ -214,7 +220,7 @@
     
     function copyL(name) {
         const link = window.location.href.replace('index.html','') + 'user.html?name=' + encodeURIComponent(name);
-        navigator.clipboard.writeText(link); alert("تم نسخ الرابط بنجاح!");
+        navigator.clipboard.writeText(link); alert("تم نسخ رابط العميل!");
     }
 
     function editClient(i) {
@@ -251,7 +257,7 @@
     
     function saveLogo() {
         const file = document.getElementById('logoFile').files[0];
-        const r = new FileReader(); r.onload=async()=>{ cloudData.logo=r.result; await sync(); alert("تم تحديث اللوقو!"); };
+        const r = new FileReader(); r.onload=async()=>{ cloudData.logo=r.result; await sync(); alert("تم تحديث اللوقو بنجاح!"); };
         r.readAsDataURL(file);
     }
 </script>
