@@ -14,15 +14,32 @@
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
         .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .date-box .day-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-bottom: 2px; }
-        /* تغيير لون الرقم للدرجة المطلوبة #f87171 */
         .date-box b { font-size: 1.8rem; color: #f87171; line-height: 1; display: block; }
         .date-box .month-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-top: 2px; }
         
         .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; transition: 0.3s ease; }
 
-        .welcome-msg { padding: 15px 20px; text-align: center; }
+        .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.6; }
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
         .u-name-highlight { color: #000000; font-weight: bold; font-size: 1.1rem; }
+
+        /* --- كود تحريك إيموجي المصافحة (النبض الحار) --- */
+        @keyframes warmHandshake {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.3); } /* يكبر قليلاً */
+            60% { transform: scale(1); }
+            80% { transform: scale(1.15); } /* نبضة ثانية أخف */
+            100% { transform: scale(1); }
+        }
+
+        .pulsing-handshake {
+            display: inline-block;
+            font-size: 1.3rem; /* تكبير الحجم قليلاً */
+            margin-left: 5px;
+            animation: warmHandshake 2s infinite ease-in-out; /* حركة مستمرة كسلام حار */
+            transform-origin: center; /* التحجيم من المنتصف */
+        }
+        /* ----------------------------------------------- */
 
         @keyframes strongGlow {
             0% { transform: scale(1); text-shadow: 0 0 2px var(--danger); }
@@ -71,7 +88,7 @@
 
     <div class="welcome-msg">
         <div>سعدنا بانضمامك معنا في<span class="v-family">أسرة فولتشر 🦅</span></div>
-        <div style="margin-top:10px;">مرحباً بك 🤝 <span id="userName" class="u-name-highlight">...</span></div>
+        <div style="margin-top:10px;">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight">...</span></div>
     </div>
 
     <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
