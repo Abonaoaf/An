@@ -7,29 +7,50 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
-        :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; }
+        :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
         #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; }
         #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+
         .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
         .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
         .tab-btn { padding: 10px 18px; border-radius: 12px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; font-size: 0.85rem; color: #555; }
         .tab-btn.active { background: var(--link); color: white; border-color: var(--link); }
+
         .container { padding: 20px; max-width: 1200px; margin: auto; }
         .section { display: none; }
         .section.active { display: block; }
+
         @keyframes dayGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--d); } 50% { transform: scale(1.15); text-shadow: 0 0 10px var(--d); opacity: 0.9; } }
         .days-highlight { color: var(--d); font-weight: 900; display: inline-block; animation: dayGlow 1.2s infinite ease-in-out; }
+
         .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 12px 0; border: 1px solid #eee; }
         .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s linear; }
+
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
+        
         .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
         input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-family: inherit; }
+        
         .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; }
+
+        /* --- نافذة عرض بيانات العميل المطورة --- */
+        #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .view-card { background: white; width: 90%; max-width: 450px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .view-header { background: var(--link); color: white; padding: 20px; text-align: center; position: relative; }
+        .view-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
+        .view-row { border-bottom: 1px solid #f0f0f0; padding: 12px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+        .view-row:last-child { border: none; }
+        .v-label { font-size: 0.75rem; color: var(--soft-red); font-weight: bold; }
+        .v-text { font-size: 0.9rem; color: #333; font-weight: bold; word-break: break-all; text-align: left; flex: 1; margin-right: 15px; }
+        .close-view { position: absolute; top: 15px; left: 15px; color: white; cursor: pointer; font-size: 1.2rem; }
+
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; }
         .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
         .drag-handle { position: absolute; top: 12px; left: 12px; cursor: grab; color: #cbd5e0; font-size: 1.2rem; }
@@ -42,6 +63,20 @@
     <h2>إدارة فولتشر 🦅</h2>
     <input type="password" id="passInput" placeholder="كلمة المرور">
     <button onclick="checkPass()">دخول</button>
+</div>
+
+<div id="viewModal">
+    <div class="view-card">
+        <div class="view-header">
+            <i class="fas fa-times close-view" onclick="closeView()"></i>
+            <h3 id="v_title" style="margin:0">بيانات المشترك</h3>
+        </div>
+        <div class="view-body" id="v_content">
+            </div>
+        <div style="padding: 15px;">
+            <button class="btn btn-main" onclick="closeView()">إغلاق النافذة</button>
+        </div>
+    </div>
 </div>
 
 <div id="adminApp" style="display:none;">
@@ -137,34 +172,47 @@
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
-                    <button class="btn btn-link" onclick="copyL('${c.name}')">نسخ الرابط</button>
-                    <button class="btn btn-view" onclick="alert('جوال: ${c.cp}\\nيوزر: ${c.cu}\\nسر: ${c.ck}')">بيانات</button>
+                    <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
+                    <button class="btn btn-view" onclick="openView(${i})">بيانات</button>
                     <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
                 </div>
             </div>`;
         }).join('');
     }
 
-    /* الوظيفة المحدثة لنسخ رابط العميل الصحيح */
+    /* وظائف نافذة عرض البيانات المطورة */
+    function openView(i) {
+        const c = cloudData.clients[i];
+        document.getElementById('v_title').innerText = "بطاقة: " + c.name;
+        const fields = [
+            ['الاسم الكامل', c.name, 'user'],
+            ['رقم الجوال', c.cp, 'phone'],
+            ['اسم المستخدم', c.cu, 'user-circle'],
+            ['الرقم السري', c.ck, 'lock'],
+            ['رابط الدخول', c.cl, 'link'],
+            ['بداية الاشتراك', c.cs, 'calendar-alt'],
+            ['نهاية الاشتراك', c.ce, 'calendar-check']
+        ];
+        
+        document.getElementById('v_content').innerHTML = fields.map(f => `
+            <div class="view-row">
+                <div class="v-label"><i class="fas fa-${f[2]}"></i> ${f[0]}</div>
+                <div class="v-text">${f[1] || '--'}</div>
+            </div>
+        `).join('');
+        
+        document.getElementById('viewModal').style.display = 'flex';
+    }
+
+    function closeView() { document.getElementById('viewModal').style.display = 'none'; }
+
     function copyL(name) {
-        // استخراج المسار الأساسي (الدومين) واستبدال index.html بـ user.html
-        let baseUrl = window.location.href.split('?')[0]; // إزالة أي بارامترات قديمة
-        if (baseUrl.endsWith('index.html')) {
-            baseUrl = baseUrl.replace('index.html', 'user.html');
-        } else if (baseUrl.endsWith('/')) {
-            baseUrl += 'user.html';
-        } else {
-            // في حال كان الرابط ينتهي بالدومين فقط بدون اسم ملف
-            baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/") + 1) + "user.html";
-        }
-        
+        let baseUrl = window.location.href.split('?')[0];
+        if (baseUrl.endsWith('index.html')) baseUrl = baseUrl.replace('index.html', 'user.html');
+        else if (baseUrl.endsWith('/')) baseUrl += 'user.html';
+        else baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/") + 1) + "user.html";
         const finalUrl = baseUrl + '?name=' + encodeURIComponent(name);
-        
-        navigator.clipboard.writeText(finalUrl).then(() => {
-            alert("✅ تم نسخ رابط العميل بنجاح:\n" + name);
-        }).catch(err => {
-            alert("فشل النسخ، يرجى النسخ يدوياً: " + finalUrl);
-        });
+        navigator.clipboard.writeText(finalUrl); alert("تم نسخ رابط العميل!");
     }
 
     async function saveClient() {
@@ -179,7 +227,7 @@
         const c = cloudData.clients[i];
         document.getElementById('editClientIndex').value = i;
         ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
-        document.getElementById('clientTitle').innerText = "تعديل بيانات: " + c.name;
+        document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
         document.getElementById('cancelBtn').style.display = "block";
         window.scrollTo(0,0);
     }
@@ -202,7 +250,7 @@
                 <img src="${a.img || ''}">
                 <div style="text-align:center; font-weight:bold; font-size:0.9rem;">${a.name}</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px;">
-                    <button class="btn btn-view" onclick="viewApp(${i})"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-view" onclick="alert('تطبيق: ${a.name}\\nكود: ${a.ad}\\nرابط: ${a.al}')"><i class="fas fa-eye"></i></button>
                     <button class="btn btn-edit" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
                     <button class="btn btn-del" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
                 </div>
@@ -230,6 +278,8 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active'); btn.classList.add('active');
     }
+    async function delClient(i) { if(confirm("حذف المشترك؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
+    async function delApp(i) { if(confirm("حذف التطبيق؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
 </script>
 </body>
 </html>
