@@ -45,15 +45,15 @@
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
         .copy-btn { color: var(--main); cursor: pointer; padding: 5px; font-size: 1.1rem; }
 
-        /* العداد الخماسي: الأرقام بالأحمر والكلمات بالأزرق */
+        /* العداد الخماسي: الأرقام بالأحمر والكلمات بالأسود */
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
         
-        /* اللون الأحمر للأرقام (المطلوب) مع النبض الهادئ */
+        /* اللون الأحمر للأرقام مع النبض الهادئ */
         .t-box b { display: block; color: var(--danger); font-size: 1.1rem; animation: lightPulse 2s infinite ease-in-out; }
         
-        /* اللون الأزرق المعتمد للكلمات (ثانية، دقيقة، إلخ) */
-        .t-box span { font-size: 0.6rem; color: var(--main); font-weight: 600; }
+        /* اللون الأسود الصريح للكلمات (ثانية، دقيقة، إلخ) */
+        .t-box span { font-size: 0.6rem; color: #000000; font-weight: bold; }
 
         .action-btns { padding: 15px 20px; }
         .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; }
@@ -135,7 +135,7 @@
             }
         } catch(e) { console.error(e); }
     }
-    function copyText(id) { const text = document.getElementById(id).innerText; navigator.clipboard.writeText(text); alert("تم نسخ البيانات!"); }
+    function copyText(id) { const text = document.getElementById(id).innerText; navigator.clipboard.writeText(text); alert("تم النسخ!"); }
     load();
 </script>
 </body>
