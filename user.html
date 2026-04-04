@@ -48,7 +48,10 @@
 
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
-        .data-label { font-size: 0.7rem; color: #888; }
+        
+        /* رفع درجة لون عناوين الحقول (الجوال، المستخدم، إلخ) */
+        .data-label { font-size: 0.75rem; color: #555; font-weight: 600; margin-bottom: 2px; display: block; }
+        
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
         .copy-btn { color: var(--main); cursor: pointer; padding: 5px; font-size: 1.1rem; }
 
@@ -61,7 +64,6 @@
             font-size: 1.1rem; 
             animation: lightPulse 2s infinite ease-in-out; 
         }
-        /* رفع درجة لون العبارات (ثانية، دقيقة، إلخ) لتكون أوضح */
         .t-box span { font-size: 0.6rem; color: #777; font-weight: 600; }
 
         .action-btns { padding: 15px 20px; }
@@ -86,7 +88,7 @@
         <div style="margin-top:10px;">مرحباً بك 🤝 <span id="userName" class="u-name-highlight">جاري التحميل...</span></div>
     </div>
 
-    <div class="status-line">✅ اشتراكك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
+    <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
 
     <div class="prog-static"><div id="barConsumed" class="fill-red"></div></div>
 
@@ -97,12 +99,12 @@
 
     <div class="action-btns">
         <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
-        <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة قبل الحدث بالواتساب</a>
+        <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة فولتشر بالواتساب</a>
         <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
     </div>
 </div>
 
-<div class="footer-rights">أبو نواف - قبل الحدث 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
+<div class="footer-rights">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
 
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
@@ -127,7 +129,6 @@
                     const now = new Date().getTime(), end = new Date(user.ce).getTime();
                     const timeLeft = end - now, daysLeft = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
                     document.getElementById('daysCount').innerText = daysLeft;
-                    
                     const maxDays = 365;
                     let redPercent = Math.max(0, Math.min(100, 100 - (daysLeft / maxDays * 100)));
                     document.getElementById('barConsumed').style.width = redPercent + "%";
@@ -137,11 +138,10 @@
                         const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
                         document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
                     } else {
-                        document.getElementById('timerGrid').innerHTML = "<b style='color:red; width:100%; text-align:center;'>انتهى الاشتراكك</b>";
+                        document.getElementById('timerGrid').innerHTML = "<b style='color:red; width:100%; text-align:center;'>انتهى الاشتراك</b>";
                     }
                 };
                 updateUI(); setInterval(updateUI, 1000);
-                
                 const fields = [['الجوال', user.cp || '--'], ['اسم المستخدم', user.cu || '--'], ['الرقم السري', user.ck || '--'], ['رابط الدخول', user.cl || '--'], ['تاريخ البداية', user.cs || '--'], ['تاريخ النهاية', user.ce || '--']];
                 document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
                     <div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>
