@@ -9,96 +9,88 @@
         :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* شاشة القفل السحابية */
-        #cloudLockOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a202c; display: none; justify-content: center; align-items: center; z-index: 10000; flex-direction: column; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
-        #cloudLockOverlay input { padding: 15px; border-radius: 15px; border: none; width: 100%; max-width: 280px; text-align: center; font-size: 1.2rem; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        #cloudLockOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid #4a4ae2; background: #4a4ae2; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; max-width: 280px; }
-
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; }
-        .date-box b { font-size: 1.8rem; color: var(--soft-red); display: block; line-height: 1; }
-        .date-box span { font-size: 0.75rem; color: #666; font-weight: bold; }
+        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .date-box .day-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-bottom: 2px; }
+        .date-box b { font-size: 1.8rem; color: var(--soft-red); line-height: 1; display: block; }
+        .date-box .month-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-top: 2px; }
+        
         .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; }
 
-        /* تعديل قسم الترحيب ليكون في الوسط */
-        .welcome-msg { padding: 20px; text-align: center; width: 100%; box-sizing: border-box; }
-        .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; text-align: center; }
+        .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.6; }
+        .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
         .u-name-highlight { color: #000; font-weight: bold; font-size: 1.1rem; }
 
-        @keyframes runningMan { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-8deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(8deg); } }
+        /* 1. حركة نبض المصافحة 🤝 */
+        @keyframes handshakePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+        .pulsing-handshake { display: inline-block; animation: handshakePulse 2s infinite ease-in-out; }
+
+        /* 2. حركة نبض الأيام المتبقية */
+        @keyframes daysPulseGlow {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 0px var(--danger); }
+            50% { transform: scale(1.15); text-shadow: 0 0 10px var(--danger); color: var(--danger); }
+        }
+        .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.4rem; animation: daysPulseGlow 1.5s infinite ease-in-out; margin: 0 5px; }
+
+        /* 3. حركة الشخص الذي يجري 🏃‍♂️ */
+        @keyframes runningManAction {
+            0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); }
+            25% { transform: scaleX(-1) translateY(-3px) rotate(-10deg); }
+            75% { transform: scaleX(-1) translateY(-3px) rotate(10deg); }
+        }
         .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; border: 1px solid #ddd; }
-        .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.3s linear; border-radius: 0 10px 10px 0; position: relative; }
-        .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; display: inline-block; animation: runningMan 0.4s infinite linear; text-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 10; }
+        .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s linear; border-radius: 0 10px 10px 0; position: relative; }
+        .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; display: inline-block; animation: runningManAction 0.4s infinite linear; text-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 10; }
 
         .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; }
-        .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; text-align: right; }
+        .data-value { font-size: 0.85rem; font-weight: bold; color: #333; }
         .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; }
 
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
-        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; }
+        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
         .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
-        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; box-sizing: border-box; cursor: pointer; border: none;}
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; box-sizing: border-box;}
         .btn-store { background: #5e4cc1; }
         .btn-support { background: var(--success); }
         .btn-wa-channel { background: #075E54; }
-        .btn-change-pass { background: #333; font-size: 0.8rem; padding: 10px; }
 
         .footer-rights { margin-top: 10px; text-align: center; color: #aaa; font-size: 0.75rem; padding-bottom: 20px; }
-
-        #changePassModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10001; justify-content: center; align-items: center; }
-        .modal-body { background: white; width: 90%; max-width: 350px; border-radius: 20px; padding: 20px; text-align: center; }
-        .modal-body input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; text-align: center; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-<div id="cloudLockOverlay">
-    <div id="lockIcon"><i class="fas fa-user-lock" style="font-size: 4rem; color: #4a4ae2; margin-bottom: 20px;"></i></div>
-    <h3 id="lockTitle">تأمين الحساب 🛡️</h3>
-    <p id="lockDesc">جاري التحقق...</p>
-    <div id="lockInputArea" style="display: none;">
-        <input type="password" id="cloudPassInput" placeholder="أدخل الرمز السري">
-        <button id="lockActionBtn" onclick="handleCloudLock()">تـأكـيـد</button>
-    </div>
-</div>
-
-<div id="changePassModal">
-    <div class="modal-body">
-        <h3>تغيير رمز القفل 🔐</h3>
-        <input type="password" id="oldPass" placeholder="الرمز القديم">
-        <input type="password" id="newPass1" placeholder="الرمز الجديد">
-        <input type="password" id="newPass2" placeholder="تأكيد الرمز الجديد">
-        <button class="btn btn-support" onclick="processChangePass()">حفظ الرمز الجديد</button>
-        <button class="btn" style="background:#ddd; color:#333;" onclick="closeChangeModal()">إلغاء</button>
-    </div>
-</div>
-
-<div class="card" id="mainCard" style="display: none;">
+<div class="card">
     <div class="top-info">
         <div class="date-box">
-            <span id="dayName"></span>
+            <span id="dayName" class="day-name"></span>
             <b id="dayNum"></b>
-            <span id="monthName"></span>
+            <span id="monthName" class="month-name"></span>
         </div>
         <img id="userLogo" src="" class="main-logo">
     </div>
 
     <div class="welcome-msg">
-        <div style="font-size: 1rem;">سعدنا بانضمامك معنا في</div>
-        <span class="v-family">أسرة فولتشر 🦅</span>
-        <div style="margin-top:12px;">مرحباً بك 🤝 <span id="userName" class="u-name-highlight">...</span></div>
+        <div>سعدنا بانضمامك معنا في<span class="v-family">أسرة فولتشر 🦅</span></div>
+        <div style="margin-top:10px;">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight">...</span></div>
     </div>
 
-    <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" style="color:var(--danger); font-weight:900;">0</span> يوم</div>
+    <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
 
-    <div class="prog-static"><div id="barConsumed" class="fill-red"><i class="fas fa-running running-person"></i></div></div>
+    <div class="prog-static">
+        <div id="barConsumed" class="fill-red">
+            <i class="fas fa-running running-person"></i>
+        </div>
+    </div>
 
     <div class="data-section">
         <div id="dataFields"></div>
@@ -109,17 +101,15 @@
         <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
         <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة فولتشر بالواتساب</a>
         <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
-        <button class="btn btn-change-pass" onclick="openChangeModal()"><i class="fas fa-key"></i> تغيير رمز قفل الصفحة</button>
     </div>
 </div>
 
-<div class="footer-rights" id="footerText" style="display: none;">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
+<div class="footer-rights">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
 
 <script>
-    const BASE_DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
-    const MASTER_KEY = "Aztlg1512";
-    let clientName = "", clientIndex = -1, storedCloudPass = null;
-
+    const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    
+    // ضبط التاريخ الميلادي الصحيح
     const today = new Date();
     document.getElementById('dayNum').innerText = today.getDate();
     document.getElementById('dayName').innerText = today.toLocaleDateString('ar-EG', { weekday: 'long' });
@@ -127,80 +117,66 @@
 
     async function load() {
         const urlParams = new URLSearchParams(window.location.search);
-        clientName = urlParams.get('name');
-        if(!clientName) return;
-        document.getElementById('cloudLockOverlay').style.display = 'flex';
+        const targetName = urlParams.get('name');
+        if(!targetName) return;
+
         try {
-            const res = await fetch(BASE_DB_URL + ".json");
+            const res = await fetch(DB_URL);
             const data = await res.json();
+            
             if(data.logo) document.getElementById('userLogo').src = data.logo;
-            clientIndex = (data.clients || []).findIndex(u => u.name === clientName);
-            const user = data.clients[clientIndex];
+            if(data.logoSize) document.getElementById('userLogo').style.width = data.logoSize + "px";
+
+            const user = (data.clients || []).find(u => u.name === targetName);
             if(user) {
-                storedCloudPass = user.userLock;
                 document.getElementById('userName').innerText = user.name;
-                document.getElementById('lockInputArea').style.display = 'block';
-                if (!storedCloudPass) {
-                    document.getElementById('lockTitle').innerText = "إعداد القفل 🛡️";
-                    document.getElementById('lockDesc').innerText = "اختر رمزاً خاصاً بك لحماية صفحتك";
-                } else {
-                    document.getElementById('lockTitle').innerText = "صفحة محمية 🔐";
-                    document.getElementById('lockDesc').innerText = "أدخل رمزك الخاص للدخول";
-                }
+                
                 const updateUI = () => {
-                    const now = new Date().getTime(), end = new Date(user.ce).getTime(), start = new Date(user.cs).getTime();
+                    const now = new Date().getTime();
+                    const start = new Date(user.cs).getTime();
+                    const end = new Date(user.ce).getTime();
+                    
+                    const totalDuration = end - start;
                     const timeLeft = end - now;
-                    document.getElementById('daysCount').innerText = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
-                    document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, ((now - start) / (end - start)) * 100)) + "%";
+
+                    // 1. تحديث رقم الأيام المتبقية (مع حركة النبض)
+                    const daysLeft = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
+                    document.getElementById('daysCount').innerText = daysLeft;
+
+                    // 2. تحديث شريط التقدم بناءً على الأيام المتبقية (من أصل السنة 365 يوم أو مدة الاشتراك)
+                    // كلما نقصت الأيام، زادت النسبة المستهلكة (اللون الأحمر)
+                    let percentRemaining = (timeLeft / totalDuration) * 100;
+                    let percentConsumed = Math.max(0, Math.min(100, 100 - percentRemaining));
+                    document.getElementById('barConsumed').style.width = percentConsumed + "%";
+
+                    // 3. تحديث مربعات الوقت
                     if(timeLeft > 0) {
                         const s=Math.floor(timeLeft/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
                         const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
                         document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
+                    } else {
+                        document.getElementById('timerGrid').innerHTML = "<b style='color:red; width:100%; text-align:center;'>انتهى الاشتراك</b>";
+                        document.querySelector('.running-person').style.display = 'none';
                     }
                 };
-                updateUI(); setInterval(updateUI, 1000);
-                const fields = [['رقم الجوال', user.cp],['اسم المستخدم', user.cu],['الرقم السري للاشتراك', user.ck],['رابط الدخول', user.cl],['بداية الاشتراك', user.cs],['نهاية الاشتراك', user.ce]];
-                document.getElementById('dataFields').innerHTML = fields.map((f, i) => `<div class="data-row"><div style="flex:1;"><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1] || '--'}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>`).join('');
+
+                updateUI();
+                setInterval(updateUI, 1000);
+
+                const fields = [['الجوال', user.cp || '--'], ['اسم المستخدم', user.cu || '--'], ['الرقم السري', user.ck || '--'], ['رابط الدخول', user.cl || '--'], ['تاريخ البداية', user.cs || '--'], ['تاريخ النهاية', user.ce || '--']];
+                document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
+                    <div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>
+                `).join('');
             }
         } catch(e) { console.error(e); }
     }
 
-    async function handleCloudLock() {
-        const input = document.getElementById('cloudPassInput').value;
-        if (!input) return alert("يرجى إدخال الرمز");
-        if (input === MASTER_KEY || input === storedCloudPass || (!storedCloudPass && input)) {
-            if (!storedCloudPass) await updatePassInCloud(input);
-            unlockApp();
-        } else { alert("الرمز غير صحيح ❌"); }
+    function copyText(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text);
+        alert("تم النسخ بنجاح ✅");
     }
 
-    async function updatePassInCloud(newPass) {
-        await fetch(`${BASE_DB_URL}clients/${clientIndex}/userLock.json`, { method: 'PUT', body: JSON.stringify(newPass) });
-        storedCloudPass = newPass;
-    }
-
-    function unlockApp() {
-        document.getElementById('cloudLockOverlay').style.display = 'none';
-        document.getElementById('mainCard').style.display = 'block';
-        document.getElementById('footerText').style.display = 'block';
-    }
-
-    function openChangeModal() { document.getElementById('changePassModal').style.display = 'flex'; }
-    function closeChangeModal() { document.getElementById('changePassModal').style.display = 'none'; }
-
-    async function processChangePass() {
-        const oldP = document.getElementById('oldPass').value;
-        const n1 = document.getElementById('newPass1').value;
-        const n2 = document.getElementById('newPass2').value;
-        if (oldP !== storedCloudPass && oldP !== MASTER_KEY) return alert("الرمز القديم غير صحيح ❌");
-        if (n1 !== n2) return alert("الرمزان الجديدان غير متطابقين ❌");
-        if (n1.length < 1) return alert("يرجى كتابة رمز جديد");
-        await updatePassInCloud(n1);
-        alert("تم تغيير رمز القفل بنجاح ✅");
-        closeChangeModal();
-    }
-
-    function copyText(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("تم النسخ ✅"); }
     load();
 </script>
 </body>
