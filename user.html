@@ -9,18 +9,18 @@
         :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* شاشة القفل */
+        /* --- شاشة القفل --- */
         #lockScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .lock-card { background: white; padding: 35px 20px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--main); }
         .pin-input { width: 80%; padding: 15px; border-radius: 15px; border: 2px solid #ddd; text-align: center; font-size: 1.5rem; margin: 20px 0; outline: none; }
 
-        /* البطاقة الرئيسية - مخفية تماماً حتى ينجح الإقلاع */
+        /* --- البطاقة الرئيسية (مخفية حتى ينجح الإقلاع) --- */
         .card { display: none; background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; }
+        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .date-box b { font-size: 1.8rem; color: #f87171; line-height: 1; display: block; }
-        .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; }
+        .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; transition: 0.3s ease; }
         
         .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.6; }
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
@@ -48,7 +48,6 @@
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
         .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; border: none; cursor: pointer; }
-        .btn-main { background: var(--main); }
         .btn-support { background: var(--success); }
         .btn-wa-channel { background: var(--wa); }
         .footer-rights { margin-top: 10px; text-align: center; color: #aaa; font-size: 0.75rem; padding-bottom: 20px; }
@@ -62,7 +61,7 @@
         <h2 id="lockTitle" style="margin-top:15px;">تحقق آمن</h2>
         <p id="lockDesc">يرجى إدخال الرمز الخاص بك</p>
         <input type="password" id="pinInput" class="pin-input" placeholder="****">
-        <button onclick="handleAuth()" id="authBtn" class="btn btn-main">دخول</button>
+        <button onclick="handleAuth()" id="authBtn" class="btn" style="background: var(--main); width: 100%;">دخول</button>
         <div id="errorMsg" style="color:var(--danger); margin-top:10px; font-weight:bold; display:none;"></div>
     </div>
 </div>
@@ -93,18 +92,18 @@
     <div class="action-btns">
         <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
         <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة فولتشر بالواتساب</a>
-        <a href="store.html" class="btn btn-main" style="background:#5e4cc1;"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
+        <a href="store.html" class="btn" style="background:#5e4cc1;"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
     </div>
 </div>
 
 <div class="footer-rights">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
 
 <script>
-    const DB_BASE = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
+    const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
     let clientIdx = -1;
     let user = null;
 
-    // التاريخ الفوري
+    // تهيئة التاريخ
     const d = new Date();
     document.getElementById('dayNum').innerText = d.getDate();
     document.getElementById('dayName').innerText = d.toLocaleString('ar-SA', {weekday: 'long'});
@@ -115,7 +114,7 @@
         if(!targetName) return;
 
         try {
-            const res = await fetch(DB_BASE + ".json");
+            const res = await fetch(DB_URL + ".json");
             const data = await res.json();
             
             if(data.logo) document.getElementById('userLogo').src = data.logo;
@@ -126,10 +125,10 @@
                 user = data.clients[clientIdx];
                 document.getElementById('userName').innerText = user.name;
 
-                // حالة الإنشاء لأول مرة
+                // إذا لم يكن العميل قد أنشأ رمزاً خاصاً بعد
                 if(!user.private_pin) {
                     document.getElementById('lockTitle').innerText = "إنشاء رمز خاص";
-                    document.getElementById('lockDesc').innerText = "أهلاً بك! اختر رقماً سرياً خاصاً بك لقفل الصفحة.";
+                    document.getElementById('lockDesc').innerText = "أهلاً بك! يرجى تعيين رمز سري خاص بك لقفل صفحتك.";
                     document.getElementById('authBtn').innerText = "حفظ الرمز والدخول";
                 }
             }
@@ -139,22 +138,19 @@
     async function handleAuth() {
         const val = document.getElementById('pinInput').value.trim();
         if(val.length < 2) {
-            msg("أدخل رمزاً صحيحاً (رقمين أو أكثر)");
+            msg("أدخل رمزاً صحيحاً");
             return;
         }
 
         if(!user.private_pin) {
+            // حفظ الرمز في الخانة السحابية المستقلة
             try {
-                await fetch(`${DB_BASE}clients/${clientIdx}/private_pin.json`, { method: 'PUT', body: JSON.stringify(val) });
+                await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'PUT', body: JSON.stringify(val) });
                 user.private_pin = val;
-                bootApp();
-            } catch(e) { msg("خطأ في الاتصال بالسحابة"); }
+                boot();
+            } catch(e) { msg("فشل الحفظ السحابي"); }
         } else {
-            if(val === user.private_pin) { 
-                bootApp(); 
-            } else { 
-                msg("الرمز غير صحيح!"); 
-            }
+            if(val === user.private_pin) { boot(); } else { msg("الرمز غير صحيح!"); }
         }
     }
 
@@ -163,12 +159,14 @@
         e.innerText = t; e.style.display = 'block';
     }
 
-    function bootApp() {
+    function boot() {
         document.getElementById('lockScreen').style.display = 'none';
-        const card = document.getElementById('mainCard');
-        card.style.display = 'block';
-        
-        [span_2](start_span)// رسم كافة الحقول الستة الأصلية[span_2](end_span)
+        document.getElementById('mainCard').style.display = 'block';
+        startApp();
+    }
+
+    function startApp() {
+        // رسم كافة الحقول الستة الأصلية
         const fields = [
             ['الجوال', user.cp || '--'], 
             ['اسم المستخدم', user.cu || '--'], 
@@ -189,7 +187,7 @@
             const now = new Date().getTime(), end = new Date(user.ce).getTime();
             const timeLeft = end - now, daysLeft = Math.max(0, Math.ceil(timeLeft / 86400000));
             document.getElementById('daysCount').innerText = daysLeft;
-            document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, 100 - (daysLeft / 365 * 100))) + "%";
+            document.getElementById('barConsumed').style.width = Math.max(0, 100 - (daysLeft / 365 * 100)) + "%";
 
             if(timeLeft > 0) {
                 const s=Math.floor(timeLeft/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
@@ -202,10 +200,7 @@
         updateUI(); setInterval(updateUI, 1000);
     }
 
-    function copyText(id) {
-        navigator.clipboard.writeText(document.getElementById(id).innerText);
-        alert("تم النسخ!");
-    }
+    function copyText(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("تم النسخ!"); }
 
     init();
 </script>
