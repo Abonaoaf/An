@@ -26,7 +26,6 @@
             min-height: 100vh;
         }
 
-        /* شاشة القفل */
         #lockScreen {
             position: fixed;
             top: 0;
@@ -62,7 +61,7 @@
             outline: none;
         }
 
-        /* البطاقة الرئيسية */
+        /* البطاقة مع الإطار العلوي والسفلي */
         .card {
             display: none;
             background: white;
@@ -72,6 +71,7 @@
             overflow: hidden;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             border-top: 8px solid var(--success);
+            border-bottom: 8px solid var(--success); /* الإطار السفلي الجديد */
         }
 
         .top-info {
@@ -79,7 +79,7 @@
             justify-content: center;
             gap: 20px;
             padding: 20px;
-            border-bottom: 1px solid #eee; /* هذا هو الخط الذي طلبت مثله */
+            border-bottom: 1px solid #eee;
             align-items: center;
         }
 
@@ -105,32 +105,23 @@
             object-fit: contain;
         }
 
-        /* --- منطقة الترحيب --- */
         .welcome-msg {
             padding: 20px;
             text-align: center;
         }
 
-        .welcome-line-1 {
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-        }
+        .welcome-line-1 { font-size: 1.1rem; margin-bottom: 15px; }
+        .welcome-line-2 { font-size: 1rem; margin-bottom: 10px; }
 
-        .welcome-line-2 {
-            font-size: 1rem;
-            margin-bottom: 10px;
-        }
-
-        /* تعديل أسرة فولتشر لإضافة الخط الخفيف */
         .v-family {
             color: var(--danger);
             font-weight: bold;
             font-size: 1.4rem;
             display: block;
             margin-top: 8px;
-            padding-bottom: 15px; /* مسافة قبل الخط */
-            border-bottom: 1px solid #eee; /* نفس الخط الخفيف العلوي */
-            margin-bottom: 15px; /* مسافة بعد الخط */
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
         }
 
         .u-name-highlight {
@@ -190,9 +181,7 @@
             transition: 0.5s linear;
         }
 
-        .data-section {
-            padding: 0 20px;
-        }
+        .data-section { padding: 0 20px; }
 
         .data-row {
             background: #f9f9f9;
@@ -219,12 +208,7 @@
             word-break: break-all;
         }
 
-        .copy-btn {
-            color: var(--soft-red);
-            cursor: pointer;
-            padding: 5px;
-            font-size: 1.1rem;
-        }
+        .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; font-size: 1.1rem; }
 
         .timer-grid {
             display: grid;
@@ -242,21 +226,10 @@
             text-align: center;
         }
 
-        .t-box b {
-            display: block;
-            color: var(--soft-red);
-            font-size: 1.1rem;
-        }
+        .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
+        .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
-        .t-box span {
-            font-size: 0.6rem;
-            color: #000;
-            font-weight: bold;
-        }
-
-        .action-btns {
-            padding: 10px 25px 25px 25px;
-        }
+        .action-btns { padding: 10px 25px 25px 25px; }
 
         .btn {
             display: block;
