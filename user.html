@@ -23,26 +23,16 @@
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
         .u-name-highlight { color: #000; font-weight: bold; font-size: 1.1rem; }
 
-        /* 1. حركة نبض المصافحة 🤝 */
-        @keyframes handshakePulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-        }
+        /* نبض المصافحة 🤝 */
+        @keyframes handshakePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
         .pulsing-handshake { display: inline-block; animation: handshakePulse 2s infinite ease-in-out; }
 
-        /* 2. حركة نبض الأيام المتبقية */
-        @keyframes daysPulseGlow {
-            0%, 100% { transform: scale(1); text-shadow: 0 0 0px var(--danger); }
-            50% { transform: scale(1.15); text-shadow: 0 0 10px var(--danger); color: var(--danger); }
-        }
+        /* نبض الأيام المتبقية */
+        @keyframes daysPulseGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 0px var(--danger); } 50% { transform: scale(1.15); text-shadow: 0 0 10px var(--danger); } }
         .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.4rem; animation: daysPulseGlow 1.5s infinite ease-in-out; margin: 0 5px; }
 
-        /* 3. حركة الشخص الذي يجري 🏃‍♂️ */
-        @keyframes runningManAction {
-            0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); }
-            25% { transform: scaleX(-1) translateY(-3px) rotate(-10deg); }
-            75% { transform: scaleX(-1) translateY(-3px) rotate(10deg); }
-        }
+        /* الشخص الذي يركض 🏃‍♂️ */
+        @keyframes runningManAction { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-10deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(10deg); } }
         .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; border: 1px solid #ddd; }
         .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s linear; border-radius: 0 10px 10px 0; position: relative; }
         .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; display: inline-block; animation: runningManAction 0.4s infinite linear; text-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 10; }
@@ -50,9 +40,9 @@
         .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
-        .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; }
-        .data-value { font-size: 0.85rem; font-weight: bold; color: #333; }
-        .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; }
+        .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; display: block; }
+        .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
+        .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; font-size: 1.1rem; }
 
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
@@ -109,7 +99,7 @@
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     
-    // ضبط التاريخ الميلادي الصحيح
+    // ضبط التاريخ الميلادي الصحيح (الأحد 5 أبريل)
     const today = new Date();
     document.getElementById('dayNum').innerText = today.getDate();
     document.getElementById('dayName').innerText = today.toLocaleDateString('ar-EG', { weekday: 'long' });
@@ -139,17 +129,14 @@
                     const totalDuration = end - start;
                     const timeLeft = end - now;
 
-                    // 1. تحديث رقم الأيام المتبقية (مع حركة النبض)
                     const daysLeft = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
                     document.getElementById('daysCount').innerText = daysLeft;
 
-                    // 2. تحديث شريط التقدم بناءً على الأيام المتبقية (من أصل السنة 365 يوم أو مدة الاشتراك)
-                    // كلما نقصت الأيام، زادت النسبة المستهلكة (اللون الأحمر)
+                    // حساب شريط التقدم بناءً على الأيام المتبقية
                     let percentRemaining = (timeLeft / totalDuration) * 100;
                     let percentConsumed = Math.max(0, Math.min(100, 100 - percentRemaining));
                     document.getElementById('barConsumed').style.width = percentConsumed + "%";
 
-                    // 3. تحديث مربعات الوقت
                     if(timeLeft > 0) {
                         const s=Math.floor(timeLeft/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
                         const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
@@ -163,9 +150,20 @@
                 updateUI();
                 setInterval(updateUI, 1000);
 
-                const fields = [['الجوال', user.cp || '--'], ['اسم المستخدم', user.cu || '--'], ['الرقم السري', user.ck || '--'], ['رابط الدخول', user.cl || '--'], ['تاريخ البداية', user.cs || '--'], ['تاريخ النهاية', user.ce || '--']];
+                // استرجاع كل البيانات بما فيها الرقم السري
+                const fields = [
+                    ['الجوال', user.cp || '--'], 
+                    ['اسم المستخدم', user.cu || '--'], 
+                    ['الرقم السري', user.ck || '--'], // الرقم السري رجع مكانه
+                    ['رابط الدخول', user.cl || '--'], 
+                    ['تاريخ البداية', user.cs || '--'], 
+                    ['تاريخ النهاية', user.ce || '--']
+                ];
                 document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
-                    <div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>
+                    <div class="data-row">
+                        <div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div>
+                        <i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i>
+                    </div>
                 `).join('');
             }
         } catch(e) { console.error(e); }
@@ -173,8 +171,9 @@
 
     function copyText(id) {
         const text = document.getElementById(id).innerText;
-        navigator.clipboard.writeText(text);
-        alert("تم النسخ بنجاح ✅");
+        navigator.clipboard.writeText(text).then(() => {
+            alert("تم نسخ البيانات بنجاح ✅");
+        });
     }
 
     load();
