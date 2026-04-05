@@ -9,24 +9,19 @@
         :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* شاشة القفل الخاصة بالعميل */
-        #personalLockOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a202c; display: none; justify-content: center; align-items: center; z-index: 10000; flex-direction: column; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
-        #personalLockOverlay input { padding: 15px; border-radius: 15px; border: none; width: 100%; max-width: 280px; text-align: center; font-size: 1.2rem; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        #personalLockOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid #4a4ae2; background: #4a4ae2; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; max-width: 280px; }
+        /* شاشة القفل السحابية */
+        #cloudLockOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a202c; display: none; justify-content: center; align-items: center; z-index: 10000; flex-direction: column; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
+        #cloudLockOverlay input { padding: 15px; border-radius: 15px; border: none; width: 100%; max-width: 280px; text-align: center; font-size: 1.2rem; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        #cloudLockOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid #4a4ae2; background: #4a4ae2; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; max-width: 280px; }
 
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
-        
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
         .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; }
         .date-box b { font-size: 1.8rem; color: var(--soft-red); display: block; line-height: 1; }
         .date-box span { font-size: 0.75rem; color: #666; font-weight: bold; }
-        
         .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; }
-        .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.6; }
-        .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
-        .u-name-highlight { color: #000; font-weight: bold; font-size: 1.1rem; }
 
-        /* حركات العناصر */
+        /* حركات الأنميشن */
         @keyframes handshakePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
         .pulsing-handshake { display: inline-block; animation: handshakePulse 2s infinite ease-in-out; }
         @keyframes daysGlowEffect { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; text-shadow: 0 0 10px var(--danger); } }
@@ -53,22 +48,23 @@
         .btn-store { background: #5e4cc1; }
         .btn-support { background: var(--success); }
         .btn-wa-channel { background: #075E54; }
-        .btn-lock-settings { background: #333; font-size: 0.8rem; padding: 10px; margin-top: 10px; }
-
+        
         .footer-rights { margin-top: 10px; text-align: center; color: #aaa; font-size: 0.75rem; padding-bottom: 20px; }
     </style>
 </head>
 <body>
 
-<div id="personalLockOverlay">
-    <div id="lockIconArea"><i class="fas fa-fingerprint" style="font-size: 4rem; color: #4a4ae2; margin-bottom: 20px;"></i></div>
-    <h3 id="lockTitle">خـصـوصـيـتـك أولاً 🔐</h3>
-    <p id="lockDesc">أدخل رمز القفل لفتح بياناتك</p>
-    <input type="password" id="personalPassInput" placeholder="الرمز السري">
-    <button id="lockActionBtn" onclick="handleLockAction()">فـتـح الـصـفـحـة</button>
+<div id="cloudLockOverlay">
+    <div id="lockIcon"><i class="fas fa-shield-alt" style="font-size: 4rem; color: #4a4ae2; margin-bottom: 20px;"></i></div>
+    <h3 id="lockTitle">تأمين الحساب 🛡️</h3>
+    <p id="lockDesc">جاري التحقق من حالة القفل...</p>
+    <div id="lockInputArea" style="display: none;">
+        <input type="password" id="cloudPassInput" placeholder="أدخل الرمز السري">
+        <button id="lockActionBtn" onclick="handleCloudLock()">تأكيد</button>
+    </div>
 </div>
 
-<div class="card" id="mainAppCard" style="display: none;">
+<div class="card" id="mainCard" style="display: none;">
     <div class="top-info">
         <div class="date-box">
             <span id="dayName"></span>
@@ -100,20 +96,18 @@
         <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
         <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة فولتشر بالواتساب</a>
         <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
-        
-        <button id="lockSettingsBtn" class="btn btn-lock-settings" onclick="resetPersonalLock()">
-            <i class="fas fa-user-shield"></i> إعادة تعيين رمز قفل الخصوصية
-        </button>
     </div>
 </div>
 
 <div class="footer-rights" id="footerText" style="display: none;">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
 
 <script>
-    const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
-    let clientID = ""; // معرف العميل من الرابط
+    const BASE_DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
+    let clientName = "";
+    let clientIndex = -1;
+    let storedCloudPass = null;
 
-    // ضبط التاريخ الميلادي
+    // التاريخ الميلادي
     const today = new Date();
     document.getElementById('dayNum').innerText = today.getDate();
     document.getElementById('dayName').innerText = today.toLocaleDateString('ar-EG', { weekday: 'long' });
@@ -121,78 +115,75 @@
 
     async function load() {
         const urlParams = new URLSearchParams(window.location.search);
-        clientID = urlParams.get('name');
-        if(!clientID) return;
+        clientName = urlParams.get('name');
+        if(!clientName) return;
 
-        // إدارة نظام القفل المحلي
-        const savedPass = localStorage.getItem('vulture_pass_' + clientID);
-        const overlay = document.getElementById('personalLockOverlay');
-        
-        if (!savedPass) {
-            // أول مرة يفتح العميل الصفحة: نطلب منه إنشاء رمز
-            overlay.style.display = 'flex';
-            document.getElementById('lockTitle').innerText = "إنشاء قفل خصوصية 🛡️";
-            document.getElementById('lockDesc').innerText = "هذا الرمز خاص بك فقط لحماية صفحتك، ضعه واحفظه جيداً";
-            document.getElementById('lockActionBtn').innerText = "تـعـيـيـن الـرمـز وحـفـظـه";
-        } else {
-            // العميل لديه رمز مسبق: نطلبه منه
-            overlay.style.display = 'flex';
-        }
+        document.getElementById('cloudLockOverlay').style.display = 'flex';
 
         try {
-            const res = await fetch(DB_URL);
+            const res = await fetch(BASE_DB_URL + ".json");
             const data = await res.json();
             
             if(data.logo) document.getElementById('userLogo').src = data.logo;
             if(data.logoSize) document.getElementById('userLogo').style.width = data.logoSize + "px";
 
-            const user = (data.clients || []).find(u => u.name === clientID);
+            clientIndex = (data.clients || []).findIndex(u => u.name === clientName);
+            const user = data.clients[clientIndex];
+
             if(user) {
+                storedCloudPass = user.userLock; // الرمز المختار من العميل والمخزن في Firebase
                 document.getElementById('userName').innerText = user.name;
-                
+                document.getElementById('lockInputArea').style.display = 'block';
+
+                if (!storedCloudPass) {
+                    document.getElementById('lockTitle').innerText = "إعداد القفل لأول مرة 🛡️";
+                    document.getElementById('lockDesc').innerText = "اختر رمزاً خاصاً بك لحماية صفحتك من أي جهاز";
+                    document.getElementById('lockActionBtn').innerText = "حفظ الرمز السحابي";
+                } else {
+                    document.getElementById('lockTitle').innerText = "صفحة محمية 🔐";
+                    document.getElementById('lockDesc').innerText = "أدخل الرمز الذي اخترته مسبقاً";
+                    document.getElementById('lockActionBtn').innerText = "دخول";
+                }
+
+                // تحديث العداد والبيانات
                 const updateUI = () => {
-                    const now = new Date().getTime();
-                    const start = new Date(user.cs).getTime();
-                    const end = new Date(user.ce).getTime();
+                    const now = new Date().getTime(), end = new Date(user.ce).getTime(), start = new Date(user.cs).getTime();
                     const timeLeft = end - now;
                     document.getElementById('daysCount').innerText = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
                     document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, ((now - start) / (end - start)) * 100)) + "%";
-
                     if(timeLeft > 0) {
                         const s=Math.floor(timeLeft/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
                         const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
                         document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
-                    } else {
-                        document.getElementById('timerGrid').innerHTML = "انتهى الاشتراك";
-                        document.querySelector('.running-person').style.display = 'none';
                     }
                 };
-                updateUI();
-                setInterval(updateUI, 1000);
+                updateUI(); setInterval(updateUI, 1000);
 
-                const fields = [['الجوال', user.cp || '--'], ['اسم المستخدم', user.cu || '--'], ['الرقم السري', user.ck || '--'], ['رابط الدخول', user.cl || '--'], ['تاريخ البداية', user.cs || '--'], ['تاريخ النهاية', user.ce || '--']];
+                const fields = [['الجوال', user.cp], ['اسم المستخدم', user.cu], ['الرقم السري', user.ck], ['رابط الدخول', user.cl], ['بداية الاشتراك', user.cs], ['نهاية الاشتراك', user.ce]];
                 document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
-                    <div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>
+                    <div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1] || '--'}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>
                 `).join('');
             }
         } catch(e) { console.error(e); }
     }
 
-    // التعامل مع شاشة القفل (إنشاء أو فتح)
-    function handleLockAction() {
-        const input = document.getElementById('personalPassInput').value;
-        const savedPass = localStorage.getItem('vulture_pass_' + clientID);
-
+    async function handleCloudLock() {
+        const input = document.getElementById('cloudPassInput').value;
         if (!input) return alert("يرجى إدخال الرمز");
 
-        if (!savedPass) {
-            // تعيين الرمز لأول مرة
-            localStorage.setItem('vulture_pass_' + clientID, input);
-            alert("تم تعيين رمز القفل بنجاح! احفظه جيداً ✅");
-            unlockApp();
+        if (!storedCloudPass) {
+            // حفظ الرمز في السحابة لأول مرة
+            try {
+                await fetch(`${BASE_DB_URL}clients/${clientIndex}/userLock.json`, {
+                    method: 'PUT',
+                    body: JSON.stringify(input)
+                });
+                alert("تم حفظ الرمز في السحابة بنجاح ✅");
+                unlockApp();
+            } catch (e) { alert("خطأ في الاتصال بالسحابة"); }
         } else {
-            // التحقق من الرمز الموجود
-            if (input === savedPass) {
+            // التحقق من الرمز المخزن سحابياً
+            if (input === storedCloudPass) {
                 unlockApp();
             } else {
                 alert("الرمز غير صحيح ❌");
@@ -201,16 +192,9 @@
     }
 
     function unlockApp() {
-        document.getElementById('personalLockOverlay').style.display = 'none';
-        document.getElementById('mainAppCard').style.display = 'block';
+        document.getElementById('cloudLockOverlay').style.display = 'none';
+        document.getElementById('mainCard').style.display = 'block';
         document.getElementById('footerText').style.display = 'block';
-    }
-
-    function resetPersonalLock() {
-        if(confirm("هل تريد إلغاء رمز القفل الحالي وتعيين رمز جديد؟")) {
-            localStorage.removeItem('vulture_pass_' + clientID);
-            location.reload();
-        }
     }
 
     function copyText(id) {
