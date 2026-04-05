@@ -6,15 +6,16 @@
     <title>بطاقة اشتراك فولتشر 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; --soft-red: #f87171; --dark-blue: #00008B; }
+        :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; }
-        .date-box b { font-size: 1.8rem; color: #f87171; display: block; line-height: 1; }
-        .date-box span { font-size: 0.75rem; color: #666; font-weight: bold; }
+        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .date-box .day-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-bottom: 2px; }
+        .date-box b { font-size: 1.8rem; color: var(--soft-red); line-height: 1; display: block; }
+        .date-box .month-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-top: 2px; }
         
         .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; }
 
@@ -22,16 +23,15 @@
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
         .u-name-highlight { color: #000; font-weight: bold; font-size: 1.1rem; }
 
-        /* حركة المصافحة 🤝 */
+        /* حركات العناصر */
         @keyframes handshakePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
         .pulsing-handshake { display: inline-block; animation: handshakePulse 2s infinite ease-in-out; }
 
-        /* حركة الأيام المتبقية */
         @keyframes daysGlowEffect { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; text-shadow: 0 0 10px var(--danger); } }
         .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.3rem; animation: daysGlowEffect 1.5s infinite; }
 
-        /* حركة الشخص الذي يجري */
         @keyframes runningMan { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-8deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(8deg); } }
+        
         .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; border: 1px solid #ddd; }
         .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.3s linear; border-radius: 0 10px 10px 0; position: relative; }
         .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; display: inline-block; animation: runningMan 0.4s infinite linear; text-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 10; }
@@ -43,10 +43,9 @@
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; }
         .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; }
 
-        /* تعديل ألوان العداد التنازلي للأزرق الغامق */
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-        .t-box b { display: block; color: var(--dark-blue); font-size: 1.1rem; } /* هنا تم تغيير اللون للأزرق الغامق */
+        .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
         .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; box-sizing: border-box;}
@@ -62,9 +61,9 @@
 <div class="card">
     <div class="top-info">
         <div class="date-box">
-            <span id="dayName"></span>
+            <span id="dayName" class="day-name"></span>
             <b id="dayNum"></b>
-            <span id="monthName"></span>
+            <span id="monthName" class="month-name"></span>
         </div>
         <img id="userLogo" src="" class="main-logo">
     </div>
@@ -99,10 +98,11 @@
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     
-    const d = new Date();
-    document.getElementById('dayNum').innerText = d.getDate();
-    document.getElementById('dayName').innerText = d.toLocaleString('ar-SA', {weekday: 'long'});
-    document.getElementById('monthName').innerText = d.toLocaleString('ar-SA', {month: 'long'});
+    // ضبط التاريخ (اليوم: الأحد، التاريخ: 5 أبريل)
+    const today = new Date();
+    document.getElementById('dayNum').innerText = today.getDate();
+    document.getElementById('dayName').innerText = today.toLocaleDateString('ar-SA', { weekday: 'long' });
+    document.getElementById('monthName').innerText = today.toLocaleDateString('ar-SA', { month: 'long' });
 
     async function load() {
         const urlParams = new URLSearchParams(window.location.search);
