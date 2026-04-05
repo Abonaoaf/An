@@ -15,22 +15,27 @@
         .auth-box input { width: 100%; padding: 15px; border-radius: 12px; border: none; text-align: center; font-size: 1.2rem; margin: 20px 0; outline: none; }
         .auth-box button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: white; color: var(--main); font-weight: bold; cursor: pointer; font-size: 1.1rem; }
 
-        /* البطاقة والمحتوى */
+        /* المحتوى الرئيسي */
         #userContent { display: none; width: 100%; max-width: 400px; padding: 15px; box-sizing: border-box; }
         .card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
         .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px; text-align: center; min-width: 85px; }
         .date-box b { font-size: 1.8rem; color: var(--soft-red); display: block; line-height: 1; }
         
-        .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; }
+        /* حركات النبض والجري */
+        @keyframes handshakePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+        .pulsing-handshake { display: inline-block; animation: handshakePulse 2s infinite ease-in-out; }
+        @keyframes daysPulseGlow { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.8; text-shadow: 0 0 10px var(--danger); } }
+        .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.4rem; animation: daysPulseGlow 1.5s infinite; }
+        @keyframes runningManAction { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-10deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(10deg); } }
+        
+        .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; border: 1px solid #ddd; }
         .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; border-radius: 0 10px 10px 0; position: relative; transition: 0.5s; }
-        .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; animation: run 0.4s infinite linear; }
-        @keyframes run { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-10deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(10deg); } }
+        .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; display: inline-block; animation: runningManAction 0.4s infinite linear; text-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 10; }
 
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 12px; margin: 8px 20px; display: flex; justify-content: space-between; border: 1px solid #f0f0f0; align-items: center; }
         .data-label { font-size: 0.7rem; color: var(--soft-red); font-weight: bold; }
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; }
-        
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 20px; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; }
         .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
@@ -44,11 +49,11 @@
 
 <div id="authOverlay">
     <div class="auth-box">
-        <i class="fas fa-lock-open" style="font-size:4rem; margin-bottom:15px;"></i>
+        <i id="authIcon" class="fas fa-user-lock" style="font-size:4rem; margin-bottom:15px;"></i>
         <h2 id="authTitle">جاري التحميل...</h2>
         <p id="authMsg">مرحباً بك في نظام فولتشر 🦅</p>
         <input type="password" id="passInput" style="display:none;">
-        <button id="authBtn" style="display:none;" onclick="processAuth()">فتح الصفحة</button>
+        <button id="authBtn" style="display:none;" onclick="processAuth()">دخول</button>
     </div>
 </div>
 
@@ -69,9 +74,8 @@
         </div>
 
         <div style="padding: 0 20px; text-align: right; font-weight: bold;">
-            باقي <span id="daysCount" style="color:var(--danger); font-size:1.5rem; display:inline-block; animation: pulse 1.5s infinite;">0</span> يوم 🤝
+            باقي <span id="daysCount" class="days-glow">0</span> يوم <span class="pulsing-handshake">🤝</span>
         </div>
-        <style>@keyframes pulse { 0%,100% {transform:scale(1);} 50% {transform:scale(1.1); text-shadow: 0 0 5px var(--danger);} }</style>
 
         <div class="prog-static"><div id="barConsumed" class="fill-red"><i class="fas fa-running running-person"></i></div></div>
 
@@ -81,7 +85,7 @@
         <div class="settings">
             <p style="font-size: 0.75rem; color: #888; margin-bottom: 5px;">قفل الصفحة (خاص بك فقط)</p>
             <input type="password" id="changeInput" placeholder="رقم قفل جديد">
-            <button onclick="updatePass()">تغيير القفل</button>
+            <button onclick="updatePass()">تحديث القفل</button>
         </div>
     </div>
     <div style="text-align:center; padding: 20px; color:#aaa; font-size:0.7rem;">جميع الحقوق محفوظة - فولتشر 🦅</div>
@@ -107,14 +111,13 @@
         document.getElementById('passInput').style.display = 'block';
         document.getElementById('authBtn').style.display = 'block';
 
-        // فحص حقل lock_code الجديد
         if(!user.lock_code || user.lock_code === "") {
             document.getElementById('authTitle').innerText = "إنشاء قفل للصفحة";
-            document.getElementById('authMsg').innerText = "هذا أول دخول لك، يرجى كتابة رقم سري لتقفل به صفحتك وتحمي بياناتك";
+            document.getElementById('authMsg').innerText = "يرجى كتابة رقم سري لتقفل به صفحتك وتحمي بياناتك";
             document.getElementById('passInput').placeholder = "اكتب رقم القفل الجديد";
         } else {
             document.getElementById('authTitle').innerText = "الصفحة مقفلة";
-            document.getElementById('authMsg').innerText = "يرجى إدخال رقم القفل لفتح بياناتك";
+            document.getElementById('authMsg').innerText = "أدخل رقم القفل لفتح بياناتك";
             document.getElementById('passInput').placeholder = "رقم القفل";
         }
     }
@@ -123,7 +126,6 @@
         const val = document.getElementById('passInput').value;
         const user = cloud.clients[uIdx];
         
-        // إذا لم يكن لديه قفل، نقوم بإنشائه الآن وحفظه في خانة lock_code
         if(!user.lock_code || user.lock_code === "") {
             if(val.length < 4) return alert("يرجى اختيار رقم من 4 خانات فأكثر");
             user.lock_code = val; 
@@ -131,7 +133,6 @@
             alert("✅ تم إنشاء قفل صفحتك بنجاح!"); 
             go(user);
         } else {
-            // التحقق برقم العميل الخاص أو الماستر كي
             if(val === user.lock_code || val === MASTER) go(user);
             else alert("❌ رقم القفل غير صحيح!");
         }
@@ -144,8 +145,8 @@
         document.getElementById('userName').innerText = user.name;
         
         const tick = () => {
-            const left = new Date(user.ce).getTime() - new Date().getTime();
-            const total = new Date(user.ce).getTime() - new Date(user.cs).getTime();
+            const now = new Date().getTime(), start = new Date(user.cs).getTime(), end = new Date(user.ce).getTime();
+            const total = end - start, left = end - now;
             document.getElementById('daysCount').innerText = Math.max(0, Math.ceil(left/86400000));
             document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, 100-(left/total*100))) + "%";
             if(left > 0) {
@@ -156,28 +157,23 @@
         };
         tick(); setInterval(tick, 1000);
         
-        // عرض البيانات التي وضعتها أنت في لوحة التحكم (اسم المستخدم والرقم السري للاشتراك)
-        const fields = [
-            ['رقم الجوال', user.cp],
-            ['اسم المستخدم (الاشتراك)', user.cu],
-            ['كلمة مرور (الاشتراك)', user.ck], // الحقل ck هنا هو بياناتك أنت
-            ['تاريخ الانتهاء', user.ce]
-        ];
-        document.getElementById('dataFields').innerHTML = fields.map(x=>`
-            <div class="data-row"><span class="data-label">${x[0]}</span><span class="data-value">${x[1]||'--'}</span></div>
+        const fields = [['رقم الجوال', user.cp], ['اسم المستخدم', user.cu], ['الرقم السري', user.ck], ['تاريخ الانتهاء', user.ce]];
+        document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
+            <div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1] || '--'}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>
         `).join('');
     }
 
     async function updatePass() {
         const p = document.getElementById('changeInput').value;
         if(p.length < 4) return alert("الرقم ضعيف!");
-        cloud.clients[uIdx].lock_code = p; // تحديث خانة القفل فقط
+        cloud.clients[uIdx].lock_code = p; 
         await sync(); 
         alert("✅ تم تحديث قفل الصفحة بنجاح!");
         document.getElementById('changeInput').value = "";
     }
 
     async function sync() { await fetch(DB, {method:'PUT', body: JSON.stringify(cloud)}); }
+    function copyText(id) { const text = document.getElementById(id).innerText; navigator.clipboard.writeText(text); alert("تم النسخ!"); }
     start();
 </script>
 </body>
