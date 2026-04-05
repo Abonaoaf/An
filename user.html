@@ -21,26 +21,19 @@
         .date-box span { font-size: 0.75rem; color: #666; font-weight: bold; }
         .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; }
 
-        /* حركات الأنميشن */
-        @keyframes handshakePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
-        .pulsing-handshake { display: inline-block; animation: handshakePulse 2s infinite ease-in-out; }
-        @keyframes daysGlowEffect { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; text-shadow: 0 0 10px var(--danger); } }
-        .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.3rem; animation: daysGlowEffect 1.5s infinite; }
         @keyframes runningMan { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-8deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(8deg); } }
-        
         .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; border: 1px solid #ddd; }
         .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.3s linear; border-radius: 0 10px 10px 0; position: relative; }
         .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; display: inline-block; animation: runningMan 0.4s infinite linear; text-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 10; }
 
         .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
-        .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; }
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; }
         .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; }
 
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
-        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; }
         .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
@@ -48,19 +41,36 @@
         .btn-store { background: #5e4cc1; }
         .btn-support { background: var(--success); }
         .btn-wa-channel { background: #075E54; }
-        
+        .btn-change-pass { background: #333; font-size: 0.8rem; padding: 10px; }
+
         .footer-rights { margin-top: 10px; text-align: center; color: #aaa; font-size: 0.75rem; padding-bottom: 20px; }
+
+        /* نافذة تغيير الرمز */
+        #changePassModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10001; justify-content: center; align-items: center; }
+        .modal-body { background: white; width: 90%; max-width: 350px; border-radius: 20px; padding: 20px; text-align: center; }
+        .modal-body input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; text-align: center; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <div id="cloudLockOverlay">
-    <div id="lockIcon"><i class="fas fa-shield-alt" style="font-size: 4rem; color: #4a4ae2; margin-bottom: 20px;"></i></div>
+    <div id="lockIcon"><i class="fas fa-user-lock" style="font-size: 4rem; color: #4a4ae2; margin-bottom: 20px;"></i></div>
     <h3 id="lockTitle">تأمين الحساب 🛡️</h3>
-    <p id="lockDesc">جاري التحقق من حالة القفل...</p>
+    <p id="lockDesc">جاري التحقق...</p>
     <div id="lockInputArea" style="display: none;">
         <input type="password" id="cloudPassInput" placeholder="أدخل الرمز السري">
-        <button id="lockActionBtn" onclick="handleCloudLock()">تأكيد</button>
+        <button id="lockActionBtn" onclick="handleCloudLock()">تـأكـيـد</button>
+    </div>
+</div>
+
+<div id="changePassModal">
+    <div class="modal-body">
+        <h3>تغيير رمز القفل 🔐</h3>
+        <input type="password" id="oldPass" placeholder="الرمز القديم">
+        <input type="password" id="newPass1" placeholder="الرمز الجديد">
+        <input type="password" id="newPass2" placeholder="تأكيد الرمز الجديد">
+        <button class="btn btn-support" onclick="processChangePass()">حفظ الرمز الجديد</button>
+        <button class="btn btn-lock-settings" style="background:#ddd; color:#333;" onclick="closeChangeModal()">إلغاء</button>
     </div>
 </div>
 
@@ -76,16 +86,12 @@
 
     <div class="welcome-msg">
         <div>سعدنا بانضمامك معنا في<span class="v-family">أسرة فولتشر 🦅</span></div>
-        <div style="margin-top:10px;">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight">...</span></div>
+        <div style="margin-top:10px;">مرحباً بك 🤝 <span id="userName" class="u-name-highlight">...</span></div>
     </div>
 
-    <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
+    <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" style="color:var(--danger); font-weight:900;">0</span> يوم</div>
 
-    <div class="prog-static">
-        <div id="barConsumed" class="fill-red">
-            <i class="fas fa-running running-person"></i>
-        </div>
-    </div>
+    <div class="prog-static"><div id="barConsumed" class="fill-red"><i class="fas fa-running running-person"></i></div></div>
 
     <div class="data-section">
         <div id="dataFields"></div>
@@ -96,6 +102,8 @@
         <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
         <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة فولتشر بالواتساب</a>
         <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
+        
+        <button class="btn btn-change-pass" onclick="openChangeModal()"><i class="fas fa-key"></i> تغيير رمز قفل الصفحة</button>
     </div>
 </div>
 
@@ -103,11 +111,9 @@
 
 <script>
     const BASE_DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
-    let clientName = "";
-    let clientIndex = -1;
-    let storedCloudPass = null;
+    const MASTER_KEY = "Aztlg1512";
+    let clientName = "", clientIndex = -1, storedCloudPass = null;
 
-    // التاريخ الميلادي
     const today = new Date();
     document.getElementById('dayNum').innerText = today.getDate();
     document.getElementById('dayName').innerText = today.toLocaleDateString('ar-EG', { weekday: 'long' });
@@ -117,35 +123,24 @@
         const urlParams = new URLSearchParams(window.location.search);
         clientName = urlParams.get('name');
         if(!clientName) return;
-
         document.getElementById('cloudLockOverlay').style.display = 'flex';
-
         try {
             const res = await fetch(BASE_DB_URL + ".json");
             const data = await res.json();
-            
             if(data.logo) document.getElementById('userLogo').src = data.logo;
-            if(data.logoSize) document.getElementById('userLogo').style.width = data.logoSize + "px";
-
             clientIndex = (data.clients || []).findIndex(u => u.name === clientName);
             const user = data.clients[clientIndex];
-
             if(user) {
-                storedCloudPass = user.userLock; // الرمز المختار من العميل والمخزن في Firebase
+                storedCloudPass = user.userLock;
                 document.getElementById('userName').innerText = user.name;
                 document.getElementById('lockInputArea').style.display = 'block';
-
                 if (!storedCloudPass) {
-                    document.getElementById('lockTitle').innerText = "إعداد القفل لأول مرة 🛡️";
-                    document.getElementById('lockDesc').innerText = "اختر رمزاً خاصاً بك لحماية صفحتك من أي جهاز";
-                    document.getElementById('lockActionBtn').innerText = "حفظ الرمز السحابي";
+                    document.getElementById('lockTitle').innerText = "إعداد القفل 🛡️";
+                    document.getElementById('lockDesc').innerText = "اختر رمزاً خاصاً بك لحماية صفحتك";
                 } else {
                     document.getElementById('lockTitle').innerText = "صفحة محمية 🔐";
-                    document.getElementById('lockDesc').innerText = "أدخل الرمز الذي اخترته مسبقاً";
-                    document.getElementById('lockActionBtn').innerText = "دخول";
+                    document.getElementById('lockDesc').innerText = "أدخل رمزك الخاص للدخول";
                 }
-
-                // تحديث العداد والبيانات
                 const updateUI = () => {
                     const now = new Date().getTime(), end = new Date(user.ce).getTime(), start = new Date(user.cs).getTime();
                     const timeLeft = end - now;
@@ -158,11 +153,8 @@
                     }
                 };
                 updateUI(); setInterval(updateUI, 1000);
-
-                const fields = [['الجوال', user.cp], ['اسم المستخدم', user.cu], ['الرقم السري', user.ck], ['رابط الدخول', user.cl], ['بداية الاشتراك', user.cs], ['نهاية الاشتراك', user.ce]];
-                document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
-                    <div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1] || '--'}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>
-                `).join('');
+                const fields = [['الجوال', user.cp],['اسم المستخدم', user.cu],['الرقم السري', user.ck],['رابط الدخول', user.cl]];
+                document.getElementById('dataFields').innerHTML = fields.map((f, i) => `<div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1] || '--'}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>`).join('');
             }
         } catch(e) { console.error(e); }
     }
@@ -170,25 +162,15 @@
     async function handleCloudLock() {
         const input = document.getElementById('cloudPassInput').value;
         if (!input) return alert("يرجى إدخال الرمز");
+        if (input === MASTER_KEY || input === storedCloudPass || (!storedCloudPass && input)) {
+            if (!storedCloudPass) await updatePassInCloud(input);
+            unlockApp();
+        } else { alert("الرمز غير صحيح ❌"); }
+    }
 
-        if (!storedCloudPass) {
-            // حفظ الرمز في السحابة لأول مرة
-            try {
-                await fetch(`${BASE_DB_URL}clients/${clientIndex}/userLock.json`, {
-                    method: 'PUT',
-                    body: JSON.stringify(input)
-                });
-                alert("تم حفظ الرمز في السحابة بنجاح ✅");
-                unlockApp();
-            } catch (e) { alert("خطأ في الاتصال بالسحابة"); }
-        } else {
-            // التحقق من الرمز المخزن سحابياً
-            if (input === storedCloudPass) {
-                unlockApp();
-            } else {
-                alert("الرمز غير صحيح ❌");
-            }
-        }
+    async function updatePassInCloud(newPass) {
+        await fetch(`${BASE_DB_URL}clients/${clientIndex}/userLock.json`, { method: 'PUT', body: JSON.stringify(newPass) });
+        storedCloudPass = newPass;
     }
 
     function unlockApp() {
@@ -197,11 +179,24 @@
         document.getElementById('footerText').style.display = 'block';
     }
 
-    function copyText(id) {
-        navigator.clipboard.writeText(document.getElementById(id).innerText);
-        alert("تم النسخ بنجاح ✅");
+    function openChangeModal() { document.getElementById('changePassModal').style.display = 'flex'; }
+    function closeChangeModal() { document.getElementById('changePassModal').style.display = 'none'; }
+
+    async function processChangePass() {
+        const oldP = document.getElementById('oldPass').value;
+        const n1 = document.getElementById('newPass1').value;
+        const n2 = document.getElementById('newPass2').value;
+
+        if (oldP !== storedCloudPass && oldP !== MASTER_KEY) return alert("الرمز القديم غير صحيح ❌");
+        if (n1 !== n2) return alert("الرمزان الجديدان غير متطابقين ❌");
+        if (n1.length < 1) return alert("يرجى كتابة رمز جديد");
+
+        await updatePassInCloud(n1);
+        alert("تم تغيير رمز القفل بنجاح ✅");
+        closeChangeModal();
     }
 
+    function copyText(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("تم النسخ ✅"); }
     load();
 </script>
 </body>
