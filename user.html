@@ -12,35 +12,20 @@
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
+        
+        /* مربع التاريخ - مستوحى من image_0.png */
         .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .date-box .day-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-bottom: 2px; }
-        .date-box b { font-size: 1.8rem; color: #f87171; line-height: 1; display: block; }
+        .date-box b { font-size: 1.8rem; color: #333; line-height: 1; display: block; }
         .date-box .month-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-top: 2px; }
-        
-        .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; transition: 0.3s ease; }
 
-        .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.6; }
+        .main-logo { width: 70px; height: 70px; border-radius: 15px; object-fit: contain; }
+
+        .welcome-msg { padding: 15px 20px; text-align: center; }
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
-        .u-name-highlight { color: #000000; font-weight: bold; font-size: 1.1rem; }
+        .u-name-highlight { color: var(--main); font-weight: bold; font-size: 1.1rem; }
 
-        /* --- كود تحريك إيموجي المصافحة (النبض الحار) --- */
-        @keyframes warmHandshake {
-            0% { transform: scale(1); }
-            30% { transform: scale(1.3); } /* يكبر قليلاً */
-            60% { transform: scale(1); }
-            80% { transform: scale(1.15); } /* نبضة ثانية أخف */
-            100% { transform: scale(1); }
-        }
-
-        .pulsing-handshake {
-            display: inline-block;
-            font-size: 1.3rem; /* تكبير الحجم قليلاً */
-            margin-left: 5px;
-            animation: warmHandshake 2s infinite ease-in-out; /* حركة مستمرة كسلام حار */
-            transform-origin: center; /* التحجيم من المنتصف */
-        }
-        /* ----------------------------------------------- */
-
+        /* حركة النبض - مستوحاة من image_1.png */
         @keyframes strongGlow {
             0% { transform: scale(1); text-shadow: 0 0 2px var(--danger); }
             50% { transform: scale(1.2); text-shadow: 0 0 10px var(--danger); }
@@ -56,13 +41,18 @@
 
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
+        
+        /* عناوين الحقول - أحمر وردي هادئ للتناسق */
         .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; margin-bottom: 2px; display: block; }
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
-        .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; font-size: 1.1rem; }
+        
+        /* أيقونة النسخ - مستوحاة من image_0.png */
+        .copy-btn { color: #f00; cursor: pointer; padding: 5px; font-size: 1.1rem; transition: 0.2s; }
+        .copy-btn:active { transform: scale(0.8); opacity: 0.7; }
 
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-        .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; animation: lightPulse 2s infinite ease-in-out; }
+        .t-box b { display: block; color: var(--danger); font-size: 1.1rem; animation: lightPulse 2s infinite ease-in-out; }
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
         .action-btns { padding: 15px 20px; }
@@ -88,7 +78,7 @@
 
     <div class="welcome-msg">
         <div>سعدنا بانضمامك معنا في<span class="v-family">أسرة فولتشر 🦅</span></div>
-        <div style="margin-top:10px;">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight">...</span></div>
+        <div style="margin-top:10px;">مرحباً بك 🤝 <span id="userName" class="u-name-highlight">...</span></div>
     </div>
 
     <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
@@ -112,6 +102,7 @@
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     
+    // ضبط التاريخ بالترتيب: اسم اليوم، الرقم، اسم الشهر
     const d = new Date();
     document.getElementById('dayNum').innerText = d.getDate();
     document.getElementById('dayName').innerText = d.toLocaleString('ar-SA', {weekday: 'long'});
@@ -124,10 +115,7 @@
         try {
             const res = await fetch(DB_URL);
             const data = await res.json();
-            
             if(data.logo) document.getElementById('userLogo').src = data.logo;
-            if(data.logoSize) document.getElementById('userLogo').style.width = data.logoSize + "px";
-
             const user = (data.clients || []).find(u => u.name === targetName);
             if(user) {
                 document.getElementById('userName').innerText = user.name;
