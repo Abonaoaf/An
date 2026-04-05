@@ -9,27 +9,28 @@
         :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
+        /* شاشة القفل الخاصة بالعميل */
+        #personalLockOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a202c; display: none; justify-content: center; align-items: center; z-index: 10000; flex-direction: column; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
+        #personalLockOverlay input { padding: 15px; border-radius: 15px; border: none; width: 100%; max-width: 280px; text-align: center; font-size: 1.2rem; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        #personalLockOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid #4a4ae2; background: #4a4ae2; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; max-width: 280px; }
+
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .date-box .day-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-bottom: 2px; }
-        .date-box b { font-size: 1.8rem; color: var(--soft-red); line-height: 1; display: block; }
-        .date-box .month-name { font-size: 0.75rem; color: #666; font-weight: bold; margin-top: 2px; }
+        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; }
+        .date-box b { font-size: 1.8rem; color: var(--soft-red); display: block; line-height: 1; }
+        .date-box span { font-size: 0.75rem; color: #666; font-weight: bold; }
         
         .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; }
-
         .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.6; }
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
         .u-name-highlight { color: #000; font-weight: bold; font-size: 1.1rem; }
 
-        /* حركات العناصر المتحركة */
+        /* حركات العناصر */
         @keyframes handshakePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
         .pulsing-handshake { display: inline-block; animation: handshakePulse 2s infinite ease-in-out; }
-
         @keyframes daysGlowEffect { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; text-shadow: 0 0 10px var(--danger); } }
         .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.3rem; animation: daysGlowEffect 1.5s infinite; }
-
         @keyframes runningMan { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-8deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(8deg); } }
         
         .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; border: 1px solid #ddd; }
@@ -48,22 +49,31 @@
         .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
-        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; box-sizing: border-box;}
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; box-sizing: border-box; cursor: pointer; border: none;}
         .btn-store { background: #5e4cc1; }
         .btn-support { background: var(--success); }
         .btn-wa-channel { background: #075E54; }
+        .btn-lock-settings { background: #333; font-size: 0.8rem; padding: 10px; margin-top: 10px; }
 
         .footer-rights { margin-top: 10px; text-align: center; color: #aaa; font-size: 0.75rem; padding-bottom: 20px; }
     </style>
 </head>
 <body>
 
-<div class="card">
+<div id="personalLockOverlay">
+    <div id="lockIconArea"><i class="fas fa-fingerprint" style="font-size: 4rem; color: #4a4ae2; margin-bottom: 20px;"></i></div>
+    <h3 id="lockTitle">خـصـوصـيـتـك أولاً 🔐</h3>
+    <p id="lockDesc">أدخل رمز القفل لفتح بياناتك</p>
+    <input type="password" id="personalPassInput" placeholder="الرمز السري">
+    <button id="lockActionBtn" onclick="handleLockAction()">فـتـح الـصـفـحـة</button>
+</div>
+
+<div class="card" id="mainAppCard" style="display: none;">
     <div class="top-info">
         <div class="date-box">
-            <span id="dayName" class="day-name"></span>
+            <span id="dayName"></span>
             <b id="dayNum"></b>
-            <span id="monthName" class="month-name"></span>
+            <span id="monthName"></span>
         </div>
         <img id="userLogo" src="" class="main-logo">
     </div>
@@ -90,28 +100,44 @@
         <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
         <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة فولتشر بالواتساب</a>
         <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
+        
+        <button id="lockSettingsBtn" class="btn btn-lock-settings" onclick="resetPersonalLock()">
+            <i class="fas fa-user-shield"></i> إعادة تعيين رمز قفل الخصوصية
+        </button>
     </div>
 </div>
 
-<div class="footer-rights">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
+<div class="footer-rights" id="footerText" style="display: none;">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
 
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
-    
-    // ضبط التاريخ الميلادي الصريح (5 أبريل الأحد)
-    const today = new Date();
-    const dayOptions = { weekday: 'long' };
-    const monthOptions = { month: 'long' };
+    let clientID = ""; // معرف العميل من الرابط
 
+    // ضبط التاريخ الميلادي
+    const today = new Date();
     document.getElementById('dayNum').innerText = today.getDate();
-    // استخدام ar-EG لضمان الأسماء الميلادية (أبريل بدلاً من شوال)
-    document.getElementById('dayName').innerText = today.toLocaleDateString('ar-EG', dayOptions);
-    document.getElementById('monthName').innerText = today.toLocaleDateString('ar-EG', monthOptions);
+    document.getElementById('dayName').innerText = today.toLocaleDateString('ar-EG', { weekday: 'long' });
+    document.getElementById('monthName').innerText = today.toLocaleDateString('ar-EG', { month: 'long' });
 
     async function load() {
         const urlParams = new URLSearchParams(window.location.search);
-        const targetName = urlParams.get('name');
-        if(!targetName) return;
+        clientID = urlParams.get('name');
+        if(!clientID) return;
+
+        // إدارة نظام القفل المحلي
+        const savedPass = localStorage.getItem('vulture_pass_' + clientID);
+        const overlay = document.getElementById('personalLockOverlay');
+        
+        if (!savedPass) {
+            // أول مرة يفتح العميل الصفحة: نطلب منه إنشاء رمز
+            overlay.style.display = 'flex';
+            document.getElementById('lockTitle').innerText = "إنشاء قفل خصوصية 🛡️";
+            document.getElementById('lockDesc').innerText = "هذا الرمز خاص بك فقط لحماية صفحتك، ضعه واحفظه جيداً";
+            document.getElementById('lockActionBtn').innerText = "تـعـيـيـن الـرمـز وحـفـظـه";
+        } else {
+            // العميل لديه رمز مسبق: نطلبه منه
+            overlay.style.display = 'flex';
+        }
 
         try {
             const res = await fetch(DB_URL);
@@ -120,7 +146,7 @@
             if(data.logo) document.getElementById('userLogo').src = data.logo;
             if(data.logoSize) document.getElementById('userLogo').style.width = data.logoSize + "px";
 
-            const user = (data.clients || []).find(u => u.name === targetName);
+            const user = (data.clients || []).find(u => u.name === clientID);
             if(user) {
                 document.getElementById('userName').innerText = user.name;
                 
@@ -128,27 +154,19 @@
                     const now = new Date().getTime();
                     const start = new Date(user.cs).getTime();
                     const end = new Date(user.ce).getTime();
-                    
-                    const totalDuration = end - start;
-                    const timePassed = now - start;
                     const timeLeft = end - now;
-
-                    const daysLeft = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
-                    document.getElementById('daysCount').innerText = daysLeft;
-
-                    let percentConsumed = Math.max(0, Math.min(100, (timePassed / totalDuration) * 100));
-                    document.getElementById('barConsumed').style.width = percentConsumed + "%";
+                    document.getElementById('daysCount').innerText = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
+                    document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, ((now - start) / (end - start)) * 100)) + "%";
 
                     if(timeLeft > 0) {
                         const s=Math.floor(timeLeft/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
                         const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
                         document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
                     } else {
-                        document.getElementById('timerGrid').innerHTML = "<b style='color:red; width:100%; text-align:center;'>انتهى الاشتراك</b>";
+                        document.getElementById('timerGrid').innerHTML = "انتهى الاشتراك";
                         document.querySelector('.running-person').style.display = 'none';
                     }
                 };
-
                 updateUI();
                 setInterval(updateUI, 1000);
 
@@ -160,9 +178,43 @@
         } catch(e) { console.error(e); }
     }
 
+    // التعامل مع شاشة القفل (إنشاء أو فتح)
+    function handleLockAction() {
+        const input = document.getElementById('personalPassInput').value;
+        const savedPass = localStorage.getItem('vulture_pass_' + clientID);
+
+        if (!input) return alert("يرجى إدخال الرمز");
+
+        if (!savedPass) {
+            // تعيين الرمز لأول مرة
+            localStorage.setItem('vulture_pass_' + clientID, input);
+            alert("تم تعيين رمز القفل بنجاح! احفظه جيداً ✅");
+            unlockApp();
+        } else {
+            // التحقق من الرمز الموجود
+            if (input === savedPass) {
+                unlockApp();
+            } else {
+                alert("الرمز غير صحيح ❌");
+            }
+        }
+    }
+
+    function unlockApp() {
+        document.getElementById('personalLockOverlay').style.display = 'none';
+        document.getElementById('mainAppCard').style.display = 'block';
+        document.getElementById('footerText').style.display = 'block';
+    }
+
+    function resetPersonalLock() {
+        if(confirm("هل تريد إلغاء رمز القفل الحالي وتعيين رمز جديد؟")) {
+            localStorage.removeItem('vulture_pass_' + clientID);
+            location.reload();
+        }
+    }
+
     function copyText(id) {
-        const text = document.getElementById(id).innerText;
-        navigator.clipboard.writeText(text);
+        navigator.clipboard.writeText(document.getElementById(id).innerText);
         alert("تم النسخ بنجاح ✅");
     }
 
