@@ -9,28 +9,36 @@
         :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* شاشة القفل المستقلة */
+        /* --- شاشة القفل المستقلة --- */
         #lockScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .lock-card { background: white; padding: 35px 20px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--main); }
         .pin-input { width: 80%; padding: 15px; border-radius: 15px; border: 2px solid #ddd; text-align: center; font-size: 1.5rem; margin: 20px 0; outline: none; transition: 0.3s; }
-        
-        /* البطاقة الرئيسية - مخفية حتى يتم الفتح */
+        .pin-input:focus { border-color: var(--main); }
+
+        /* --- البطاقة الرئيسية (مخفية حتى النجاح في الدخول) --- */
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); display: none; }
         
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; }
-        .date-box b { font-size: 1.8rem; color: #f87171; line-height: 1; }
+        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .date-box b { font-size: 1.8rem; color: #f87171; line-height: 1; display: block; }
         .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; }
         
         .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.6; }
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
+        .u-name-highlight { color: #000000; font-weight: bold; font-size: 1.1rem; }
+
+        @keyframes warmHandshake { 0%, 100% { transform: scale(1); } 30% { transform: scale(1.3); } 80% { transform: scale(1.15); } }
+        .pulsing-handshake { display: inline-block; font-size: 1.3rem; margin-left: 5px; animation: warmHandshake 2s infinite ease-in-out; }
         
+        @keyframes strongGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--danger); } 50% { transform: scale(1.2); text-shadow: 0 0 10px var(--danger); } }
+        .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.3rem; animation: strongGlow 1.2s infinite ease-in-out; margin: 0 5px; }
+
         .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
         .prog-static { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 20px; position: relative; }
         .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s linear; }
 
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
-        .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; }
+        .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; display: block; }
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
         .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; }
 
@@ -39,8 +47,7 @@
         .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
-        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; cursor: pointer; border: none; font-size: 0.95rem; }
-        .btn-main { background: var(--main); }
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; border: none; cursor: pointer; }
         .btn-support { background: var(--success); }
         .btn-wa-channel { background: var(--wa); }
         .footer-rights { margin-top: 10px; text-align: center; color: #aaa; font-size: 0.75rem; padding-bottom: 20px; }
@@ -50,11 +57,11 @@
 
 <div id="lockScreen">
     <div class="lock-card">
-        <i id="lockIcon" class="fas fa-user-shield" style="font-size: 3.5rem; color: var(--main);"></i>
+        <i id="lockIcon" class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--main);"></i>
         <h2 id="lockTitle" style="margin-top:15px;">تحقق آمن</h2>
-        <p id="lockDesc">يرجى إدخال الرقم السري الخاص بك</p>
+        <p id="lockDesc">يرجى إدخال الرمز الخاص بك</p>
         <input type="password" id="pinInput" class="pin-input" placeholder="****">
-        <button onclick="handleAuth()" id="authBtn" class="btn btn-main">دخول</button>
+        <button onclick="handleAuth()" id="authBtn" class="btn" style="background: var(--main);">دخول</button>
         <div id="errorMsg" style="color:var(--danger); margin-top:10px; font-weight:bold; display:none;"></div>
     </div>
 </div>
@@ -62,22 +69,22 @@
 <div id="mainCard" class="card">
     <div class="top-info">
         <div class="date-box">
-            <span id="dayName" style="font-size:0.75rem; color:#666; font-weight:bold;"></span>
+            <span id="dayName" style="font-size: 0.75rem; color: #666; font-weight: bold;"></span>
             <b id="dayNum"></b>
-            <span id="monthName" style="font-size:0.75rem; color:#666; font-weight:bold;"></span>
+            <span id="monthName" style="font-size: 0.75rem; color: #666; font-weight: bold;"></span>
         </div>
         <img id="userLogo" src="" class="main-logo">
     </div>
 
     <div class="welcome-msg">
         <div>سعدنا بانضمامك معنا في<span class="v-family">أسرة فولتشر 🦅</span></div>
-        <div style="margin-top:10px;">مرحباً بك 🤝 <span id="userName" style="font-weight:bold; color:#000;"></span></div>
+        <div style="margin-top:10px;">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight"></span></div>
     </div>
 
-    <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" style="color:var(--danger); font-weight:900;">0</span> يوم</div>
+    <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
     <div class="prog-static"><div id="barConsumed" class="fill-red"></div></div>
 
-    <div class="data-section" style="padding: 0 20px;">
+    <div class="data-section">
         <div id="dataFields"></div>
         <div class="timer-grid" id="timerGrid"></div>
     </div>
@@ -93,7 +100,7 @@
 <script>
     const DB_BASE = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
     let clientIdx = -1;
-    let userData = null;
+    let user = null;
 
     // تهيئة التاريخ
     const d = new Date();
@@ -101,7 +108,7 @@
     document.getElementById('dayName').innerText = d.toLocaleString('ar-SA', {weekday: 'long'});
     document.getElementById('monthName').innerText = d.toLocaleString('ar-SA', {month: 'long'});
 
-    async function loadData() {
+    async function init() {
         const name = new URLSearchParams(window.location.search).get('name');
         if(!name) return;
 
@@ -111,74 +118,72 @@
             
             clientIdx = (data.clients || []).findIndex(c => c.name === name);
             if(clientIdx !== -1) {
-                userData = data.clients[clientIdx];
-                document.getElementById('userName').innerText = userData.name;
+                user = data.clients[clientIdx];
+                document.getElementById('userName').innerText = user.name;
                 if(data.logo) document.getElementById('userLogo').src = data.logo;
 
-                // إذا كانت الخانة الجديدة private_pin فارغة بالسحابة
-                if (!userData.private_pin) {
-                    document.getElementById('lockTitle').innerText = "إنشاء رقم سري";
-                    document.getElementById('lockDesc').innerText = "هذا أول دخول لك، اختر رقماً سرياً خاصاً بك لقفل هذه الصفحة مستقبلاً.";
-                    document.getElementById('authBtn').innerText = "حفظ الرقم وفتح الصفحة";
+                // إذا كان العميل يفتح الصفحة لأول مرة (الخانة الجديدة فارغة في السحابة)
+                if(!user.private_pin) {
+                    document.getElementById('lockIcon').className = "fas fa-user-plus";
+                    document.getElementById('lockTitle').innerText = "إنشاء رمز قفل";
+                    document.getElementById('lockDesc').innerText = "اختر رمزاً سرياً خاصاً بك لحماية هذه الصفحة دائماً.";
+                    document.getElementById('authBtn').innerText = "حفظ الرمز وفتح الصفحة";
                 }
             }
         } catch(e) { console.error(e); }
     }
 
     async function handleAuth() {
-        const inputPin = document.getElementById('pinInput').value.trim();
-        if(inputPin.length < 2) {
-            msg("يرجى إدخال رقم صحيح");
+        const val = document.getElementById('pinInput').value.trim();
+        if(val.length < 2) {
+            showMsg("يرجى إدخال رمز صحيح (رقمين فأكثر)");
             return;
         }
 
-        // الحالة 1: العميل ينشئ رقماً لأول مرة
-        if (!userData.private_pin) {
+        if(!user.private_pin) {
+            // حفظ الرمز المختار من قبل العميل في الخانة الجديدة بالسحابة
             try {
-                // حفظ في خانة جديدة تماماً private_pin
                 await fetch(`${DB_BASE}clients/${clientIdx}/private_pin.json`, {
                     method: 'PUT',
-                    body: JSON.stringify(inputPin)
+                    body: JSON.stringify(val)
                 });
-                userData.private_pin = inputPin;
-                openApp();
-            } catch(e) { msg("فشل حفظ الرقم في السحابة"); }
-        } 
-        // الحالة 2: التحقق من الرقم المحفوظ مسبقاً
-        else {
-            if (inputPin === userData.private_pin) {
-                openApp();
+                user.private_pin = val;
+                unlock();
+            } catch(e) { showMsg("فشل الاتصال بالسحابة"); }
+        } else {
+            // التحقق من الرمز المحفوظ مسبقاً
+            if(val === user.private_pin) {
+                unlock();
             } else {
-                msg("الرقم السري غير صحيح!");
+                showMsg("الرمز غير صحيح!");
             }
         }
     }
 
-    function openApp() {
+    function unlock() {
         document.getElementById('lockScreen').style.display = 'none';
         document.getElementById('mainCard').style.display = 'block';
-        startApp();
+        renderApp();
     }
 
-    function msg(t) {
+    function showMsg(t) {
         const e = document.getElementById('errorMsg');
         e.innerText = t; e.style.display = 'block';
     }
 
-    function startApp() {
+    function renderApp() {
         const fields = [
-            ['الجوال', userData.cp || '--'],
-            ['اسم المستخدم', userData.cu || '--'],
-            ['الرقم السري', userData.ck || '--'],
-            ['تاريخ النهاية', userData.ce || '--']
+            ['الجوال', user.cp || '--'],
+            ['المستخدم', user.cu || '--'],
+            ['الرقم السري', user.ck || '--'], // بيانات الاشتراك الأصلية
+            ['تاريخ النهاية', user.ce || '--']
         ];
-        
         document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
-            <div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>
+            <div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="v${i}">${f[1]}</div></div><i class="far fa-copy copy-btn" onclick="copyText('v${i}')"></i></div>
         `).join('');
 
-        const updateTimer = () => {
-            const now = new Date().getTime(), end = new Date(userData.ce).getTime();
+        const updateUI = () => {
+            const now = new Date().getTime(), end = new Date(user.ce).getTime();
             const left = end - now, days = Math.max(0, Math.ceil(left / 86400000));
             document.getElementById('daysCount').innerText = days;
             document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%";
@@ -187,9 +192,11 @@
                 const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
                 const u = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
                 document.getElementById('timerGrid').innerHTML = u.map(x => `<div class="t-box"><b>${x[1]}</b><span>${x[0]}</span></div>`).reverse().join('');
+            } else {
+                document.getElementById('timerGrid').innerHTML = "<b style='color:red;width:100%'>انتهى الاشتراك</b>";
             }
         };
-        updateTimer(); setInterval(updateTimer, 1000);
+        updateUI(); setInterval(updateUI, 1000);
     }
 
     function copyText(id) {
@@ -197,7 +204,7 @@
         alert("تم النسخ!");
     }
 
-    loadData();
+    init();
 </script>
 </body>
 </html>
