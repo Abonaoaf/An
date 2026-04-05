@@ -23,24 +23,30 @@
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
         .u-name-highlight { color: #000000; font-weight: bold; font-size: 1.1rem; }
 
-        @keyframes warmHandshake { 0%, 60%, 100% { transform: scale(1); } 30% { transform: scale(1.3); } 80% { transform: scale(1.15); } }
-        .pulsing-handshake { display: inline-block; font-size: 1.3rem; margin-left: 5px; animation: warmHandshake 2s infinite ease-in-out; transform-origin: center; }
+        /* حركة الشخص الذي يجري */
+        @keyframes fastRun {
+            0% { transform: scaleX(-1) translateY(0) rotate(0deg); }
+            25% { transform: scaleX(-1) translateY(-2px) rotate(-5deg); }
+            50% { transform: scaleX(-1) translateY(0) rotate(0deg); }
+            75% { transform: scaleX(-1) translateY(-2px) rotate(5deg); }
+            100% { transform: scaleX(-1) translateY(0) rotate(0deg); }
+        }
 
-        @keyframes strongGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--danger); } 50% { transform: scale(1.2); text-shadow: 0 0 10px var(--danger); } }
-        .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.3rem; animation: strongGlow 1.2s infinite ease-in-out; margin: 0 5px; }
-
-        @keyframes lightPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.9; } }
-
-        .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
-        
-        /* --- تنسيق شريط التقدم مع الشخص الذي يجري --- */
         .prog-static { height: 16px; background: var(--success); border-radius: 10px; overflow: visible; margin: 10px 20px; position: relative; border: 1px solid #ddd; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
         .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s linear; border-radius: 0 10px 10px 0; position: relative; }
         
-        /* أيقونة الشخص الذي يجري (يجري جهة اليسار) */
-        .running-person { position: absolute; left: -10px; top: -4px; color: white; font-size: 1.2rem; transform: scaleX(-1); text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-        /* ----------------------------------------------- */
+        .running-person { 
+            position: absolute; 
+            left: -12px; 
+            top: -4px; 
+            color: white; 
+            font-size: 1.2rem; 
+            display: inline-block;
+            animation: fastRun 0.4s infinite linear; /* حركة جري سريعة */
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3); 
+        }
 
+        .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; margin-bottom: 2px; display: block; }
@@ -49,7 +55,7 @@
 
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
         .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-        .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; animation: lightPulse 2s infinite ease-in-out; }
+        .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
         .action-btns { padding: 15px 20px; }
@@ -70,15 +76,15 @@
             <b id="dayNum"></b>
             <span id="monthName" class="month-name"></span>
         </div>
-        <img id="userLogo" src="https://cdn-icons-png.flaticon.com/512/5359/5359051.png" class="main-logo">
+        <img id="userLogo" src="" class="main-logo">
     </div>
 
     <div class="welcome-msg">
         <div>سعدنا بانضمامك معنا في<span class="v-family">أسرة فولتشر 🦅</span></div>
-        <div style="margin-top:10px;">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight">...</span></div>
+        <div style="margin-top:10px;">مرحباً بك 🤝 <span id="userName" class="u-name-highlight">...</span></div>
     </div>
 
-    <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
+    <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" style="color:var(--danger); font-weight:900;">0</span> يوم</div>
 
     <div class="prog-static">
         <div id="barConsumed" class="fill-red">
@@ -127,7 +133,6 @@
                     const timeLeft = end - now, daysLeft = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
                     document.getElementById('daysCount').innerText = daysLeft;
                     
-                    // حساب النسبة المئوية للمستهلك (لتحديد مكان الشخص)
                     const maxDays = 365;
                     let redPercent = Math.max(0, Math.min(100, 100 - (daysLeft / maxDays * 100)));
                     document.getElementById('barConsumed').style.width = redPercent + "%";
@@ -138,7 +143,6 @@
                         document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
                     } else {
                         document.getElementById('timerGrid').innerHTML = "<b style='color:red; width:100%; text-align:center;'>انتهى الاشتراك</b>";
-                        // إخفاء الشخص إذا انتهى الاشتراك
                         document.querySelector('.running-person').style.display = 'none';
                     }
                 };
