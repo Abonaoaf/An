@@ -15,11 +15,17 @@
         #cloudLockOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid #4a4ae2; background: #4a4ae2; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; max-width: 280px; }
 
         .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
+        
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
         .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; }
         .date-box b { font-size: 1.8rem; color: var(--soft-red); display: block; line-height: 1; }
         .date-box span { font-size: 0.75rem; color: #666; font-weight: bold; }
         .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; }
+
+        /* تعديل قسم الترحيب ليكون في الوسط */
+        .welcome-msg { padding: 20px; text-align: center; width: 100%; box-sizing: border-box; }
+        .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; text-align: center; }
+        .u-name-highlight { color: #000; font-weight: bold; font-size: 1.1rem; }
 
         @keyframes runningMan { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-8deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(8deg); } }
         .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; border: 1px solid #ddd; }
@@ -27,9 +33,10 @@
         .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; display: inline-block; animation: runningMan 0.4s infinite linear; text-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 10; }
 
         .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
+        .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; }
-        .data-value { font-size: 0.85rem; font-weight: bold; color: #333; }
+        .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; text-align: right; }
         .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; }
 
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
@@ -45,7 +52,6 @@
 
         .footer-rights { margin-top: 10px; text-align: center; color: #aaa; font-size: 0.75rem; padding-bottom: 20px; }
 
-        /* نافذة تغيير الرمز */
         #changePassModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10001; justify-content: center; align-items: center; }
         .modal-body { background: white; width: 90%; max-width: 350px; border-radius: 20px; padding: 20px; text-align: center; }
         .modal-body input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; text-align: center; box-sizing: border-box; }
@@ -70,7 +76,7 @@
         <input type="password" id="newPass1" placeholder="الرمز الجديد">
         <input type="password" id="newPass2" placeholder="تأكيد الرمز الجديد">
         <button class="btn btn-support" onclick="processChangePass()">حفظ الرمز الجديد</button>
-        <button class="btn btn-lock-settings" style="background:#ddd; color:#333;" onclick="closeChangeModal()">إلغاء</button>
+        <button class="btn" style="background:#ddd; color:#333;" onclick="closeChangeModal()">إلغاء</button>
     </div>
 </div>
 
@@ -85,8 +91,9 @@
     </div>
 
     <div class="welcome-msg">
-        <div>سعدنا بانضمامك معنا في<span class="v-family">أسرة فولتشر 🦅</span></div>
-        <div style="margin-top:10px;">مرحباً بك 🤝 <span id="userName" class="u-name-highlight">...</span></div>
+        <div style="font-size: 1rem;">سعدنا بانضمامك معنا في</div>
+        <span class="v-family">أسرة فولتشر 🦅</span>
+        <div style="margin-top:12px;">مرحباً بك 🤝 <span id="userName" class="u-name-highlight">...</span></div>
     </div>
 
     <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" style="color:var(--danger); font-weight:900;">0</span> يوم</div>
@@ -102,7 +109,6 @@
         <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
         <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة فولتشر بالواتساب</a>
         <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
-        
         <button class="btn btn-change-pass" onclick="openChangeModal()"><i class="fas fa-key"></i> تغيير رمز قفل الصفحة</button>
     </div>
 </div>
@@ -153,8 +159,8 @@
                     }
                 };
                 updateUI(); setInterval(updateUI, 1000);
-                const fields = [['الجوال', user.cp],['اسم المستخدم', user.cu],['الرقم السري', user.ck],['رابط الدخول', user.cl]];
-                document.getElementById('dataFields').innerHTML = fields.map((f, i) => `<div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1] || '--'}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>`).join('');
+                const fields = [['رقم الجوال', user.cp],['اسم المستخدم', user.cu],['الرقم السري للاشتراك', user.ck],['رابط الدخول', user.cl],['بداية الاشتراك', user.cs],['نهاية الاشتراك', user.ce]];
+                document.getElementById('dataFields').innerHTML = fields.map((f, i) => `<div class="data-row"><div style="flex:1;"><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1] || '--'}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>`).join('');
             }
         } catch(e) { console.error(e); }
     }
@@ -186,11 +192,9 @@
         const oldP = document.getElementById('oldPass').value;
         const n1 = document.getElementById('newPass1').value;
         const n2 = document.getElementById('newPass2').value;
-
         if (oldP !== storedCloudPass && oldP !== MASTER_KEY) return alert("الرمز القديم غير صحيح ❌");
         if (n1 !== n2) return alert("الرمزان الجديدان غير متطابقين ❌");
         if (n1.length < 1) return alert("يرجى كتابة رمز جديد");
-
         await updatePassInCloud(n1);
         alert("تم تغيير رمز القفل بنجاح ✅");
         closeChangeModal();
