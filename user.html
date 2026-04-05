@@ -47,11 +47,13 @@
         .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
-        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; border: none; cursor: pointer; }
+        /* تعديل المسافات للأزرار لمنع الاختفاء من الأطراف */
+        .action-btns { padding: 10px 25px 25px 25px; } 
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 12px; text-decoration: none; text-align: center; font-size: 0.95rem; border: none; cursor: pointer; box-sizing: border-box; }
         .btn-support { background: var(--success); }
         .btn-wa-channel { background: var(--wa); }
         .btn-store { background: #5e4cc1; }
-        .btn-reset { background: #6c757d; font-size: 0.8rem; padding: 8px; }
+        .btn-reset { background: #6c757d; font-size: 0.8rem; padding: 10px; }
         .footer-rights { margin-top: 10px; text-align: center; color: #aaa; font-size: 0.75rem; padding-bottom: 20px; }
     </style>
 </head>
@@ -80,10 +82,10 @@
 
     <div class="welcome-msg">
         <div>سعدنا بانضمامك معنا في <span class="v-family">أسرة فولتشر 🦅</span></div>
-        <div style="margin-top:10px;">مـرحبـاً بـك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight"></span></div>
+        <div style="margin-top:10px;">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight"></span></div>
     </div>
 
-    <div class="status-line">✅ اشتراكك معنا | باقي منه <span id="daysCount" class="days-glow">0</span> يوم</div>
+    <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
     <div class="prog-static"><div id="barConsumed" class="fill-red"></div></div>
 
     <div class="data-section">
@@ -91,19 +93,19 @@
         <div class="timer-grid" id="timerGrid"></div>
     </div>
 
-    <div class="action-btns" style="padding: 0 20px;">
+    <div class="action-btns">
         <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
-        <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة قبل الحدث بالواتساب</a>
+        <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة فولتشر بالواتساب</a>
         <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
         <button onclick="triggerReset()" class="btn btn-reset"><i class="fas fa-key"></i> تغيير رمز القفل الخاص بي</button>
     </div>
 </div>
 
-<div class="footer-rights">أبو نواف - قبل الحدث 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
+<div class="footer-rights">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
 
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
-    const MASTER_KEY = "Aztlg1512"; // مفتاح الماستر الخاص بك
+    const MASTER_KEY = "Aztlg1512"; 
     let clientIdx = -1;
     let user = null;
 
@@ -135,11 +137,7 @@
         const val = document.getElementById('pinInput').value.trim();
         if(val.length < 2) { msg("الرمز قصير جداً"); return; }
 
-        // التحقق من مفتاح الماستر أولاً
-        if(val === MASTER_KEY) {
-            bootApp();
-            return;
-        }
+        if(val === MASTER_KEY) { bootApp(); return; }
 
         if(!user.private_pin) {
             try {
@@ -156,7 +154,7 @@
         document.getElementById('lockScreen').style.display = 'none';
         document.getElementById('mainCard').style.display = 'block';
         
-        // استعادة الحقول الستة كاملة 100%
+        // الحقول الستة كاملة
         const fields = [
             ['الجوال', user.cp || '--'], 
             ['اسم المستخدم', user.cu || '--'], 
@@ -194,7 +192,6 @@
         if(confirm("هل تريد إلغاء الرمز الحالي وتعيين رمز جديد؟")) {
             try {
                 if(clientIdx === -1) return;
-                // حذف الرمز من السحابة للتأكد من إعادة التعيين
                 await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
                 window.location.reload();
             } catch(e) { alert("حدث خطأ في الاتصال"); }
