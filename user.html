@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفعيل حماية فولتشر 🦅</title>
+    <title>خزنة فولتشر الرقمية 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* شاشة القفل */
+        /* شاشة القفل المستقلة */
         #authOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--main); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; padding: 30px; box-sizing: border-box; }
         .auth-box { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 25px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); width: 100%; max-width: 320px; }
         .auth-box input { width: 100%; padding: 15px; border-radius: 12px; border: none; text-align: center; font-size: 1.2rem; margin: 20px 0; outline: none; }
         .auth-box button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: white; color: var(--main); font-weight: bold; cursor: pointer; font-size: 1.1rem; }
 
-        /* البطاقة */
+        /* البطاقة والمحتوى */
         #userContent { display: none; width: 100%; max-width: 400px; padding: 15px; box-sizing: border-box; }
         .card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
@@ -28,27 +28,27 @@
         @keyframes run { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-10deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(10deg); } }
 
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 12px; margin: 8px 20px; display: flex; justify-content: space-between; border: 1px solid #f0f0f0; align-items: center; }
-        .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: bold; }
-        .data-value { font-size: 0.9rem; font-weight: bold; color: #333; }
+        .data-label { font-size: 0.7rem; color: var(--soft-red); font-weight: bold; }
+        .data-value { font-size: 0.85rem; font-weight: bold; color: #333; }
         
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 20px; direction: ltr; }
-        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; }
         .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
 
         .settings { padding: 15px 20px; border-top: 1px solid #eee; margin-top: 10px; text-align: center; }
-        .settings input { padding: 8px; border-radius: 10px; border: 1px solid #ddd; width: 60%; text-align: center; }
-        .settings button { padding: 8px 15px; border-radius: 10px; border: none; background: var(--main); color: white; cursor: pointer; }
+        .settings input { padding: 8px; border-radius: 10px; border: 1px solid #ddd; width: 60%; text-align: center; margin-bottom: 5px; }
+        .settings button { padding: 8px 15px; border-radius: 10px; border: none; background: var(--main); color: white; cursor: pointer; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
 <div id="authOverlay">
     <div class="auth-box">
-        <i class="fas fa-user-lock" style="font-size:4rem; margin-bottom:15px;"></i>
+        <i class="fas fa-lock-open" style="font-size:4rem; margin-bottom:15px;"></i>
         <h2 id="authTitle">جاري التحميل...</h2>
-        <p id="authMsg">حماية بيانات مشترك فولتشر 🦅</p>
+        <p id="authMsg">مرحباً بك في نظام فولتشر 🦅</p>
         <input type="password" id="passInput" style="display:none;">
-        <button id="authBtn" style="display:none;" onclick="processAuth()">دخول</button>
+        <button id="authBtn" style="display:none;" onclick="processAuth()">فتح الصفحة</button>
     </div>
 </div>
 
@@ -64,14 +64,14 @@
         </div>
 
         <div style="padding: 15px; text-align: center;">
-            <div style="font-size:1.1rem;">أهلاً بك في عائلة <b style="color:var(--danger)">فولتشر 🦅</b></div>
+            <div style="font-size:1.1rem;">مرحباً بك في أسرة <b style="color:var(--danger)">فولتشر 🦅</b></div>
             <div id="userName" style="font-weight:bold; margin-top:5px; font-size: 1.2rem; color:var(--main);"></div>
         </div>
 
         <div style="padding: 0 20px; text-align: right; font-weight: bold;">
-            باقي <span id="daysCount" style="color:var(--danger); font-size:1.5rem;">0</span> يوم <span style="display:inline-block; animation: scalePulse 2s infinite;">🤝</span>
+            باقي <span id="daysCount" style="color:var(--danger); font-size:1.5rem; display:inline-block; animation: pulse 1.5s infinite;">0</span> يوم 🤝
         </div>
-        <style>@keyframes scalePulse { 0%,100% {transform:scale(1);} 50% {transform:scale(1.3);} }</style>
+        <style>@keyframes pulse { 0%,100% {transform:scale(1);} 50% {transform:scale(1.1); text-shadow: 0 0 5px var(--danger);} }</style>
 
         <div class="prog-static"><div id="barConsumed" class="fill-red"><i class="fas fa-running running-person"></i></div></div>
 
@@ -79,9 +79,9 @@
         <div class="timer-grid" id="timerGrid"></div>
 
         <div class="settings">
-            <p style="font-size: 0.8rem; color: #777; margin-bottom: 8px;">قفل الصفحة الخاص بك</p>
+            <p style="font-size: 0.75rem; color: #888; margin-bottom: 5px;">قفل الصفحة (خاص بك فقط)</p>
             <input type="password" id="changeInput" placeholder="رقم قفل جديد">
-            <button onclick="updatePass()">تحديث</button>
+            <button onclick="updatePass()">تغيير القفل</button>
         </div>
     </div>
     <div style="text-align:center; padding: 20px; color:#aaa; font-size:0.7rem;">جميع الحقوق محفوظة - فولتشر 🦅</div>
@@ -92,7 +92,7 @@
     const MASTER = "Aztlg1512";
     let cloud = null, uIdx = -1, target = new URLSearchParams(window.location.search).get('name');
 
-    // التاريخ اليوم 5 أبريل
+    // التاريخ الميلادي (الأحد 5 أبريل)
     const today = new Date();
     document.getElementById('dayNum').innerText = today.getDate();
     document.getElementById('dayName').innerText = today.toLocaleDateString('ar-EG', {weekday:'long'});
@@ -107,13 +107,14 @@
         document.getElementById('passInput').style.display = 'block';
         document.getElementById('authBtn').style.display = 'block';
 
-        if(!user.ck || user.ck === "") {
-            document.getElementById('authTitle').innerText = "تأمين الصفحة";
-            document.getElementById('authMsg').innerText = "اختر رقم سري لفتح هذه الصفحة وحماية بيانات اشتراكك";
-            document.getElementById('passInput').placeholder = "ضع رقم سري جديد";
+        // فحص حقل lock_code الجديد
+        if(!user.lock_code || user.lock_code === "") {
+            document.getElementById('authTitle').innerText = "إنشاء قفل للصفحة";
+            document.getElementById('authMsg').innerText = "هذا أول دخول لك، يرجى كتابة رقم سري لتقفل به صفحتك وتحمي بياناتك";
+            document.getElementById('passInput').placeholder = "اكتب رقم القفل الجديد";
         } else {
-            document.getElementById('authTitle').innerText = "صفحة محمية";
-            document.getElementById('authMsg').innerText = "أدخل رقم قفل الصفحة للمتابعة";
+            document.getElementById('authTitle').innerText = "الصفحة مقفلة";
+            document.getElementById('authMsg').innerText = "يرجى إدخال رقم القفل لفتح بياناتك";
             document.getElementById('passInput').placeholder = "رقم القفل";
         }
     }
@@ -121,12 +122,18 @@
     async function processAuth() {
         const val = document.getElementById('passInput').value;
         const user = cloud.clients[uIdx];
-        if(!user.ck || user.ck === "") {
-            if(val.length < 4) return alert("يرجى وضع 4 أرقام على الأقل");
-            user.ck = val; await sync(); alert("تم حفظ قفل الصفحة بنجاح!"); go(user);
+        
+        // إذا لم يكن لديه قفل، نقوم بإنشائه الآن وحفظه في خانة lock_code
+        if(!user.lock_code || user.lock_code === "") {
+            if(val.length < 4) return alert("يرجى اختيار رقم من 4 خانات فأكثر");
+            user.lock_code = val; 
+            await sync(); 
+            alert("✅ تم إنشاء قفل صفحتك بنجاح!"); 
+            go(user);
         } else {
-            if(val === user.ck || val === MASTER) go(user);
-            else alert("عذراً، رقم القفل غير صحيح!");
+            // التحقق برقم العميل الخاص أو الماستر كي
+            if(val === user.lock_code || val === MASTER) go(user);
+            else alert("❌ رقم القفل غير صحيح!");
         }
     }
 
@@ -149,10 +156,11 @@
         };
         tick(); setInterval(tick, 1000);
         
-        // هنا تظهر بيانات الاشتراك التي أعطيتها أنت للعميل
+        // عرض البيانات التي وضعتها أنت في لوحة التحكم (اسم المستخدم والرقم السري للاشتراك)
         const fields = [
+            ['رقم الجوال', user.cp],
             ['اسم المستخدم (الاشتراك)', user.cu],
-            ['كلمة سر (الاشتراك)', user.ck_service || 'راجع الدعم'], // افترضت وجود حقل ck_service للاشتراك
+            ['كلمة مرور (الاشتراك)', user.ck], // الحقل ck هنا هو بياناتك أنت
             ['تاريخ الانتهاء', user.ce]
         ];
         document.getElementById('dataFields').innerHTML = fields.map(x=>`
@@ -163,7 +171,10 @@
     async function updatePass() {
         const p = document.getElementById('changeInput').value;
         if(p.length < 4) return alert("الرقم ضعيف!");
-        cloud.clients[uIdx].ck = p; await sync(); alert("تم تحديث قفل الصفحة!");
+        cloud.clients[uIdx].lock_code = p; // تحديث خانة القفل فقط
+        await sync(); 
+        alert("✅ تم تحديث قفل الصفحة بنجاح!");
+        document.getElementById('changeInput').value = "";
     }
 
     async function sync() { await fetch(DB, {method:'PUT', body: JSON.stringify(cloud)}); }
