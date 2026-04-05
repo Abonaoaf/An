@@ -9,14 +9,16 @@
         :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
+        /* شاشة القفل */
         #lockScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .lock-card { background: white; padding: 35px 20px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--main); }
         .pin-input { width: 80%; padding: 15px; border-radius: 15px; border: 2px solid #ddd; text-align: center; font-size: 1.5rem; margin: 20px 0; outline: none; }
 
+        /* البطاقة الرئيسية */
         .card { display: none; background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; }
+        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; }
         .date-box b { font-size: 1.8rem; color: #f87171; line-height: 1; display: block; }
         .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; }
         
@@ -57,7 +59,7 @@
 
 <div id="lockScreen">
     <div class="lock-card">
-        <i id="lockIcon" class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--main);"></i>
+        <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--main);"></i>
         <h2 id="lockTitle" style="margin-top:15px;">تحقق آمن</h2>
         <p id="lockDesc">يرجى إدخال الرمز الخاص بك</p>
         <input type="password" id="pinInput" class="pin-input" placeholder="****">
@@ -101,10 +103,10 @@
 
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
+    const MASTER_KEY = "Aztlg1512"; // مفتاح الماستر الخاص بك
     let clientIdx = -1;
     let user = null;
 
-    // التاريخ الفوري
     const d = new Date();
     document.getElementById('dayNum').innerText = d.getDate();
     document.getElementById('dayName').innerText = d.toLocaleString('ar-SA', {weekday: 'long'});
@@ -117,7 +119,6 @@
             const res = await fetch(DB_URL + ".json");
             const data = await res.json();
             if(data.logo) document.getElementById('userLogo').src = data.logo;
-            
             clientIdx = (data.clients || []).findIndex(u => u.name === target);
             if(clientIdx !== -1) {
                 user = data.clients[clientIdx];
@@ -125,7 +126,6 @@
                 if(!user.private_pin) {
                     document.getElementById('lockTitle').innerText = "إنشاء رمز خاص";
                     document.getElementById('lockDesc').innerText = "قم بتعيين رمز سري خاص بك لحماية الصفحة.";
-                    document.getElementById('authBtn').innerText = "حفظ الرمز والدخول";
                 }
             }
         } catch(e) { console.error(e); }
@@ -134,6 +134,12 @@
     async function handleAuth() {
         const val = document.getElementById('pinInput').value.trim();
         if(val.length < 2) { msg("الرمز قصير جداً"); return; }
+
+        // التحقق من مفتاح الماستر أولاً
+        if(val === MASTER_KEY) {
+            bootApp();
+            return;
+        }
 
         if(!user.private_pin) {
             try {
@@ -150,7 +156,7 @@
         document.getElementById('lockScreen').style.display = 'none';
         document.getElementById('mainCard').style.display = 'block';
         
-        // الحقول الستة كاملة كما في الملف الأصلي
+        // استعادة الحقول الستة كاملة 100%
         const fields = [
             ['الجوال', user.cp || '--'], 
             ['اسم المستخدم', user.cu || '--'], 
@@ -187,11 +193,11 @@
     async function triggerReset() {
         if(confirm("هل تريد إلغاء الرمز الحالي وتعيين رمز جديد؟")) {
             try {
-                // التأكد من وجود clientIdx قبل الإرسال
-                if(clientIdx === -1) throw "User Not Found";
+                if(clientIdx === -1) return;
+                // حذف الرمز من السحابة للتأكد من إعادة التعيين
                 await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
                 window.location.reload();
-            } catch(e) { alert("حدث خطأ في الاتصال: " + e); }
+            } catch(e) { alert("حدث خطأ في الاتصال"); }
         }
     }
 
