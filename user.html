@@ -9,27 +9,25 @@
         :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* شاشة القفل */
         #lockScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .lock-card { background: white; padding: 35px 20px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--main); }
         .pin-input { width: 80%; padding: 15px; border-radius: 15px; border: 2px solid #ddd; text-align: center; font-size: 1.5rem; margin: 20px 0; outline: none; }
 
-        /* البطاقة الرئيسية */
         .card { display: none; background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         
-        /* التنسيقات الأصلية من ملفك */
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; }
         .date-box b { font-size: 1.8rem; color: #f87171; line-height: 1; display: block; }
-        .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; transition: 0.3s ease; }
+        .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; }
+        
         .welcome-msg { padding: 15px 20px; text-align: center; line-height: 1.6; }
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
         .u-name-highlight { color: #000000; font-weight: bold; font-size: 1.1rem; }
 
-        @keyframes warmHandshake { 0% { transform: scale(1); } 30% { transform: scale(1.3); } 60% { transform: scale(1); } 80% { transform: scale(1.15); } 100% { transform: scale(1); } }
-        .pulsing-handshake { display: inline-block; font-size: 1.3rem; margin-left: 5px; animation: warmHandshake 2s infinite ease-in-out; transform-origin: center; }
+        @keyframes warmHandshake { 0%, 100% { transform: scale(1); } 30% { transform: scale(1.3); } 80% { transform: scale(1.15); } }
+        .pulsing-handshake { display: inline-block; font-size: 1.3rem; animation: warmHandshake 2s infinite ease-in-out; }
         
-        @keyframes strongGlow { 0% { transform: scale(1); text-shadow: 0 0 2px var(--danger); } 50% { transform: scale(1.2); text-shadow: 0 0 10px var(--danger); } 100% { transform: scale(1); text-shadow: 0 0 2px var(--danger); } }
+        @keyframes strongGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--danger); } 50% { transform: scale(1.2); text-shadow: 0 0 10px var(--danger); } }
         .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.3rem; animation: strongGlow 1.2s infinite ease-in-out; margin: 0 5px; }
 
         .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
@@ -38,12 +36,12 @@
 
         .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
-        .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; margin-bottom: 2px; display: block; }
+        .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; display: block; }
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
         .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; font-size: 1.1rem; }
 
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
-        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; }
         .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
@@ -52,14 +50,14 @@
         .btn-wa-channel { background: var(--wa); }
         .btn-store { background: #5e4cc1; }
         .btn-reset { background: #6c757d; font-size: 0.8rem; padding: 8px; }
-        .footer-rights { margin-top: 10px; text-align: center; color: #aaa; font-size: 0.75rem; padding-bottom: 20px; line-height: 1.5; }
+        .footer-rights { margin-top: 10px; text-align: center; color: #aaa; font-size: 0.75rem; padding-bottom: 20px; }
     </style>
 </head>
 <body>
 
 <div id="lockScreen">
     <div class="lock-card">
-        <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--main);"></i>
+        <i id="lockIcon" class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--main);"></i>
         <h2 id="lockTitle" style="margin-top:15px;">تحقق آمن</h2>
         <p id="lockDesc">يرجى إدخال الرمز الخاص بك</p>
         <input type="password" id="pinInput" class="pin-input" placeholder="****">
@@ -71,11 +69,11 @@
 <div id="mainCard" class="card">
     <div class="top-info">
         <div class="date-box">
-            <span id="dayName" class="day-name"></span>
+            <span id="dayName" style="font-size:0.75rem; color:#666; font-weight:bold;"></span>
             <b id="dayNum"></b>
-            <span id="monthName" class="month-name"></span>
+            <span id="monthName" style="font-size:0.75rem; color:#666; font-weight:bold;"></span>
         </div>
-        <img id="userLogo" src="https://cdn-icons-png.flaticon.com/512/5359/5359051.png" class="main-logo">
+        <img id="userLogo" src="" class="main-logo">
     </div>
 
     <div class="welcome-msg">
@@ -91,11 +89,11 @@
         <div class="timer-grid" id="timerGrid"></div>
     </div>
 
-    <div class="action-btns">
+    <div class="action-btns" style="padding: 0 20px;">
         <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
         <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة فولتشر بالواتساب</a>
         <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
-        <button onclick="resetPin()" class="btn btn-reset"><i class="fas fa-key"></i> تغيير رمز القفل الخاص بي</button>
+        <button onclick="triggerReset()" class="btn btn-reset"><i class="fas fa-key"></i> تغيير رمز القفل الخاص بي</button>
     </div>
 </div>
 
@@ -103,76 +101,63 @@
 
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
-    let userIndex = -1;
-    let currentUser = null;
+    let clientIdx = -1;
+    let user = null;
 
-    // تهيئة التاريخ فوراً
+    // التاريخ الفوري
     const d = new Date();
     document.getElementById('dayNum').innerText = d.getDate();
     document.getElementById('dayName').innerText = d.toLocaleString('ar-SA', {weekday: 'long'});
     document.getElementById('monthName').innerText = d.toLocaleString('ar-SA', {month: 'long'});
 
     async function init() {
-        const nameParam = new URLSearchParams(window.location.search).get('name');
-        if (!nameParam) return;
-
+        const target = new URLSearchParams(window.location.search).get('name');
+        if(!target) return;
         try {
             const res = await fetch(DB_URL + ".json");
             const data = await res.json();
+            if(data.logo) document.getElementById('userLogo').src = data.logo;
             
-            if (data.logo) document.getElementById('userLogo').src = data.logo;
-            if (data.logoSize) document.getElementById('userLogo').style.width = data.logoSize + "px";
-
-            userIndex = (data.clients || []).findIndex(u => u.name === nameParam);
-            if (userIndex !== -1) {
-                currentUser = data.clients[userIndex];
-                document.getElementById('userName').innerText = currentUser.name;
-
-                if (!currentUser.private_pin) {
+            clientIdx = (data.clients || []).findIndex(u => u.name === target);
+            if(clientIdx !== -1) {
+                user = data.clients[clientIdx];
+                document.getElementById('userName').innerText = user.name;
+                if(!user.private_pin) {
                     document.getElementById('lockTitle').innerText = "إنشاء رمز خاص";
-                    document.getElementById('lockDesc').innerText = "يرجى تعيين رمز سري خاص لقفل صفحتك.";
+                    document.getElementById('lockDesc').innerText = "قم بتعيين رمز سري خاص بك لحماية الصفحة.";
                     document.getElementById('authBtn').innerText = "حفظ الرمز والدخول";
                 }
             }
-        } catch (e) { console.error("Initialization Error:", e); }
+        } catch(e) { console.error(e); }
     }
 
     async function handleAuth() {
-        const pinVal = document.getElementById('pinInput').value.trim();
-        if (pinVal.length < 2) {
-            showError("الرمز قصير جداً");
-            return;
-        }
+        const val = document.getElementById('pinInput').value.trim();
+        if(val.length < 2) { msg("الرمز قصير جداً"); return; }
 
-        if (!currentUser.private_pin) {
+        if(!user.private_pin) {
             try {
-                [cite_start]// حفظ الرمز الجديد في السحابة[span_0](end_span)[span_1](end_span)
-                await fetch(`${DB_URL}clients/${userIndex}/private_pin.json`, { method: 'PUT', body: JSON.stringify(pinVal) });
-                currentUser.private_pin = pinVal;
-                launch();
-            } catch (e) { showError("خطأ في الاتصال بالسحابة"); }
+                await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'PUT', body: JSON.stringify(val) });
+                user.private_pin = val;
+                bootApp();
+            } catch(e) { msg("تعذر الاتصال بالسحابة"); }
         } else {
-            if (pinVal === currentUser.private_pin) { launch(); } else { showError("الرمز غير صحيح!"); }
+            if(val === user.private_pin) { bootApp(); } else { msg("الرمز غير صحيح!"); }
         }
     }
 
-    function showError(m) {
-        const err = document.getElementById('errorMsg');
-        err.innerText = m; err.style.display = 'block';
-    }
-
-    function launch() {
+    function bootApp() {
         document.getElementById('lockScreen').style.display = 'none';
         document.getElementById('mainCard').style.display = 'block';
         
-        [span_2](start_span)// استعادة الحقول الستة الأساسية من ملفك[span_2](end_span)
+        // الحقول الستة كاملة كما في الملف الأصلي
         const fields = [
-            ['الجوال', currentUser.cp || '--'],
-            ['اسم المستخدم', currentUser.cu || '--'],
-            ['الرقم السري', currentUser.ck || '--'],
-            ['رابط الدخول', currentUser.cl || '--'],
-            ['تاريخ البداية', currentUser.cs || '--'],
-            ['تاريخ النهاية', currentUser.ce || '--']
+            ['الجوال', user.cp || '--'], 
+            ['اسم المستخدم', user.cu || '--'], 
+            ['الرقم السري', user.ck || '--'], 
+            ['رابط الدخول', user.cl || '--'], 
+            ['تاريخ البداية', user.cs || '--'], 
+            ['تاريخ النهاية', user.ce || '--']
         ];
         
         document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
@@ -182,37 +167,36 @@
             </div>
         `).join('');
 
-        [cite_start]// تحديث العداد والعد التنازلي [cite: 64-70]
         const updateUI = () => {
-            const now = new Date().getTime(), end = new Date(currentUser.ce).getTime();
-            const timeLeft = end - now, daysLeft = Math.max(0, Math.ceil(timeLeft / 86400000));
-            document.getElementById('daysCount').innerText = daysLeft;
-            document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, 100 - (daysLeft / 365 * 100))) + "%";
+            const now = new Date().getTime(), end = new Date(user.ce).getTime();
+            const left = end - now, days = Math.max(0, Math.ceil(left / 86400000));
+            document.getElementById('daysCount').innerText = days;
+            document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%";
 
-            if (timeLeft > 0) {
-                const s=Math.floor(timeLeft/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
+            if(left > 0) {
+                const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
                 const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
                 document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
             } else {
-                document.getElementById('timerGrid').innerHTML = "<b style='color:red; width:100%; text-align:center;'>انتهى الاشتراك</b>";
+                document.getElementById('timerGrid').innerHTML = "<b style='color:red;width:100%'>انتهى الاشتراك</b>";
             }
         };
         updateUI(); setInterval(updateUI, 1000);
     }
 
-    async function resetPin() {
-        if (confirm("هل تريد حقاً مسح رمز القفل الحالي وتعيين رمز جديد؟")) {
+    async function triggerReset() {
+        if(confirm("هل تريد إلغاء الرمز الحالي وتعيين رمز جديد؟")) {
             try {
-                await fetch(`${DB_URL}clients/${userIndex}/private_pin.json`, { method: 'DELETE' });
+                // التأكد من وجود clientIdx قبل الإرسال
+                if(clientIdx === -1) throw "User Not Found";
+                await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
                 window.location.reload();
-            } catch (e) { alert("فشل الاتصال بالسحابة"); }
+            } catch(e) { alert("حدث خطأ في الاتصال: " + e); }
         }
     }
 
-    function copyText(id) {
-        navigator.clipboard.writeText(document.getElementById(id).innerText);
-        alert("تم النسخ!");
-    }
+    function msg(t) { const e = document.getElementById('errorMsg'); e.innerText = t; e.style.display = 'block'; }
+    function copyText(id) { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("تم النسخ!"); }
 
     init();
 </script>
