@@ -6,8 +6,8 @@
     <title>خزنة فولتشر الرقمية 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --soft-red: #f87171; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; --soft-red: #f87171; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
         /* شاشة القفل المستقلة */
         #authOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--main); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; padding: 30px; box-sizing: border-box; }
@@ -15,45 +15,52 @@
         .auth-box input { width: 100%; padding: 15px; border-radius: 12px; border: none; text-align: center; font-size: 1.2rem; margin: 20px 0; outline: none; }
         .auth-box button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: white; color: var(--main); font-weight: bold; cursor: pointer; font-size: 1.1rem; }
 
-        /* المحتوى الرئيسي */
-        #userContent { display: none; width: 100%; max-width: 400px; padding: 15px; box-sizing: border-box; }
+        /* البطاقة والمحتوى */
+        #userContent { display: none; width: 100%; max-width: 400px; animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
         .card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px; text-align: center; min-width: 85px; }
-        .date-box b { font-size: 1.8rem; color: var(--soft-red); display: block; line-height: 1; }
-        
-        /* حركات النبض والجري */
-        @keyframes handshakePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
-        .pulsing-handshake { display: inline-block; animation: handshakePulse 2s infinite ease-in-out; }
-        @keyframes daysPulseGlow { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.8; text-shadow: 0 0 10px var(--danger); } }
-        .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.4rem; animation: daysPulseGlow 1.5s infinite; }
-        @keyframes runningManAction { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-10deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(10deg); } }
-        
-        .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; border: 1px solid #ddd; }
-        .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; border-radius: 0 10px 10px 0; position: relative; transition: 0.5s; }
-        .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; display: inline-block; animation: runningManAction 0.4s infinite linear; text-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 10; }
+        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .date-box b { font-size: 1.8rem; color: #f87171; line-height: 1; display: block; }
+        .date-box span { font-size: 0.75rem; color: #666; font-weight: bold; }
 
-        .data-row { background: #f9f9f9; border-radius: 12px; padding: 12px; margin: 8px 20px; display: flex; justify-content: space-between; border: 1px solid #f0f0f0; align-items: center; }
-        .data-label { font-size: 0.7rem; color: var(--soft-red); font-weight: bold; }
-        .data-value { font-size: 0.85rem; font-weight: bold; color: #333; }
-        .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 20px; direction: ltr; }
-        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; }
-        .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
+        /* حركات النبض والجري المستعادة من كودك */
+        @keyframes warmHandshake { 0% { transform: scale(1); } 30% { transform: scale(1.3); } 60% { transform: scale(1); } 80% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        .pulsing-handshake { display: inline-block; animation: warmHandshake 2s infinite ease-in-out; }
+        @keyframes strongGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--danger); } 50% { transform: scale(1.2); text-shadow: 0 0 10px var(--danger); } }
+        .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.3rem; animation: strongGlow 1.2s infinite ease-in-out; margin: 0 5px; }
 
-        .settings { padding: 15px 20px; border-top: 1px solid #eee; margin-top: 10px; text-align: center; }
-        .settings input { padding: 8px; border-radius: 10px; border: 1px solid #ddd; width: 60%; text-align: center; margin-bottom: 5px; }
-        .settings button { padding: 8px 15px; border-radius: 10px; border: none; background: var(--main); color: white; cursor: pointer; font-size: 0.8rem; }
+        .prog-static { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 20px; position: relative; }
+        .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s linear; }
+
+        .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
+        .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; margin-bottom: 2px; display: block; }
+        .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
+        .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; font-size: 1.1rem; }
+
+        .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
+        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; animation: lightPulse 2s infinite ease-in-out; }
+        @keyframes lightPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.9; } }
+
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; }
+        .btn-store { background: #5e4cc1; } .btn-support { background: var(--success); } .btn-wa-channel { background: var(--wa); }
+        
+        .settings-area { padding: 15px 20px; border-top: 1px solid #eee; margin-top: 10px; text-align: center; }
+        .settings-area input { padding: 8px; border-radius: 10px; border: 1px solid #ddd; width: 60%; text-align: center; }
+        .settings-area button { padding: 8px 15px; border-radius: 10px; border: none; background: var(--main); color: white; cursor: pointer; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
 <div id="authOverlay">
     <div class="auth-box">
-        <i id="authIcon" class="fas fa-user-lock" style="font-size:4rem; margin-bottom:15px;"></i>
-        <h2 id="authTitle">جاري التحميل...</h2>
-        <p id="authMsg">مرحباً بك في نظام فولتشر 🦅</p>
+        <i class="fas fa-fingerprint" style="font-size:4rem; margin-bottom:15px;"></i>
+        <h2 id="authTitle">جاري التحقق...</h2>
+        <p id="authMsg">مرحباً بك في فولتشر 🦅</p>
         <input type="password" id="passInput" style="display:none;">
-        <button id="authBtn" style="display:none;" onclick="processAuth()">دخول</button>
+        <button id="authBtn" style="display:none;" onclick="processAuth()">فتح الحساب</button>
     </div>
 </div>
 
@@ -61,34 +68,39 @@
     <div class="card">
         <div class="top-info">
             <div class="date-box">
-                <span id="dayName" style="font-size:0.7rem; font-weight:bold; color:#666;"></span>
+                <span id="dayName" style="font-size: 0.75rem; color: #666; font-weight: bold;"></span>
                 <b id="dayNum"></b>
-                <span id="monthName" style="font-size:0.7rem; font-weight:bold; color:#666;"></span>
+                <span id="monthName" style="font-size: 0.75rem; color: #666; font-weight: bold;"></span>
             </div>
-            <img id="userLogo" src="" style="width:70px; border-radius:12px;">
+            <img id="userLogo" src="https://cdn-icons-png.flaticon.com/512/5359/5359051.png" class="main-logo">
         </div>
 
-        <div style="padding: 15px; text-align: center;">
-            <div style="font-size:1.1rem;">مرحباً بك في أسرة <b style="color:var(--danger)">فولتشر 🦅</b></div>
-            <div id="userName" style="font-weight:bold; margin-top:5px; font-size: 1.2rem; color:var(--main);"></div>
+        <div class="welcome-msg" style="text-align: center; padding: 15px;">
+            <div>سعدنا بانضمامك معنا في <span class="v-family" style="color:var(--danger); font-weight:bold;">أسرة فولتشر 🦅</span></div>
+            <div style="margin-top:10px;">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" style="font-weight:bold; color:#000;">...</span></div>
         </div>
 
-        <div style="padding: 0 20px; text-align: right; font-weight: bold;">
-            باقي <span id="daysCount" class="days-glow">0</span> يوم <span class="pulsing-handshake">🤝</span>
+        <div style="font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right;">
+            ✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم
         </div>
 
-        <div class="prog-static"><div id="barConsumed" class="fill-red"><i class="fas fa-running running-person"></i></div></div>
+        <div class="prog-static"><div id="barConsumed" class="fill-red"></div></div>
 
-        <div id="dataFields"></div>
-        <div class="timer-grid" id="timerGrid"></div>
+        <div style="padding: 0 20px;" id="dataFields"></div>
+        <div class="timer-grid" id="timerGrid" style="padding: 0 20px;"></div>
 
-        <div class="settings">
-            <p style="font-size: 0.75rem; color: #888; margin-bottom: 5px;">قفل الصفحة (خاص بك فقط)</p>
-            <input type="password" id="changeInput" placeholder="رقم قفل جديد">
-            <button onclick="updatePass()">تحديث القفل</button>
+        <div class="action-btns" style="padding: 15px 20px;">
+            <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
+            <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
+            
+            <div class="settings-area">
+                <p style="font-size: 0.75rem; color: #888; margin-bottom: 5px;">قفل الصفحة الخاص بك</p>
+                <input type="password" id="changeInput" placeholder="رقم قفل جديد">
+                <button onclick="updatePass()">تحديث القفل</button>
+            </div>
         </div>
     </div>
-    <div style="text-align:center; padding: 20px; color:#aaa; font-size:0.7rem;">جميع الحقوق محفوظة - فولتشر 🦅</div>
+    <div style="text-align:center; padding: 20px; color:#aaa; font-size:0.75rem;">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
 </div>
 
 <script>
@@ -96,13 +108,14 @@
     const MASTER = "Aztlg1512";
     let cloud = null, uIdx = -1, target = new URLSearchParams(window.location.search).get('name');
 
-    // التاريخ الميلادي (الأحد 5 أبريل)
+    // التاريخ (الأحد 5 أبريل)
     const today = new Date();
     document.getElementById('dayNum').innerText = today.getDate();
-    document.getElementById('dayName').innerText = today.toLocaleDateString('ar-EG', {weekday:'long'});
-    document.getElementById('monthName').innerText = today.toLocaleDateString('ar-EG', {month:'long'});
+    document.getElementById('dayName').innerText = today.toLocaleDateString('ar-SA', {weekday:'long'});
+    document.getElementById('monthName').innerText = today.toLocaleDateString('ar-SA', {month:'long'});
 
     async function start() {
+        if(!target) return alert("الرابط غير صحيح!");
         const r = await fetch(DB); cloud = await r.json();
         uIdx = (cloud.clients || []).findIndex(u => u.name === target);
         const user = cloud.clients[uIdx];
@@ -112,12 +125,12 @@
         document.getElementById('authBtn').style.display = 'block';
 
         if(!user.lock_code || user.lock_code === "") {
-            document.getElementById('authTitle').innerText = "إنشاء قفل للصفحة";
-            document.getElementById('authMsg').innerText = "يرجى كتابة رقم سري لتقفل به صفحتك وتحمي بياناتك";
-            document.getElementById('passInput').placeholder = "اكتب رقم القفل الجديد";
+            document.getElementById('authTitle').innerText = "تأمين الصفحة";
+            document.getElementById('authMsg').innerText = "يرجى وضع رقم سري لتقفل به صفحتك وتحمي بياناتك";
+            document.getElementById('passInput').placeholder = "ضع رقم سري جديد";
         } else {
-            document.getElementById('authTitle').innerText = "الصفحة مقفلة";
-            document.getElementById('authMsg').innerText = "أدخل رقم القفل لفتح بياناتك";
+            document.getElementById('authTitle').innerText = "صفحة محمية";
+            document.getElementById('authMsg').innerText = "أدخل رقم القفل للمتابعة";
             document.getElementById('passInput').placeholder = "رقم القفل";
         }
     }
@@ -125,16 +138,12 @@
     async function processAuth() {
         const val = document.getElementById('passInput').value;
         const user = cloud.clients[uIdx];
-        
         if(!user.lock_code || user.lock_code === "") {
-            if(val.length < 4) return alert("يرجى اختيار رقم من 4 خانات فأكثر");
-            user.lock_code = val; 
-            await sync(); 
-            alert("✅ تم إنشاء قفل صفحتك بنجاح!"); 
-            go(user);
+            if(val.length < 4) return alert("يرجى اختيار 4 أرقام فأكثر");
+            user.lock_code = val; await sync(); alert("تم حفظ قفل الصفحة!"); go(user);
         } else {
             if(val === user.lock_code || val === MASTER) go(user);
-            else alert("❌ رقم القفل غير صحيح!");
+            else alert("عذراً، رقم القفل غير صحيح!");
         }
     }
 
@@ -145,10 +154,10 @@
         document.getElementById('userName').innerText = user.name;
         
         const tick = () => {
-            const now = new Date().getTime(), start = new Date(user.cs).getTime(), end = new Date(user.ce).getTime();
-            const total = end - start, left = end - now;
-            document.getElementById('daysCount').innerText = Math.max(0, Math.ceil(left/86400000));
-            document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, 100-(left/total*100))) + "%";
+            const now = new Date().getTime(), end = new Date(user.ce).getTime();
+            const left = end - now, days = Math.max(0, Math.ceil(left/86400000));
+            document.getElementById('daysCount').innerText = days;
+            document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, 100-(days/3.65))) + "%";
             if(left > 0) {
                 const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
                 const u = [['ثانية',s%60],['دقيقة',m%60],['ساعة',h%24],['يوم',dL%30],['شهر',Math.floor(dL/30)]];
@@ -157,7 +166,7 @@
         };
         tick(); setInterval(tick, 1000);
         
-        const fields = [['رقم الجوال', user.cp], ['اسم المستخدم', user.cu], ['الرقم السري', user.ck], ['تاريخ الانتهاء', user.ce]];
+        const fields = [['الجوال', user.cp], ['اسم المستخدم', user.cu], ['الرقم السري', user.ck], ['تاريخ الانتهاء', user.ce]];
         document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
             <div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1] || '--'}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>
         `).join('');
@@ -166,10 +175,7 @@
     async function updatePass() {
         const p = document.getElementById('changeInput').value;
         if(p.length < 4) return alert("الرقم ضعيف!");
-        cloud.clients[uIdx].lock_code = p; 
-        await sync(); 
-        alert("✅ تم تحديث قفل الصفحة بنجاح!");
-        document.getElementById('changeInput').value = "";
+        cloud.clients[uIdx].lock_code = p; await sync(); alert("✅ تم تحديث قفل الصفحة!");
     }
 
     async function sync() { await fetch(DB, {method:'PUT', body: JSON.stringify(cloud)}); }
