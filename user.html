@@ -9,10 +9,10 @@
         :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* شاشة الدخول */
-        #lockScreen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--main); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; }
-        #lockScreen input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin: 20px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        #lockScreen button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        /* شاشات الدخول والتفعيل */
+        .auth-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--main); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
+        .auth-overlay input { padding: 15px; border-radius: 12px; border: none; width: 100%; max-width: 280px; text-align: center; font-size: 1.1rem; margin: 15px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .auth-overlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
 
         /* المحتوى الرئيسي */
         #userContent { display: none; width: 100%; max-width: 400px; animation: fadeIn 0.5s ease-in; }
@@ -20,126 +20,135 @@
 
         .card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); margin-bottom: 15px; }
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; }
+        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px; text-align: center; min-width: 80px; }
         .date-box b { font-size: 1.8rem; color: var(--soft-red); line-height: 1; display: block; }
-        .date-box span { font-size: 0.75rem; color: #666; font-weight: bold; }
-
-        /* حركات النبض والجري */
-        @keyframes handshakePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
-        .pulsing-handshake { display: inline-block; animation: handshakePulse 2s infinite ease-in-out; }
-        @keyframes daysPulseGlow { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.8; text-shadow: 0 0 10px var(--danger); } }
-        .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.4rem; animation: daysPulseGlow 1.5s infinite; }
-        @keyframes runningManAction { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-10deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(10deg); } }
+        
         .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; border: 1px solid #ddd; }
         .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s linear; border-radius: 0 10px 10px 0; position: relative; }
-        .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; display: inline-block; animation: runningManAction 0.4s infinite linear; text-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 10; }
+        .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; animation: runningMan 0.4s infinite linear; text-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 10; }
+        @keyframes runningMan { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-10deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(10deg); } }
 
-        /* قسم تغيير الرقم السري */
         .settings-card { background: #fff; padding: 20px; border-radius: 20px; border: 1px solid #eee; margin-top: 15px; text-align: center; }
-        .settings-card h4 { margin: 0 0 10px 0; color: #333; }
-        .settings-card input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; text-align: center; margin-bottom: 10px; }
-        .btn-update { background: var(--main); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; }
+        .settings-card input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; text-align: center; margin-bottom: 10px; box-sizing: border-box; }
+        .btn-update { background: var(--main); color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; }
 
-        .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; }
-        .data-value { font-size: 0.85rem; font-weight: bold; color: #333; }
+        .data-row { background: #f9f9f9; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; border: 1px solid #f0f0f0; }
         .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
-        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; }
         .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
-<div id="lockScreen">
-    <i class="fas fa-user-lock" style="font-size: 4rem; margin-bottom: 10px;"></i>
-    <h2>دخول فولتشر 🦅</h2>
-    <input type="password" id="userPass" placeholder="أدخل الرقم السري">
-    <button onclick="checkUserPass()">دخول</button>
+<div id="authScreen" class="auth-overlay">
+    <i id="authIcon" class="fas fa-user-shield" style="font-size: 4rem; margin-bottom: 15px;"></i>
+    <h2 id="authTitle">جاري التحقق...</h2>
+    <p id="authMsg">يرجى الانتظار قليلاً</p>
+    <input type="password" id="authInput" style="display:none;">
+    <button id="authBtn" style="display:none;" onclick="handleAuth()">بدء</button>
 </div>
 
 <div id="userContent">
     <div class="card">
         <div class="top-info">
             <div class="date-box">
-                <span id="dayName"></span>
+                <span id="dayName" style="font-size:0.7rem; color:#666; font-weight:bold;"></span>
                 <b id="dayNum"></b>
-                <span id="monthName"></span>
+                <span id="monthName" style="font-size:0.7rem; color:#666; font-weight:bold;"></span>
             </div>
-            <img id="userLogo" src="" class="main-logo">
+            <img id="userLogo" src="" style="width:70px; border-radius:15px; object-fit:contain;">
         </div>
 
-        <div style="padding: 15px 20px; text-align: center;">
-            <div>مرحباً بك في <span class="v-family">أسرة فولتشر 🦅</span></div>
-            <div style="margin-top:10px;"><span id="userName" style="font-weight:bold; font-size:1.1rem;">...</span> <span class="pulsing-handshake">🤝</span></div>
+        <div style="padding: 15px; text-align: center;">
+            <div style="font-size:1.1rem;">مرحباً بك في أسرة <b style="color:var(--danger)">فولتشر 🦅</b></div>
+            <div id="userName" style="font-weight:bold; margin-top:5px;">...</div>
         </div>
 
-        <div style="font-weight:bold; font-size:0.95rem; color:#333; padding: 0 20px; text-align: right;">
-            باقي <span id="daysCount" class="days-glow">0</span> يوم
-        </div>
+        <div style="font-weight:bold; padding: 0 20px; text-align: right;">باقي <span id="daysCount" style="color:var(--danger); font-size:1.4rem;">0</span> يوم</div>
 
-        <div class="prog-static">
-            <div id="barConsumed" class="fill-red">
-                <i class="fas fa-running running-person"></i>
-            </div>
-        </div>
+        <div class="prog-static"><div id="barConsumed" class="fill-red"><i class="fas fa-running running-person"></i></div></div>
 
         <div style="padding: 0 20px;" id="dataFields"></div>
         <div class="timer-grid" id="timerGrid" style="padding: 0 20px;"></div>
     </div>
 
     <div class="settings-card">
-        <h4>🔒 حماية الحساب</h4>
-        <input type="password" id="newPass" placeholder="رقم سري جديد">
-        <button class="btn-update" onclick="updatePassword()">تحديث الرقم السري</button>
-    </div>
-
-    <div style="margin-top:20px; text-align:center; color:#aaa; font-size:0.75rem; padding-bottom:30px;">
-        جميع الحقوق محفوظة - فولتشر 🦅
+        <h4>🔒 تغيير الرقم السري</h4>
+        <input type="password" id="changePassInput" placeholder="اكتب رقمك الجديد هنا">
+        <button class="btn-update" onclick="updatePassword()">حفظ الرقم الجديد</button>
     </div>
 </div>
 
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     const MASTER_KEY = "Aztlg1512";
-    let cloudData = null;
-    let userIndex = -1;
-    let targetName = new URLSearchParams(window.location.search).get('name');
+    let cloudData = null, userIdx = -1, targetName = new URLSearchParams(window.location.search).get('name');
 
     // التاريخ الميلادي
-    const today = new Date();
-    document.getElementById('dayNum').innerText = today.getDate();
-    document.getElementById('dayName').innerText = today.toLocaleDateString('ar-EG', { weekday: 'long' });
-    document.getElementById('monthName').innerText = today.toLocaleDateString('ar-EG', { month: 'long' });
+    const d = new Date();
+    document.getElementById('dayNum').innerText = d.getDate();
+    document.getElementById('dayName').innerText = d.toLocaleDateString('ar-EG', { weekday: 'long' });
+    document.getElementById('monthName').innerText = d.toLocaleDateString('ar-EG', { month: 'long' });
 
-    async function checkUserPass() {
-        const inputPass = document.getElementById('userPass').value;
+    async function init() {
+        if(!targetName) return alert("رابط غير صحيح");
         const res = await fetch(DB_URL);
         cloudData = await res.json();
-        
-        userIndex = (cloudData.clients || []).findIndex(u => u.name === targetName);
-        const user = cloudData.clients[userIndex];
+        userIdx = (cloudData.clients || []).findIndex(u => u.name === targetName);
+        const user = cloudData.clients[userIdx];
 
-        // التحقق بالرقم الخاص بالعميل أو الماستر كيد
-        if (user && (user.ck === inputPass || inputPass === MASTER_KEY)) {
-            if(cloudData.logo) document.getElementById('userLogo').src = cloudData.logo;
-            if(cloudData.logoSize) document.getElementById('userLogo').style.width = cloudData.logoSize + "px";
-            
-            document.getElementById('lockScreen').style.display = 'none';
-            document.getElementById('userContent').style.display = 'block';
-            renderDashboard(user);
+        if(!user) return alert("المشترك غير موجود");
+
+        // فحص: هل العميل جديد (ليس لديه رقم سري)؟
+        const isNew = (!user.ck || user.ck === "" || user.ck === "مؤقت");
+        
+        document.getElementById('authInput').style.display = 'block';
+        document.getElementById('authBtn').style.display = 'inline-block';
+        
+        if(isNew) {
+            document.getElementById('authTitle').innerText = "تفعيل الحساب لأول مرة";
+            document.getElementById('authMsg').innerText = "أهلاً بك! يرجى وضع رقم سري خاص بك لحماية حسابك";
+            document.getElementById('authInput').placeholder = "ضع رقم سري جديد";
+            document.getElementById('authBtn').innerText = "تفعيل الحساب 🚀";
         } else {
-            alert("❌ خطأ في الرقم السري");
+            document.getElementById('authTitle').innerText = "تسجيل الدخول";
+            document.getElementById('authMsg').innerText = "يرجى إدخال رقمك السري للمتابعة";
+            document.getElementById('authInput').placeholder = "أدخل الرقم السري";
+            document.getElementById('authBtn').innerText = "فتح البطاقة 🔓";
         }
     }
 
-    function renderDashboard(user) {
+    async function handleAuth() {
+        const input = document.getElementById('authInput').value;
+        const user = cloudData.clients[userIdx];
+        const isNew = (!user.ck || user.ck === "" || user.ck === "مؤقت");
+
+        if(isNew) {
+            if(input.length < 4) return alert("يرجى اختيار رقم سري أقوى (4 خانات فأكثر)");
+            user.ck = input; // حفظ الرقم السري الجديد
+            await sync();
+            alert("✅ تم تفعيل حسابك بنجاح!");
+            showDashboard(user);
+        } else {
+            if(input === user.ck || input === MASTER_KEY) {
+                showDashboard(user);
+            } else {
+                alert("❌ الرقم السري خاطئ");
+            }
+        }
+    }
+
+    function showDashboard(user) {
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('userContent').style.display = 'block';
+        if(cloudData.logo) document.getElementById('userLogo').src = cloudData.logo;
         document.getElementById('userName').innerText = user.name;
-        const updateUI = () => {
-            const now = new Date().getTime(), start = new Date(user.cs).getTime(), end = new Date(user.ce).getTime();
-            const total = end - start, left = end - now;
+        
+        const timer = () => {
+            const left = new Date(user.ce).getTime() - new Date().getTime();
             const days = Math.max(0, Math.ceil(left / 86400000));
             document.getElementById('daysCount').innerText = days;
-            document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, 100 - (left/total*100))) + "%";
+            document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, 100 - (left / (new Date(user.ce) - new Date(user.cs)) * 100))) + "%";
             
             if(left > 0) {
                 const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
@@ -147,21 +156,23 @@
                 document.getElementById('timerGrid').innerHTML = u.map(x => `<div class="t-box"><b>${x[1]}</b><span>${x[0]}</span></div>`).reverse().join('');
             }
         };
-        updateUI(); setInterval(updateUI, 1000);
-        
-        const f = [['الجوال', user.cp], ['المستخدم', user.cu], ['تاريخ النهاية', user.ce]];
-        document.getElementById('dataFields').innerHTML = f.map(x => `<div class="data-row"><span class="data-label">${x[0]}</span><span class="data-value">${x[1] || '--'}</span></div>`).join('');
+        timer(); setInterval(timer, 1000);
+
+        const f = [['الجوال', user.cp], ['اسم المستخدم', user.cu], ['نهاية الاشتراك', user.ce]];
+        document.getElementById('dataFields').innerHTML = f.map(x => `<div class="data-row"><b>${x[0]}</b><span>${x[1] || '--'}</span></div>`).join('');
     }
 
     async function updatePassword() {
-        const newP = document.getElementById('newPass').value;
-        if(newP.length < 4) return alert("الرقم السري ضعيف جداً!");
-        
-        cloudData.clients[userIndex].ck = newP;
-        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cloudData) });
-        alert("✅ تم تحديث رقمك السري بنجاح!");
-        document.getElementById('newPass').value = "";
+        const newP = document.getElementById('changePassInput').value;
+        if(newP.length < 4) return alert("الرقم السري قصير!");
+        cloudData.clients[userIdx].ck = newP;
+        await sync();
+        alert("✅ تم تغيير الرقم السري بنجاح");
+        document.getElementById('changePassInput').value = "";
     }
+
+    async function sync() { await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cloudData) }); }
+    init();
 </script>
 </body>
 </html>
