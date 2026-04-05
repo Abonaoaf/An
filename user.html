@@ -13,6 +13,8 @@
             --bg: #f0f2f5;
             --wa: #075E54;
             --soft-red: #f87171;
+            /* لون خلفية جديد للأيقونة */
+            --v-badge-bg: rgba(220, 53, 69, 0.1); 
         }
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -96,25 +98,48 @@
             object-fit: contain;
         }
 
-        /* --- تعديل منطقة الترحيب والتباعد --- */
+        /* --- تعديل منطقة الترحيب والأيقونة الجديدة --- */
         .welcome-msg {
-            padding: 20px;
+            padding: 25px 20px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .welcome-line-1 {
             font-size: 1.1rem;
-            margin-bottom: 15px; /* مسافة تحت السطر الأول */
+            margin-bottom: 10px;
         }
         .welcome-line-2 {
             font-size: 1rem;
-            margin-bottom: 10px; /* مسافة قبل السطر الأخير */
+            color: #666;
+            margin-bottom: 20px; /* مسافة قبل الأيقونة */
         }
-        .v-family {
+        
+        /* تصميم الأيقونة/الشارة الجديدة */
+        .v-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* المسافة بين الصقر والنص */
+            background-color: var(--v-badge-bg);
             color: var(--danger);
+            padding: 10px 20px;
+            border-radius: 50px; /* أطراف دائرية بالكامل */
+            border: 2px solid rgba(220, 53, 69, 0.2);
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .v-badge:hover {
+            transform: translateY(-3px); /* تأثير بسيط عند المرور */
+        }
+        .v-family-text {
             font-weight: bold;
-            font-size: 1.4rem; /* تكبير الخط كما في الصورة */
-            display: block;
-            margin-top: 8px;
+            font-size: 1.3rem;
+            line-height: 1;
+        }
+        .v-icon {
+            font-size: 1.5rem;
         }
         /* ---------------------------------- */
 
@@ -279,7 +304,11 @@
     <div class="welcome-msg">
         <div class="welcome-line-1">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight"></span></div>
         <div class="welcome-line-2">سعدنا بانضمامك معنا في</div>
-        <div class="v-family">أسرة فولتشر 🦅</div>
+        
+        <div class="v-badge">
+            <span class="v-icon">🦅</span>
+            <span class="v-family-text">أسرة فولتشر</span>
+        </div>
     </div>
 
     <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
