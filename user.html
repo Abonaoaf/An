@@ -12,10 +12,9 @@
         /* شاشة القفل */
         #lockScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .lock-card { background: white; padding: 35px 20px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--main); }
-        .pin-input { width: 80%; padding: 15px; border-radius: 15px; border: 2px solid #ddd; text-align: center; font-size: 1.5rem; margin: 20px 0; outline: none; transition: 0.3s; }
-        .pin-input:focus { border-color: var(--main); }
+        .pin-input { width: 80%; padding: 15px; border-radius: 15px; border: 2px solid #ddd; text-align: center; font-size: 1.5rem; margin: 20px 0; outline: none; }
         
-        .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
+        .card { background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); display: none; } /* مخفية حتى يتم الفتح */
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
         .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .date-box b { font-size: 1.8rem; color: #f87171; line-height: 1; display: block; }
@@ -27,7 +26,6 @@
 
         @keyframes warmHandshake { 0%, 100% { transform: scale(1); } 30% { transform: scale(1.3); } 80% { transform: scale(1.15); } }
         .pulsing-handshake { display: inline-block; font-size: 1.3rem; margin-left: 5px; animation: warmHandshake 2s infinite ease-in-out; }
-        
         @keyframes strongGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--danger); } 50% { transform: scale(1.2); text-shadow: 0 0 10px var(--danger); } }
         .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.3rem; animation: strongGlow 1.2s infinite ease-in-out; margin: 0 5px; }
 
@@ -45,7 +43,7 @@
         .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
-        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; cursor: pointer; font-size: 0.95rem; border: none; }
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 10px; text-decoration: none; text-align: center; font-size: 0.95rem; border: none; cursor: pointer; }
         .btn-main { background: var(--main); }
         .btn-store { background: #5e4cc1; }
         .btn-support { background: var(--success); }
@@ -57,28 +55,28 @@
 
 <div id="lockScreen">
     <div class="lock-card">
-        <i id="lockIcon" class="fas fa-user-shield" style="font-size: 3.5rem; color: var(--main);"></i>
-        <h2 id="lockTitle">تحقق من الهوية</h2>
-        <p id="lockDesc">يرجى إدخال الرمز السري الخاص بك</p>
+        <i id="lockIcon" class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--main);"></i>
+        <h2 id="lockTitle" style="margin-top:15px;">تحقق آمن</h2>
+        <p id="lockDesc">يرجى إدخال الرمز الخاص بك</p>
         <input type="password" id="pinInput" class="pin-input" placeholder="****">
         <button onclick="handleAuth()" id="authBtn" class="btn btn-main">دخول</button>
-        <div id="errorMsg" style="color:var(--danger); margin-top:15px; font-weight:bold; display:none;"></div>
+        <div id="errorMsg" style="color:var(--danger); margin-top:10px; font-weight:bold; display:none;"></div>
     </div>
 </div>
 
-<div class="card">
+<div id="mainCard" class="card">
     <div class="top-info">
         <div class="date-box">
             <span id="dayName" class="day-name"></span>
             <b id="dayNum"></b>
             <span id="monthName" class="month-name"></span>
         </div>
-        <img id="userLogo" src="https://cdn-icons-png.flaticon.com/512/5359/5359051.png" class="main-logo">
+        <img id="userLogo" src="" class="main-logo">
     </div>
 
     <div class="welcome-msg">
         <div>سعدنا بانضمامك معنا في<span class="v-family">أسرة فولتشر 🦅</span></div>
-        <div style="margin-top:10px;">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight">...</span></div>
+        <div style="margin-top:10px;">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight"></span></div>
     </div>
 
     <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
@@ -99,115 +97,117 @@
 <div class="footer-rights">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
 
 <script>
-    const DB_BASE_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
-    const DB_URL = DB_BASE_URL + ".json";
-    let clientIdx = -1;
-    let currentUser = null;
+    const DB_BASE = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
+    let userIdx = -1;
+    let user = null;
 
-    [span_3](start_span)const d = new Date();[span_3](end_span)
+    [span_3](start_span)// تهيئة التاريخ فوراً[span_3](end_span)
+    const d = new Date();
     document.getElementById('dayNum').innerText = d.getDate();
     document.getElementById('dayName').innerText = d.toLocaleString('ar-SA', {weekday: 'long'});
     document.getElementById('monthName').innerText = d.toLocaleString('ar-SA', {month: 'long'});
 
-    async function load() {
-        [span_4](start_span)const urlParams = new URLSearchParams(window.location.search);[span_4](end_span)
-        [span_5](start_span)const targetName = urlParams.get('name');[span_5](end_span)
-        if(!targetName) return;
+    async function init() {
+        [span_4](start_span)const name = new URLSearchParams(window.location.search).get('name');[span_4](end_span)
+        if(!name) return;
 
         try {
-            [span_6](start_span)const res = await fetch(DB_URL);[span_6](end_span)
-            const data = await res.json();
+            [span_5](start_span)const res = await fetch(DB_BASE + ".json");[span_5](end_span)
+            [span_6](start_span)const data = await res.json();[span_6](end_span)
             
-            [span_7](start_span)clientIdx = (data.clients || []).findIndex(u => u.name === targetName);[span_7](end_span)
-            if(clientIdx !== -1) {
-                currentUser = data.clients[clientIdx];
-                [span_8](start_span)document.getElementById('userName').innerText = currentUser.name;[span_8](end_span)
-                [span_9](start_span)if(data.logo) document.getElementById('userLogo').src = data.logo;[span_9](end_span)
+            [span_7](start_span)userIdx = (data.clients || []).findIndex(c => c.name === name);[span_7](end_span)
+            if(userIdx !== -1) {
+                user = data.clients[userIdx];
+                
+                [span_8](start_span)[span_9](start_span)// تحديث الشعار والاسم خلف الكواليس[span_8](end_span)[span_9](end_span)
+                if(data.logo) document.getElementById('userLogo').src = data.logo;
+                document.getElementById('userName').innerText = user.name;
 
-                if (!currentUser.private_pin) {
-                    document.getElementById('lockIcon').className = "fas fa-user-plus";
-                    document.getElementById('lockTitle').innerText = "ضبط رمز جديد";
-                    document.getElementById('lockDesc').innerText = "يرجى اختيار رقم سري خاص لقفل الصفحة مستقبلاً.";
-                    document.getElementById('authBtn').innerText = "حفظ الرمز والدخول";
+                // إذا كان الرمز غير موجود بالسحابة، نطلب الضبط [طلب المستخدم]
+                if(!user.private_pin) {
+                    document.getElementById('lockTitle').innerText = "إنشاء رمز قفل";
+                    document.getElementById('lockDesc').innerText = "اختر رمزاً سرياً لحماية صفحتك مستقبلاً";
+                    document.getElementById('authBtn').innerText = "حفظ الرمز وفتح";
                 }
             }
         } catch(e) { console.error(e); }
     }
 
     async function handleAuth() {
-        const pinValue = document.getElementById('pinInput').value.trim();
-        if(pinValue.length < 2) {
-            showErr("يرجى إدخال رمز صحيح");
+        const val = document.getElementById('pinInput').value.trim();
+        if(val.length < 2) {
+            msg("أدخل رمزاً صحيحاً");
             return;
         }
 
-        if (!currentUser.private_pin) {
+        if(!user.private_pin) {
+            // حفظ الرمز الجديد [طلب المستخدم]
             try {
-                await fetch(`${DB_BASE_URL}clients/${clientIdx}/private_pin.json`, {
+                await fetch(`${DB_BASE}clients/${userIdx}/private_pin.json`, {
                     method: 'PUT',
-                    body: JSON.stringify(pinValue)
+                    body: JSON.stringify(val)
                 });
-                currentUser.private_pin = pinValue;
-                unlockPage();
-            } catch(e) { showErr("فشل حفظ الرمز"); }
+                user.private_pin = val;
+                unlock();
+            } catch(e) { msg("فشل الحفظ في السحابة"); }
         } else {
-            if (pinValue === currentUser.private_pin) {
-                unlockPage();
+            // التحقق من الرمز المخزن
+            if(val === user.private_pin) {
+                unlock();
             } else {
-                showErr("الرمز غير صحيح!");
+                msg("الرمز غير صحيح!");
             }
         }
     }
 
-    function unlockPage() {
+    function unlock() {
         document.getElementById('lockScreen').style.display = 'none';
-        renderContent();
+        document.getElementById('mainCard').style.display = 'block'; [span_10](start_span)// إقلاع الصفحة[span_10](end_span)
+        startApp();
     }
 
-    function showErr(t) {
+    function msg(t) {
         const e = document.getElementById('errorMsg');
         e.innerText = t; e.style.display = 'block';
     }
 
-    function renderContent() {
+    function startApp() {
+        [span_11](start_span)// عرض البيانات الأصلية[span_11](end_span)
         const fields = [
-            ['الجوال', currentUser.cp || [span_10](start_span)'--'],[span_10](end_span)
-            ['اسم المستخدم', currentUser.cu || '--'], 
-            ['الرقم السري', currentUser.ck || '--'], 
-            ['رابط الدخول', currentUser.cl || '--'], 
-            ['تاريخ النهاية', currentUser.ce || '--']
+            ['الجوال', user.cp || '--'],
+            ['المستخدم', user.cu || '--'],
+            ['الرقم السري', user.ck || '--'],
+            ['تاريخ النهاية', user.ce || '--']
         ];
-        
         document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
-            <div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div><i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i></div>
-        [span_11](start_span)`).join('');[span_11](end_span)
+            <div class="data-row"><div><span class="data-label">${f[0]}</span><div class="data-value" id="v${i}">${f[1]}</div></div><i class="far fa-copy copy-btn" onclick="copyText('v${i}')"></i></div>
+        `).join('');
 
-        const updateUI = () => {
-            [span_12](start_span)const now = new Date().getTime(), end = new Date(currentUser.ce).getTime();[span_12](end_span)
-            [span_13](start_span)const timeLeft = end - now, daysLeft = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));[span_13](end_span)
-            document.getElementById('daysCount').innerText = daysLeft;
-            
-            const maxDays = 365;
-            [span_14](start_span)let redPercent = Math.max(0, Math.min(100, 100 - (daysLeft / maxDays * 100)));[span_14](end_span)
-            document.getElementById('barConsumed').style.width = redPercent + "%";
+        [span_12](start_span)[span_13](start_span)// تشغيل العداد[span_12](end_span)[span_13](end_span)
+        const update = () => {
+            [span_14](start_span)const now = new Date().getTime(), end = new Date(user.ce).getTime();[span_14](end_span)
+            const left = end - now;
+            [span_15](start_span)const days = Math.max(0, Math.ceil(left / 86400000));[span_15](end_span)
+            [span_16](start_span)document.getElementById('daysCount').innerText = days;[span_16](end_span)
+            [span_17](start_span)document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%";[span_17](end_span)
 
-            if(timeLeft > 0) {
-                [span_15](start_span)const s=Math.floor(timeLeft/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);[span_15](end_span)
-                const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
-                [span_16](start_span)document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');[span_16](end_span)
+            if(left > 0) {
+                [span_18](start_span)const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);[span_18](end_span)
+                [span_19](start_span)const u = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];[span_19](end_span)
+                [span_20](start_span)document.getElementById('timerGrid').innerHTML = u.map(x => `<div class="t-box"><b>${x[1]}</b><span>${x[0]}</span></div>`).reverse().join('');[span_20](end_span)
             } else {
-                [span_17](start_span)document.getElementById('timerGrid').innerHTML = "<b style='color:red; width:100%; text-align:center;'>انتهى الاشتراك</b>";[span_17](end_span)
+                [span_21](start_span)document.getElementById('timerGrid').innerHTML = "<b style='color:red;width:100%'>انتهى الاشتراك</b>";[span_21](end_span)
             }
         };
-        updateUI(); setInterval(updateUI, 1000);
+        [span_22](start_span)update(); setInterval(update, 1000);[span_22](end_span)
     }
 
     function copyText(id) {
         navigator.clipboard.writeText(document.getElementById(id).innerText);
-        [span_18](start_span)alert("تم النسخ!");[span_18](end_span)
+        [span_23](start_span)alert("تم النسخ!");[span_23](end_span)
     }
 
-    load();
+    init();
 </script>
 </body>
 </html>
