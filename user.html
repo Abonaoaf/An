@@ -23,15 +23,14 @@
         .v-family { color: var(--danger); font-weight: bold; font-size: 1.2rem; display: block; margin-top: 5px; }
         .u-name-highlight { color: #000; font-weight: bold; font-size: 1.1rem; }
 
-        /* نبض المصافحة 🤝 */
+        /* حركات النبض */
         @keyframes handshakePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
         .pulsing-handshake { display: inline-block; animation: handshakePulse 2s infinite ease-in-out; }
 
-        /* نبض الأيام المتبقية */
         @keyframes daysPulseGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 0px var(--danger); } 50% { transform: scale(1.15); text-shadow: 0 0 10px var(--danger); } }
         .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.4rem; animation: daysPulseGlow 1.5s infinite ease-in-out; margin: 0 5px; }
 
-        /* الشخص الذي يركض 🏃‍♂️ */
+        /* حركة الجري 🏃‍♂️ */
         @keyframes runningManAction { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-10deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(10deg); } }
         .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; border: 1px solid #ddd; }
         .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s linear; border-radius: 0 10px 10px 0; position: relative; }
@@ -99,7 +98,7 @@
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     
-    // ضبط التاريخ الميلادي الصحيح (الأحد 5 أبريل)
+    // التاريخ الميلادي المعتمد
     const today = new Date();
     document.getElementById('dayNum').innerText = today.getDate();
     document.getElementById('dayName').innerText = today.toLocaleDateString('ar-EG', { weekday: 'long' });
@@ -132,9 +131,9 @@
                     const daysLeft = Math.max(0, Math.ceil(timeLeft / (1000 * 60 * 60 * 24)));
                     document.getElementById('daysCount').innerText = daysLeft;
 
-                    // حساب شريط التقدم بناءً على الأيام المتبقية
-                    let percentRemaining = (timeLeft / totalDuration) * 100;
-                    let percentConsumed = Math.max(0, Math.min(100, 100 - percentRemaining));
+                    // تحديث شريط التقدم: النسبة المستهلكة من أيام الاشتراك
+                    // كلما قل الوقت المتبقي، زادت نسبة الشريط الأحمر
+                    let percentConsumed = Math.max(0, Math.min(100, 100 - ((timeLeft / totalDuration) * 100)));
                     document.getElementById('barConsumed').style.width = percentConsumed + "%";
 
                     if(timeLeft > 0) {
@@ -150,11 +149,11 @@
                 updateUI();
                 setInterval(updateUI, 1000);
 
-                // استرجاع كل البيانات بما فيها الرقم السري
+                // استعراض الحقول مع التأكد من مسميات firebase الصحيحة
                 const fields = [
                     ['الجوال', user.cp || '--'], 
                     ['اسم المستخدم', user.cu || '--'], 
-                    ['الرقم السري', user.ck || '--'], // الرقم السري رجع مكانه
+                    ['الرقم السري', user.ck || '--'], 
                     ['رابط الدخول', user.cl || '--'], 
                     ['تاريخ البداية', user.cs || '--'], 
                     ['تاريخ النهاية', user.ce || '--']
@@ -166,7 +165,7 @@
                     </div>
                 `).join('');
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("Firebase Load Error:", e); }
     }
 
     function copyText(id) {
