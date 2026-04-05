@@ -3,176 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حساب مشترك فولتشر 🦅</title>
+    <title>تفعيل حماية فولتشر 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --soft-red: #f87171; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* شاشات الدخول والتفعيل */
-        .auth-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--main); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
-        .auth-overlay input { padding: 15px; border-radius: 12px; border: none; width: 100%; max-width: 280px; text-align: center; font-size: 1.1rem; margin: 15px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .auth-overlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
+        /* شاشة القفل */
+        #authOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--main); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; padding: 30px; box-sizing: border-box; }
+        .auth-box { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 25px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); width: 100%; max-width: 320px; }
+        .auth-box input { width: 100%; padding: 15px; border-radius: 12px; border: none; text-align: center; font-size: 1.2rem; margin: 20px 0; outline: none; }
+        .auth-box button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: white; color: var(--main); font-weight: bold; cursor: pointer; font-size: 1.1rem; }
 
-        /* المحتوى الرئيسي */
-        #userContent { display: none; width: 100%; max-width: 400px; animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); margin-bottom: 15px; }
+        /* البطاقة */
+        #userContent { display: none; width: 100%; max-width: 400px; padding: 15px; box-sizing: border-box; }
+        .card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); }
         .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px; text-align: center; min-width: 80px; }
-        .date-box b { font-size: 1.8rem; color: var(--soft-red); line-height: 1; display: block; }
+        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px; text-align: center; min-width: 85px; }
+        .date-box b { font-size: 1.8rem; color: var(--soft-red); display: block; line-height: 1; }
         
-        .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; border: 1px solid #ddd; }
-        .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s linear; border-radius: 0 10px 10px 0; position: relative; }
-        .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; animation: runningMan 0.4s infinite linear; text-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 10; }
-        @keyframes runningMan { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-10deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(10deg); } }
+        .prog-static { height: 18px; background: var(--success); border-radius: 10px; overflow: visible; margin: 15px 20px; position: relative; }
+        .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; border-radius: 0 10px 10px 0; position: relative; transition: 0.5s; }
+        .running-person { position: absolute; left: -12px; top: -5px; color: white; font-size: 1.3rem; animation: run 0.4s infinite linear; }
+        @keyframes run { 0%, 50%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); } 25% { transform: scaleX(-1) translateY(-3px) rotate(-10deg); } 75% { transform: scaleX(-1) translateY(-3px) rotate(10deg); } }
 
-        .settings-card { background: #fff; padding: 20px; border-radius: 20px; border: 1px solid #eee; margin-top: 15px; text-align: center; }
-        .settings-card input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; text-align: center; margin-bottom: 10px; box-sizing: border-box; }
-        .btn-update { background: var(--main); color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; }
-
-        .data-row { background: #f9f9f9; border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; border: 1px solid #f0f0f0; }
-        .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 0; direction: ltr; }
-        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; }
+        .data-row { background: #f9f9f9; border-radius: 12px; padding: 12px; margin: 8px 20px; display: flex; justify-content: space-between; border: 1px solid #f0f0f0; align-items: center; }
+        .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: bold; }
+        .data-value { font-size: 0.9rem; font-weight: bold; color: #333; }
+        
+        .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 20px; direction: ltr; }
+        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
+
+        .settings { padding: 15px 20px; border-top: 1px solid #eee; margin-top: 10px; text-align: center; }
+        .settings input { padding: 8px; border-radius: 10px; border: 1px solid #ddd; width: 60%; text-align: center; }
+        .settings button { padding: 8px 15px; border-radius: 10px; border: none; background: var(--main); color: white; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div id="authScreen" class="auth-overlay">
-    <i id="authIcon" class="fas fa-user-shield" style="font-size: 4rem; margin-bottom: 15px;"></i>
-    <h2 id="authTitle">جاري التحقق...</h2>
-    <p id="authMsg">يرجى الانتظار قليلاً</p>
-    <input type="password" id="authInput" style="display:none;">
-    <button id="authBtn" style="display:none;" onclick="handleAuth()">بدء</button>
+<div id="authOverlay">
+    <div class="auth-box">
+        <i class="fas fa-user-lock" style="font-size:4rem; margin-bottom:15px;"></i>
+        <h2 id="authTitle">جاري التحميل...</h2>
+        <p id="authMsg">حماية بيانات مشترك فولتشر 🦅</p>
+        <input type="password" id="passInput" style="display:none;">
+        <button id="authBtn" style="display:none;" onclick="processAuth()">دخول</button>
+    </div>
 </div>
 
 <div id="userContent">
     <div class="card">
         <div class="top-info">
             <div class="date-box">
-                <span id="dayName" style="font-size:0.7rem; color:#666; font-weight:bold;"></span>
+                <span id="dayName" style="font-size:0.7rem; font-weight:bold; color:#666;"></span>
                 <b id="dayNum"></b>
-                <span id="monthName" style="font-size:0.7rem; color:#666; font-weight:bold;"></span>
+                <span id="monthName" style="font-size:0.7rem; font-weight:bold; color:#666;"></span>
             </div>
-            <img id="userLogo" src="" style="width:70px; border-radius:15px; object-fit:contain;">
+            <img id="userLogo" src="" style="width:70px; border-radius:12px;">
         </div>
 
         <div style="padding: 15px; text-align: center;">
-            <div style="font-size:1.1rem;">مرحباً بك في أسرة <b style="color:var(--danger)">فولتشر 🦅</b></div>
-            <div id="userName" style="font-weight:bold; margin-top:5px;">...</div>
+            <div style="font-size:1.1rem;">أهلاً بك في عائلة <b style="color:var(--danger)">فولتشر 🦅</b></div>
+            <div id="userName" style="font-weight:bold; margin-top:5px; font-size: 1.2rem; color:var(--main);"></div>
         </div>
 
-        <div style="font-weight:bold; padding: 0 20px; text-align: right;">باقي <span id="daysCount" style="color:var(--danger); font-size:1.4rem;">0</span> يوم</div>
+        <div style="padding: 0 20px; text-align: right; font-weight: bold;">
+            باقي <span id="daysCount" style="color:var(--danger); font-size:1.5rem;">0</span> يوم <span style="display:inline-block; animation: scalePulse 2s infinite;">🤝</span>
+        </div>
+        <style>@keyframes scalePulse { 0%,100% {transform:scale(1);} 50% {transform:scale(1.3);} }</style>
 
         <div class="prog-static"><div id="barConsumed" class="fill-red"><i class="fas fa-running running-person"></i></div></div>
 
-        <div style="padding: 0 20px;" id="dataFields"></div>
-        <div class="timer-grid" id="timerGrid" style="padding: 0 20px;"></div>
-    </div>
+        <div id="dataFields"></div>
+        <div class="timer-grid" id="timerGrid"></div>
 
-    <div class="settings-card">
-        <h4>🔒 تغيير الرقم السري</h4>
-        <input type="password" id="changePassInput" placeholder="اكتب رقمك الجديد هنا">
-        <button class="btn-update" onclick="updatePassword()">حفظ الرقم الجديد</button>
+        <div class="settings">
+            <p style="font-size: 0.8rem; color: #777; margin-bottom: 8px;">قفل الصفحة الخاص بك</p>
+            <input type="password" id="changeInput" placeholder="رقم قفل جديد">
+            <button onclick="updatePass()">تحديث</button>
+        </div>
     </div>
+    <div style="text-align:center; padding: 20px; color:#aaa; font-size:0.7rem;">جميع الحقوق محفوظة - فولتشر 🦅</div>
 </div>
 
 <script>
-    const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
-    const MASTER_KEY = "Aztlg1512";
-    let cloudData = null, userIdx = -1, targetName = new URLSearchParams(window.location.search).get('name');
+    const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    const MASTER = "Aztlg1512";
+    let cloud = null, uIdx = -1, target = new URLSearchParams(window.location.search).get('name');
 
-    // التاريخ الميلادي
-    const d = new Date();
-    document.getElementById('dayNum').innerText = d.getDate();
-    document.getElementById('dayName').innerText = d.toLocaleDateString('ar-EG', { weekday: 'long' });
-    document.getElementById('monthName').innerText = d.toLocaleDateString('ar-EG', { month: 'long' });
+    // التاريخ اليوم 5 أبريل
+    const today = new Date();
+    document.getElementById('dayNum').innerText = today.getDate();
+    document.getElementById('dayName').innerText = today.toLocaleDateString('ar-EG', {weekday:'long'});
+    document.getElementById('monthName').innerText = today.toLocaleDateString('ar-EG', {month:'long'});
 
-    async function init() {
-        if(!targetName) return alert("رابط غير صحيح");
-        const res = await fetch(DB_URL);
-        cloudData = await res.json();
-        userIdx = (cloudData.clients || []).findIndex(u => u.name === targetName);
-        const user = cloudData.clients[userIdx];
+    async function start() {
+        const r = await fetch(DB); cloud = await r.json();
+        uIdx = (cloud.clients || []).findIndex(u => u.name === target);
+        const user = cloud.clients[uIdx];
+        if(!user) return alert("المشترك غير موجود!");
 
-        if(!user) return alert("المشترك غير موجود");
+        document.getElementById('passInput').style.display = 'block';
+        document.getElementById('authBtn').style.display = 'block';
 
-        // فحص: هل العميل جديد (ليس لديه رقم سري)؟
-        const isNew = (!user.ck || user.ck === "" || user.ck === "مؤقت");
-        
-        document.getElementById('authInput').style.display = 'block';
-        document.getElementById('authBtn').style.display = 'inline-block';
-        
-        if(isNew) {
-            document.getElementById('authTitle').innerText = "تفعيل الحساب لأول مرة";
-            document.getElementById('authMsg').innerText = "أهلاً بك! يرجى وضع رقم سري خاص بك لحماية حسابك";
-            document.getElementById('authInput').placeholder = "ضع رقم سري جديد";
-            document.getElementById('authBtn').innerText = "تفعيل الحساب 🚀";
+        if(!user.ck || user.ck === "") {
+            document.getElementById('authTitle').innerText = "تأمين الصفحة";
+            document.getElementById('authMsg').innerText = "اختر رقم سري لفتح هذه الصفحة وحماية بيانات اشتراكك";
+            document.getElementById('passInput').placeholder = "ضع رقم سري جديد";
         } else {
-            document.getElementById('authTitle').innerText = "تسجيل الدخول";
-            document.getElementById('authMsg').innerText = "يرجى إدخال رقمك السري للمتابعة";
-            document.getElementById('authInput').placeholder = "أدخل الرقم السري";
-            document.getElementById('authBtn').innerText = "فتح البطاقة 🔓";
+            document.getElementById('authTitle').innerText = "صفحة محمية";
+            document.getElementById('authMsg').innerText = "أدخل رقم قفل الصفحة للمتابعة";
+            document.getElementById('passInput').placeholder = "رقم القفل";
         }
     }
 
-    async function handleAuth() {
-        const input = document.getElementById('authInput').value;
-        const user = cloudData.clients[userIdx];
-        const isNew = (!user.ck || user.ck === "" || user.ck === "مؤقت");
-
-        if(isNew) {
-            if(input.length < 4) return alert("يرجى اختيار رقم سري أقوى (4 خانات فأكثر)");
-            user.ck = input; // حفظ الرقم السري الجديد
-            await sync();
-            alert("✅ تم تفعيل حسابك بنجاح!");
-            showDashboard(user);
+    async function processAuth() {
+        const val = document.getElementById('passInput').value;
+        const user = cloud.clients[uIdx];
+        if(!user.ck || user.ck === "") {
+            if(val.length < 4) return alert("يرجى وضع 4 أرقام على الأقل");
+            user.ck = val; await sync(); alert("تم حفظ قفل الصفحة بنجاح!"); go(user);
         } else {
-            if(input === user.ck || input === MASTER_KEY) {
-                showDashboard(user);
-            } else {
-                alert("❌ الرقم السري خاطئ");
-            }
+            if(val === user.ck || val === MASTER) go(user);
+            else alert("عذراً، رقم القفل غير صحيح!");
         }
     }
 
-    function showDashboard(user) {
-        document.getElementById('authScreen').style.display = 'none';
+    function go(user) {
+        document.getElementById('authOverlay').style.display = 'none';
         document.getElementById('userContent').style.display = 'block';
-        if(cloudData.logo) document.getElementById('userLogo').src = cloudData.logo;
+        if(cloud.logo) document.getElementById('userLogo').src = cloud.logo;
         document.getElementById('userName').innerText = user.name;
         
-        const timer = () => {
+        const tick = () => {
             const left = new Date(user.ce).getTime() - new Date().getTime();
-            const days = Math.max(0, Math.ceil(left / 86400000));
-            document.getElementById('daysCount').innerText = days;
-            document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, 100 - (left / (new Date(user.ce) - new Date(user.cs)) * 100))) + "%";
-            
+            const total = new Date(user.ce).getTime() - new Date(user.cs).getTime();
+            document.getElementById('daysCount').innerText = Math.max(0, Math.ceil(left/86400000));
+            document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, 100-(left/total*100))) + "%";
             if(left > 0) {
                 const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
-                const u = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
-                document.getElementById('timerGrid').innerHTML = u.map(x => `<div class="t-box"><b>${x[1]}</b><span>${x[0]}</span></div>`).reverse().join('');
+                const u = [['ثانية',s%60],['دقيقة',m%60],['ساعة',h%24],['يوم',dL%30],['شهر',Math.floor(dL/30)]];
+                document.getElementById('timerGrid').innerHTML = u.map(x=>`<div class="t-box"><b>${x[1]}</b><span>${x[0]}</span></div>`).reverse().join('');
             }
         };
-        timer(); setInterval(timer, 1000);
-
-        const f = [['الجوال', user.cp], ['اسم المستخدم', user.cu], ['نهاية الاشتراك', user.ce]];
-        document.getElementById('dataFields').innerHTML = f.map(x => `<div class="data-row"><b>${x[0]}</b><span>${x[1] || '--'}</span></div>`).join('');
+        tick(); setInterval(tick, 1000);
+        
+        // هنا تظهر بيانات الاشتراك التي أعطيتها أنت للعميل
+        const fields = [
+            ['اسم المستخدم (الاشتراك)', user.cu],
+            ['كلمة سر (الاشتراك)', user.ck_service || 'راجع الدعم'], // افترضت وجود حقل ck_service للاشتراك
+            ['تاريخ الانتهاء', user.ce]
+        ];
+        document.getElementById('dataFields').innerHTML = fields.map(x=>`
+            <div class="data-row"><span class="data-label">${x[0]}</span><span class="data-value">${x[1]||'--'}</span></div>
+        `).join('');
     }
 
-    async function updatePassword() {
-        const newP = document.getElementById('changePassInput').value;
-        if(newP.length < 4) return alert("الرقم السري قصير!");
-        cloudData.clients[userIdx].ck = newP;
-        await sync();
-        alert("✅ تم تغيير الرقم السري بنجاح");
-        document.getElementById('changePassInput').value = "";
+    async function updatePass() {
+        const p = document.getElementById('changeInput').value;
+        if(p.length < 4) return alert("الرقم ضعيف!");
+        cloud.clients[uIdx].ck = p; await sync(); alert("تم تحديث قفل الصفحة!");
     }
 
-    async function sync() { await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cloudData) }); }
-    init();
+    async function sync() { await fetch(DB, {method:'PUT', body: JSON.stringify(cloud)}); }
+    start();
 </script>
 </body>
 </html>
