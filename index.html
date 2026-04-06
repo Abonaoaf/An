@@ -24,33 +24,27 @@
         .section { display: none; }
         .section.active { display: block; }
 
-        @keyframes dayGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--d); } 50% { transform: scale(1.15); text-shadow: 0 0 10px var(--d); opacity: 0.9; } }
-        .days-highlight { color: var(--d); font-weight: 900; display: inline-block; animation: dayGlow 1.2s infinite ease-in-out; }
-
-        .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 12px 0; border: 1px solid #eee; }
-        .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s linear; }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .card, .app-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
-        
         .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
         input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
         
-        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
-        .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
-        .btn-wa { background: var(--wa); }
-        .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block;}
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .card, .app-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
 
-        /* نافذة المعاينة الموحدة للمشتركين والمتجر */
+        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
+        .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-del { background: var(--d); }
+        .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block;}
+        .btn-save-img { background: #f59e0b; color: white; width: 100%; padding: 12px; font-size: 0.9rem; margin-top: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer;}
+
+        /* نافذة المعاينة الشاملة */
         #universalModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-        .uni-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; }
+        .uni-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
         .uni-header { background: var(--link); color: white; padding: 20px; text-align: center; }
         .uni-body { padding: 15px 20px; background: white; }
         .uni-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
         .uni-label { font-size: 0.7rem; color: var(--soft-red); font-weight: bold; min-width: 90px; text-align: right; }
         .uni-text { font-size: 0.85rem; color: #333; font-weight: bold; text-align: left; flex: 1; word-break: break-all; }
 
-        .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
+        .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; display: block; margin: 0 auto; }
         .drag-handle { position: absolute; top: 12px; left: 12px; cursor: grab; color: #cbd5e0; font-size: 1.2rem; }
     </style>
 </head>
@@ -67,14 +61,14 @@
     <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
         <div style="width: 95%; max-width: 400px; margin-bottom: 10px; display: flex; gap: 10px;">
             <button class="btn btn-main" style="background:var(--d); margin:0;" onclick="closeUni()">إغلاق</button>
-            <button id="saveImgBtn" class="btn btn-main" style="background:#f59e0b; margin:0; font-size:0.9rem;" onclick="saveCardAsImage()">حفظ للأسوديو</button>
+            <button id="saveImgBtn" class="btn-save-img" style="margin:0;" onclick="saveCardAsImage()">حفظ كصورة 📸</button>
         </div>
-        <div class="uni-container" id="captureTarget">
+        <div class="uni-card-container" id="captureTarget">
             <div class="uni-header">
-                <h3 id="uniTitle" style="margin:0; font-size: 1.1rem;">بيانات العرض</h3>
-                <small>فولتشر 🦅</small>
+                <h3 id="uni_title" style="margin:0; font-size: 1.1rem;">بيانات فولتشر</h3>
+                <small>🦅 Vulture System</small>
             </div>
-            <div class="uni-body" id="uniContent"></div>
+            <div class="uni-body" id="uni_content"></div>
         </div>
     </div>
 </div>
@@ -92,7 +86,7 @@
     <div class="container">
         <div id="clients" class="section active">
             <div class="modal">
-                <h3>إضافة مشترك جديد</h3>
+                <h3 id="clientTitle">إضافة مشترك جديد</h3>
                 <input type="hidden" id="editClientIndex">
                 <input type="text" id="cn" placeholder="اسم العميل">
                 <input type="text" id="cp" placeholder="رقم الجوال">
@@ -100,7 +94,8 @@
                 <input type="text" id="ck" placeholder="الرقم السري">
                 <input type="text" id="cl" placeholder="رابط الدخول">
                 <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
-                <button class="btn btn-main" onclick="saveClient()">حفظ المشترك في السحابة ☁️</button>
+                <button class="btn btn-main" onclick="saveClient()">حفظ البيانات في السحابة ☁️</button>
+                <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء</button>
             </div>
             <div class="grid" id="clientGrid"></div>
         </div>
@@ -123,13 +118,13 @@
 
         <div id="settings" class="section">
             <div class="modal" style="text-align:center;">
-                <h3>تنسيق شعار فولتشر 🦅</h3>
-                <input type="file" id="logoFile" onchange="previewNewLogo(this)">
+                <h3>إعدادات الشعار 🦅</h3>
+                <input type="file" id="logoFile" accept="image/*" onchange="previewNewLogo(this)">
                 <div style="margin:20px 0;">
                     <label>الحجم: <b id="sizeVal">70</b>px</label>
                     <input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)">
                 </div>
-                <div style="border:1px dashed #ddd; padding:10px; display:inline-block; border-radius:15px;">
+                <div style="border:1px dashed #ddd; padding:10px; display:inline-block; border-radius:15px; margin-bottom:15px;">
                     <img id="currentLogoPreview" src="" style="width:70px; object-fit: contain;">
                 </div>
                 <button class="btn btn-main" onclick="saveSettings()">حفظ الإعدادات 🚀</button>
@@ -162,28 +157,70 @@
                 if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;
                 renderClients(); renderApps();
             }
-        } catch(e) { console.log("خطأ تحميل."); }
+        } catch(e) { console.log("خطأ في التحميل."); }
     }
 
     function renderClients() {
         const grid = document.getElementById('clientGrid');
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
             const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
-            const showWA = (days <= 5 && days > 0);
             return `<div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <b>${c.name}</b> <span class="days-highlight">${days} يوم</span>
+                    <b>${c.name}</b> <span style="color:var(--d); font-weight:bold;">${days} يوم</span>
                 </div>
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
+                    <button class="btn btn-view" onclick="viewClient(${i})">معاينة</button>
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
                     <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
-                    <button class="btn btn-view" onclick="openClientView(${i})">بيانات</button>
                     <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
-                    ${showWA ? `<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 2; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه بالانتهاء</button>` : ''}
                 </div>
             </div>`;
         }).join('');
+    }
+
+    // --- معاينة المشترك (كل الحقول السبعة) ---
+    function viewClient(i) {
+        const c = cloudData.clients[i];
+        document.getElementById('uni_title').innerText = c.name;
+        const fields = [
+            ['اسم المشترك', c.name],
+            ['رقم الجوال', c.cp],
+            ['اسم المستخدم', c.cu],
+            ['الرقم السري', c.ck],
+            ['رابط الدخول', c.cl],
+            ['تاريخ البداية', c.cs],
+            ['تاريخ الانتهاء', c.ce]
+        ];
+        document.getElementById('uni_content').innerHTML = fields.map(f => `
+            <div class="uni-row"><div class="uni-label">${f[0]}</div><div class="uni-val">${f[1] || '--'}</div></div>
+        `).join('');
+        document.getElementById('universalModal').style.display = 'flex';
+    }
+
+    // --- معاينة التطبيق (كل الحقول) ---
+    function viewApp(i) {
+        const a = cloudData.apps[i];
+        document.getElementById('uni_title').innerText = "معاينة تطبيق المتجر";
+        const fields = [['اسم التطبيق', a.name],['كود دونلودر', a.ad],['رابط التحميل', a.al],['وصف التطبيق', a.at]];
+        document.getElementById('uni_content').innerHTML = `
+            <img src="${a.img}" style="width:75px; display:block; margin:0 auto 15px; border-radius:15px;">
+            ` + fields.map(f => `
+            <div class="uni-row"><div class="uni-label">${f[0]}</div><div class="uni-val">${f[1] || '--'}</div></div>
+        `).join('');
+        document.getElementById('universalModal').style.display = 'flex';
+    }
+
+    function closeUni() { document.getElementById('universalModal').style.display = 'none'; }
+
+    function saveCardAsImage() {
+        const target = document.getElementById('captureTarget');
+        html2canvas(target, {scale: 3}).then(canvas => {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL("image/png");
+            link.download = `Vulture_Card.png`;
+            link.click();
+        });
     }
 
     function renderApps() {
@@ -192,9 +229,9 @@
             <div class="app-card" data-id="${i}">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 <img src="${a.img || ''}">
-                <div style="text-align:center; font-weight:bold; font-size:0.9rem;">${a.name}</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px;">
-                    <button class="btn btn-view" onclick="openAppView(${i})"><i class="fas fa-eye"></i></button>
+                <center><b>${a.name}</b></center>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px; margin-top:10px;">
+                    <button class="btn btn-view" onclick="viewApp(${i})"><i class="fas fa-eye"></i></button>
                     <button class="btn btn-edit" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
                     <button class="btn btn-del" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
                 </div>
@@ -202,52 +239,6 @@
         new Sortable(list, { animation: 150 });
     }
 
-    // --- وظائف المعاينة الموحدة ---
-    function openClientView(i) {
-        const c = cloudData.clients[i];
-        document.getElementById('uniTitle').innerText = c.name;
-        const f = [['اسم المشترك', c.name],['جوال', c.cp],['يوزر', c.cu],['باسورد', c.ck],['بداية', c.cs],['نهاية', c.ce]];
-        document.getElementById('uniContent').innerHTML = f.map(x => `<div class="uni-row"><div class="uni-label">${x[0]}</div><div class="uni-text">${x[1] || '--'}</div></div>`).join('');
-        document.getElementById('universalModal').style.display = 'flex';
-    }
-
-    function openAppView(i) {
-        const a = cloudData.apps[i];
-        document.getElementById('uniTitle').innerText = "معاينة التطبيق";
-        const f = [['اسم التطبيق', a.name],['كود دونلودر', a.ad],['رابط التحميل', a.al],['الوصف', a.at]];
-        document.getElementById('uniContent').innerHTML = `<center><img src="${a.img}" style="width:80px; border-radius:15px; margin-bottom:10px;"></center>` + 
-            f.map(x => `<div class="uni-row"><div class="uni-label">${x[0]}</div><div class="uni-text">${x[1] || '--'}</div></div>`).join('');
-        document.getElementById('universalModal').style.display = 'flex';
-    }
-
-    function closeUni() { document.getElementById('universalModal').style.display = 'none'; }
-
-    function saveCardAsImage() {
-        const target = document.getElementById('captureTarget');
-        html2canvas(target, {scale: 3, useCORS: true}).then(canvas => {
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL("image/png");
-            link.download = `Vulture_Details.png`;
-            link.click();
-        });
-    }
-
-    // --- وظائف العميل ---
-    async function saveClient() {
-        const idx = document.getElementById('editClientIndex').value;
-        const c = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };
-        if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
-        await sync(); location.reload();
-    }
-
-    function editClient(i) {
-        const c = cloudData.clients[i];
-        document.getElementById('editClientIndex').value = i;
-        ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
-        window.scrollTo(0,0);
-    }
-
-    // --- وظائف المتجر المصلحة ---
     function editApp(i) {
         const a = cloudData.apps[i];
         document.getElementById('editAppIndex').value = i;
@@ -255,7 +246,7 @@
         document.getElementById('ad').value = a.ad;
         document.getElementById('al').value = a.al;
         document.getElementById('at').value = a.at;
-        document.getElementById('appTitle').innerText = "تعديل: " + a.name;
+        document.getElementById('appTitle').innerText = "تعديل تطبيق: " + a.name;
         document.getElementById('saveAppBtn').innerText = "تحديث التطبيق ✨";
         document.getElementById('cancelAppBtn').style.display = "block";
         window.scrollTo(0,0);
@@ -274,20 +265,30 @@
         const doSave = async (img) => {
             const a = { name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img: img || (idx!==""?cloudData.apps[idx].img:"") };
             if(idx==="") cloudData.apps.push(a); else cloudData.apps[idx]=a;
-            await sync(); await load(); clearAppForm();
+            await sync(); load(); clearAppForm();
         };
         if(file) { const r=new FileReader(); r.onload=()=>doSave(r.result); r.readAsDataURL(file); } else doSave();
     }
 
-    // --- الوظائف العامة ---
+    // --- وظائف عامة ---
+    async function saveClient() {
+        const idx = document.getElementById('editClientIndex').value;
+        const c = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };
+        if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
+        await sync(); clearClientForm(); load();
+    }
+    function clearClientForm() { ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cancelBtn').style.display="none"; document.getElementById('clientTitle').innerText="إضافة مشترك جديد";}
+    function editClient(i) {
+        const c = cloudData.clients[i];
+        document.getElementById('editClientIndex').value = i;
+        ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        document.getElementById('cancelBtn').style.display = "block"; document.getElementById('clientTitle').innerText="تعديل: " + c.name;
+    }
     async function saveOrder() {
         const items = document.querySelectorAll('#appList .app-card');
         let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
         cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); load();
     }
-    function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
-    function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
-    async function saveSettings() { cloudData.logo = document.getElementById('currentLogoPreview').src; cloudData.logoSize = document.getElementById('logoSize').value; await sync(); alert("تم الحفظ!"); }
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
     function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
@@ -302,14 +303,6 @@
         navigator.clipboard.writeText(baseUrl + '?name=' + encodeURIComponent(name));
         alert("تم نسخ رابط العميل!");
     }
-    function sendReminder(name, phone, days) {
-        let clean = (phone || "").replace(/\D/g, '');
-        if(!clean.startsWith('966')) clean = '966' + clean;
-        const msg = `مرحباً ${name}، نود تذكيرك بأن اشتراكك في فولتشر 🦅 أوشك على الانتهاء (باقي ${days} أيام).`;
-        window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-    function closeUni() { document.getElementById('universalModal').style.display = 'none'; }
 </script>
 </body>
-            </html>
-    
+</html>
