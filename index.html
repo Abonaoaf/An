@@ -8,51 +8,51 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; --soft-red: #f87171; --wa: #25D366; [span_0](start_span)}
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }[span_0](end_span)
+        :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; --soft-red: #f87171; --wa: #25D366; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; [span_1](start_span)}
-        #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }[span_1](end_span)
-        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; [span_2](start_span)}
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
+        #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
 
-        .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }[span_2](end_span)
-        .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; [span_3](start_span)}
-        .tab-btn { padding: 10px 18px; border-radius: 12px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; font-size: 0.85rem; color: #555; }[span_3](end_span)
-        .tab-btn.active { background: var(--link); color: white; border-color: var(--link); [span_4](start_span)}
+        .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
+        .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+        .tab-btn { padding: 10px 18px; border-radius: 12px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; font-size: 0.85rem; color: #555; }
+        .tab-btn.active { background: var(--link); color: white; border-color: var(--link); }
 
-        .container { padding: 20px; max-width: 1200px; margin: auto; }[span_4](end_span)
-        .section { display: none; [span_5](start_span)}
-        .section.active { display: block; }[span_5](end_span)
+        .container { padding: 20px; max-width: 1200px; margin: auto; }
+        .section { display: none; }
+        .section.active { display: block; }
 
-        @keyframes dayGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--d); } 50% { transform: scale(1.15); text-shadow: 0 0 10px var(--d); opacity: 0.9; [span_6](start_span)} }[span_6](end_span)
-        .days-highlight { color: var(--d); font-weight: 900; display: inline-block; animation: dayGlow 1.2s infinite ease-in-out; [span_7](start_span)}
+        @keyframes dayGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--d); } 50% { transform: scale(1.15); text-shadow: 0 0 10px var(--d); opacity: 0.9; } }
+        .days-highlight { color: var(--d); font-weight: 900; display: inline-block; animation: dayGlow 1.2s infinite ease-in-out; }
 
-        .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 12px 0; border: 1px solid #eee; }[span_7](end_span)
-        .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s linear; [span_8](start_span)}
+        .prog-mini { height: 12px; background: var(--s); border-radius: 10px; overflow: hidden; margin: 12px 0; border: 1px solid #eee; }
+        .fill-red { height: 100%; background: var(--d); float: right; transition: 0.5s linear; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }[span_8](end_span)
-        .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; [span_9](start_span)}
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
         
-        .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }[span_9](end_span)
-        input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; [span_10](start_span)}
+        .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
+        input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
         
-        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }[span_10](end_span)
-        .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); [span_11](start_span)}
-        .btn-wa { background: var(--wa); }[span_11](end_span)
-        [span_12](start_span).btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block;}[span_12](end_span)
-        [span_13](start_span).btn-save-img { background: #f59e0b; color: white; width: 100%; padding: 12px; font-size: 0.9rem; margin-top: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer;}[span_13](end_span)
+        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
+        .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
+        .btn-wa { background: var(--wa); }
+        .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block;}
+        .btn-save-img { background: #f59e0b; color: white; width: 100%; padding: 12px; font-size: 0.9rem; margin-top: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer;}
 
-        #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; [span_14](start_span)}
-        .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; }[span_14](end_span)
-        .view-header { background: var(--link); color: white; padding: 20px; text-align: center; [span_15](start_span)}
-        .view-body { padding: 15px 20px; background: white; }[span_15](end_span)
-        .view-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; [span_16](start_span)}
-        .v-label { font-size: 0.7rem; color: var(--soft-red); font-weight: bold; min-width: 90px; text-align: right; }[span_16](end_span)
-        .v-text { font-size: 0.85rem; color: #333; font-weight: bold; text-align: left; flex: 1; word-break: break-all; [span_17](start_span)}
+        #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+        .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; }
+        .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
+        .view-body { padding: 15px 20px; background: white; }
+        .view-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .v-label { font-size: 0.7rem; color: var(--soft-red); font-weight: bold; min-width: 90px; text-align: right; }
+        .v-text { font-size: 0.85rem; color: #333; font-weight: bold; text-align: left; flex: 1; word-break: break-all; }
 
-        .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; }[span_17](end_span)
-        .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; [span_18](start_span)}
-        .drag-handle { position: absolute; top: 12px; left: 12px; cursor: grab; color: #cbd5e0; font-size: 1.2rem; }[span_18](end_span)
+        .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; }
+        .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
+        .drag-handle { position: absolute; top: 12px; left: 12px; cursor: grab; color: #cbd5e0; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -67,8 +67,8 @@
 <div id="viewModal">
     <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
         <div style="width: 95%; max-width: 400px; margin-bottom: 10px; display: flex; gap: 10px;">
-            [span_19](start_span)<button class="btn btn-main" style="background:var(--d); margin:0;" onclick="closeView()">إغلاق</button>[span_19](end_span)
-            [span_20](start_span)<button id="saveImgBtn" class="btn-save-img" style="margin:0;" onclick="saveCardAsImage()">حفظ للأسوديو</button>[span_20](end_span)
+            <button class="btn btn-main" style="background:var(--d); margin:0;" onclick="closeView()">إغلاق</button>
+            <button id="saveImgBtn" class="btn-save-img" style="margin:0;" onclick="saveCardAsImage()">حفظ للاستوديو</button>
         </div>
         <div class="view-card-container" id="captureTarget">
             <div class="view-header">
@@ -84,162 +84,229 @@
     <div class="header">
         <b>لوحة تحكم فولتشر 🦅</b>
         <div class="nav-tabs">
-            [span_21](start_span)<button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>[span_21](end_span)
-            [span_22](start_span)<button class="tab-btn" onclick="switchTab('store', this)">المتجر</button>[span_22](end_span)
-            [span_23](start_span)<button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات</button>[span_23](end_span)
+            <button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>
+            <button class="tab-btn" onclick="switchTab('store', this)">المتجر</button>
+            <button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات</button>
         </div>
     </div>
 
     <div class="container">
         <div id="clients" class="section active">
             <div class="modal">
-                [span_24](start_span)<h3 id="clientTitle">إضافة مشترك جديد</h3>[span_24](end_span)
-                [span_25](start_span)<input type="hidden" id="editClientIndex">[span_25](end_span)
-                [span_26](start_span)<input type="text" id="cn" placeholder="اسم العميل">[span_26](end_span)
-                [span_27](start_span)<input type="text" id="cp" placeholder="رقم الجوال">[span_27](end_span)
-                [span_28](start_span)<input type="text" id="cu" placeholder="اسم المستخدم">[span_28](end_span)
-                [span_29](start_span)<input type="text" id="ck" placeholder="الرقم السري">[span_29](end_span)
-                [span_30](start_span)<input type="text" id="cl" placeholder="رابط الدخول">[span_30](end_span)
-                [span_31](start_span)<div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>[span_31](end_span)
-                [span_32](start_span)<button class="btn btn-main" onclick="saveClient()">حفظ البيانات في السحابة ☁️</button>[span_32](end_span)
-                [span_33](start_span)<button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none; margin-top:5px;" onclick="clearClientForm()">إلغاء التعديل</button>[span_33](end_span)
+                <h3 id="clientTitle">إضافة مشترك جديد</h3>
+                <input type="hidden" id="editClientIndex">
+                <input type="text" id="cn" placeholder="اسم العميل">
+                <input type="text" id="cp" placeholder="رقم الجوال">
+                <input type="text" id="cu" placeholder="اسم المستخدم">
+                <input type="text" id="ck" placeholder="الرقم السري">
+                <input type="text" id="cl" placeholder="رابط الدخول">
+                <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
+                <button class="btn btn-main" onclick="saveClient()">حفظ البيانات في السحابة ☁️</button>
+                <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none; margin-top:5px;" onclick="clearClientForm()">إلغاء التعديل</button>
             </div>
-            [span_34](start_span)<div class="grid" id="clientGrid"></div>[span_34](end_span)
+            <div class="grid" id="clientGrid"></div>
         </div>
 
         <div id="store" class="section">
             <div class="modal">
-                [span_35](start_span)<h3 id="appTitle">+ إضافة تطبيق للمتجر</h3>[span_35](end_span)
-                [span_36](start_span)<input type="hidden" id="editAppIndex">[span_36](end_span)
-                [span_37](start_span)<input type="file" id="appIcon" accept="image/*">[span_37](end_span)
-                [span_38](start_span)<input type="text" id="an" placeholder="اسم التطبيق">[span_38](end_span)
-                [span_39](start_span)<input type="text" id="ad" placeholder="كود دونلودر">[span_39](end_span)
-                [span_40](start_span)<input type="text" id="al" placeholder="رابط التحميل المباشر">[span_40](end_span)
-                [span_41](start_span)<textarea id="at" placeholder="وصف التطبيق"></textarea>[span_41](end_span)
-                [span_42](start_span)<button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>[span_42](end_span)
-                [span_43](start_span)<button id="cancelAppBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none; margin-top:5px;" onclick="clearAppForm()">إلغاء التعديل</button>[span_43](end_span)
+                <h3 id="appTitle">+ إضافة تطبيق للمتجر</h3>
+                <input type="hidden" id="editAppIndex">
+                <input type="file" id="appIcon" accept="image/*">
+                <input type="text" id="an" placeholder="اسم التطبيق">
+                <input type="text" id="ad" placeholder="كود دونلودر">
+                <input type="text" id="al" placeholder="رابط التحميل المباشر">
+                <textarea id="at" placeholder="وصف التطبيق"></textarea>
+                <button id="saveAppBtn" class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>
+                <button id="cancelAppBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none; margin-top:5px;" onclick="clearAppForm()">إلغاء التعديل</button>
             </div>
-            [span_44](start_span)<button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px;" onclick="saveOrder()"><i class="fas fa-save"></i> حفظ الترتيب الحالي</button>[span_44](end_span)
-            [span_45](start_span)<div class="grid" id="appList"></div>[span_45](end_span)
+            <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px;" onclick="saveOrder()"><i class="fas fa-save"></i> حفظ الترتيب الحالي</button>
+            <div class="grid" id="appList"></div>
         </div>
 
         <div id="settings" class="section">
             <div class="modal" style="text-align:center;">
-                [span_46](start_span)<h3>تنسيق شعار فولتشر 🦅</h3>[span_46](end_span)
-                [span_47](start_span)<input type="file" id="logoFile" accept="image/*" onchange="previewNewLogo(this)">[span_47](end_span)
+                <h3>تنسيق شعار فولتشر 🦅</h3>
+                <input type="file" id="logoFile" accept="image/*" onchange="previewNewLogo(this)">
                 <div style="margin:20px 0;">
-                    [span_48](start_span)<label>الحجم: <b id="sizeVal">70</b>px</label>[span_48](end_span)
-                    [span_49](start_span)<input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)">[span_49](end_span)
+                    <label>الحجم: <b id="sizeVal">70</b>px</label>
+                    <input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)">
                 </div>
-                [span_50](start_span)<div style="border:1px dashed #ddd; padding:10px; display:inline-block; border-radius:15px; margin-bottom:15px;">[span_50](end_span)
-                    [span_51](start_span)<img id="currentLogoPreview" src="" style="width:70px; object-fit: contain;">[span_51](end_span)
+                <div style="border:1px dashed #ddd; padding:10px; display:inline-block; border-radius:15px; margin-bottom:15px;">
+                    <img id="currentLogoPreview" src="" style="width:70px; object-fit: contain;">
                 </div>
-                [span_52](start_span)<button class="btn btn-main" onclick="saveSettings()">حفظ الإعدادات 🚀</button>[span_52](end_span)
+                <button class="btn btn-main" onclick="saveSettings()">حفظ الإعدادات 🚀</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    [span_53](start_span)const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";[span_53](end_span)
-    [span_54](start_span)const MASTER_PASS = "Aztlg1512";[span_54](end_span)
-    [span_55](start_span)let cloudData = { clients: [], apps: [], logo: "", logoSize: "70" };[span_55](end_span)
+    const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    const MASTER_PASS = "Aztlg1512";
+    let cloudData = { clients: [], apps: [], logo: "", logoSize: "70" };
 
     async function checkPass() {
-        [span_56](start_span)if(document.getElementById('passInput').value === MASTER_PASS) {[span_56](end_span)
-            [span_57](start_span)document.getElementById('loginOverlay').style.display = "none";[span_57](end_span)
-            [span_58](start_span)document.getElementById('adminApp').style.display = "block";[span_58](end_span)
-            [span_59](start_span)await load();[span_59](end_span)
-        } else { alert("كلمة المرور غير صحيحة!"); [span_60](start_span)}
+        if(document.getElementById('passInput').value === MASTER_PASS) {
+            document.getElementById('loginOverlay').style.display = "none";
+            document.getElementById('adminApp').style.display = "block";
+            await load();
+        } else { alert("كلمة المرور غير صحيحة!"); }
     }
 
     async function load() {
         try {
-            const r = await fetch(DB);[span_60](end_span)
-            [span_61](start_span)const d = await r.json();[span_61](end_span)
+            const r = await fetch(DB);
+            const d = await r.json();
             if (d) {
-                [span_62](start_span)cloudData = d;[span_62](end_span)
-                [span_63](start_span)if(!cloudData.clients) cloudData.clients = [];[span_63](end_span)
-                [span_64](start_span)if(!cloudData.apps) cloudData.apps = [];[span_64](end_span)
-                [span_65](start_span)if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;[span_65](end_span)
-                if(cloudData.logoSize) { document.getElementById('logoSize').value = cloudData.logoSize; updateLogoPreview(cloudData.logoSize); [span_66](start_span)}
-                renderClients(); renderApps();[span_66](end_span)
+                cloudData = d;
+                if(!cloudData.clients) cloudData.clients = [];
+                if(!cloudData.apps) cloudData.apps = [];
+                if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;
+                if(cloudData.logoSize) { document.getElementById('logoSize').value = cloudData.logoSize; updateLogoPreview(cloudData.logoSize); }
+                renderClients(); renderApps();
             }
-        } catch(e) { console.log("خطأ في التحميل."); [span_67](start_span)}
+        } catch(e) { console.log("خطأ في التحميل."); }
     }
 
     function renderClients() {
-        const grid = document.getElementById('clientGrid');[span_67](end_span)
-        [span_68](start_span)grid.innerHTML = (cloudData.clients || []).map((c, i) => {[span_68](end_span)
-            [span_69](start_span)const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));[span_69](end_span)
-            [span_70](start_span)const showWA = (days <= 5 && days > 0);[span_70](end_span)
+        const grid = document.getElementById('clientGrid');
+        grid.innerHTML = (cloudData.clients || []).map((c, i) => {
+            const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
+            const showWA = (days <= 5 && days > 0);
             return `<div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    [span_71](start_span)<b>${c.name}</b> <span class="days-highlight">${days} يوم</span>[span_71](end_span)
+                    <b>${c.name}</b> <span class="days-highlight">${days} يوم</span>
                 </div>
-                [span_72](start_span)<div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>[span_72](end_span)
+                <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
-                    [span_73](start_span)<button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>[span_73](end_span)
-                    [span_74](start_span)<button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>[span_74](end_span)
-                    [span_75](start_span)<button class="btn btn-view" onclick="openView(${i})">بيانات</button>[span_75](end_span)
-                    [span_76](start_span)<button class="btn btn-del" onclick="delClient(${i})">حذف</button>[span_76](end_span)
-            ${showWA ? [span_77](start_span)`<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 4; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه بقرب الانتهاء</button>` : ''}[span_77](end_span)
+                    <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
+                    <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
+                    <button class="btn btn-view" onclick="openView(${i})">بيانات</button>
+                    <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
+                    ${showWA ? `<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 2; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه بالواتساب</button>` : ''}
                 </div>
             </div>`;
-        [span_78](start_span)}).join('');[span_78](end_span)
+        }).join('');
     }
 
     function sendReminder(name, phone, days) {
-        [span_79](start_span)if(!phone || phone === "--") return alert("رقم العميل غير متوفر!");[span_79](end_span)
-        [span_80](start_span)let cleanPhone = phone.replace(/\D/g, '');[span_80](end_span)
-        [span_81](start_span)if(!cleanPhone.startsWith('966')) cleanPhone = '966' + cleanPhone;[span_81](end_span)
-        const msg = `مرحباً ${name}، نود تذكيرك بأن اشتراكك في فولتشر 🦅 أوشك على الانتهاء (باقي ${days} أيام). لتجديد الاشتراك يرجى التواصل معنا. [span_82](start_span)تحياتنا، إدارة فولتشر.`;[span_82](end_span)
-        [span_83](start_span)const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;[span_83](end_span)
-        [span_84](start_span)window.open(waLink, '_blank');[span_84](end_span)
+        if(!phone || phone === "--") return alert("رقم العميل غير متوفر!");
+        let cleanPhone = phone.replace(/\D/g, '');
+        if(!cleanPhone.startsWith('966')) cleanPhone = '966' + cleanPhone;
+        const msg = `مرحباً ${name}، نود تذكيرك بأن اشتراكك في فولتشر 🦅 أوشك على الانتهاء (باقي ${days} أيام). لتجديد الاشتراك يرجى التواصل معنا.`;
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     function openView(i) {
-        [span_85](start_span)const c = cloudData.clients[i];[span_85](end_span)
-        [span_86](start_span)document.getElementById('v_title').innerText = c.name;[span_86](end_span)
-        [span_87](start_span)const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['الرقم السري', c.ck],['رابط الدخول', c.cl],['تاريخ البداية', c.cs],['تاريخ الانتهاء', c.ce]];[span_87](end_span)
-        [span_88](start_span)document.getElementById('v_content').innerHTML = fields.map(f => `<div class="view-row"><div class="v-label">${f[0]}</div><div class="v-text">${f[1] || '--'}</div></div>`).join('');[span_88](end_span)
-        [span_89](start_span)document.getElementById('viewModal').style.display = 'flex';[span_89](end_span)
+        const c = cloudData.clients[i];
+        document.getElementById('v_title').innerText = c.name;
+        const fields = [['اسم المشترك', c.name],['جوال', c.cp],['يوزر', c.cu],['باسورد', c.ck],['رابط', c.cl],['بداية', c.cs],['نهاية', c.ce]];
+        document.getElementById('v_content').innerHTML = fields.map(f => `<div class="view-row"><div class="v-label">${f[0]}</div><div class="v-text">${f[1] || '--'}</div></div>`).join('');
+        document.getElementById('viewModal').style.display = 'flex';
     }
 
-    function closeView() { document.getElementById('viewModal').style.display = 'none'; [span_90](start_span)}
+    function closeView() { document.getElementById('viewModal').style.display = 'none'; }
 
     function saveCardAsImage() {
-        const target = document.getElementById('captureTarget');[span_90](end_span)
-        [span_91](start_span)html2canvas(target, {scale: 3}).then(canvas => {[span_91](end_span)
+        const target = document.getElementById('captureTarget');
+        html2canvas(target, {scale: 3}).then(canvas => {
             const link = document.createElement('a');
             link.href = canvas.toDataURL("image/png");
             link.download = `Vulture_Card.png`;
             link.click();
-        [span_92](start_span)});[span_92](end_span)
+        });
     }
 
     function copyL(name) {
-        [span_93](start_span)let baseUrl = window.location.href.split('?')[0].replace('index.html', 'user.html');[span_93](end_span)
-        [span_94](start_span)if (!baseUrl.includes('user.html')) baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/") + 1) + "user.html";[span_94](end_span)
-        [span_95](start_span)navigator.clipboard.writeText(baseUrl + '?name=' + encodeURIComponent(name));[span_95](end_span)
-        [span_96](start_span)alert("تم نسخ رابط العميل!");[span_96](end_span)
+        let baseUrl = window.location.href.split('?')[0].replace('index.html', 'user.html');
+        if (!baseUrl.includes('user.html')) baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/") + 1) + "user.html";
+        navigator.clipboard.writeText(baseUrl + '?name=' + encodeURIComponent(name));
+        alert("تم نسخ رابط العميل!");
     }
 
     async function saveClient() {
-        [span_97](start_span)const idx = document.getElementById('editClientIndex').value;[span_97](end_span)
-        [span_98](start_span)const c = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };[span_98](end_span)
-        [span_99](start_span)if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;[span_99](end_span)
-        [span_100](start_span)await sync(); clearClientForm(); load();[span_100](end_span)
+        const idx = document.getElementById('editClientIndex').value;
+        const c = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };
+        if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
+        await sync(); clearClientForm(); load();
     }
 
-    [span_101](start_span)function clearClientForm() { ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cancelBtn').style.display="none"; document.getElementById('clientTitle').innerText="إضافة مشترك جديد";}[span_101](end_span)
+    function clearClientForm() { ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cancelBtn').style.display="none"; document.getElementById('clientTitle').innerText="إضافة مشترك جديد";}
     
     function editClient(i) {
-        [span_102](start_span)const c = cloudData.clients[i];[span_102](end_span)
-        [span_103](start_span)document.getElementById('editClientIndex').value = i;[span_103](end_span)
-        [span_104](start_span)['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");[span_104](end_span)
-        [span_105](start_span)document.getElementById('cancelBtn').style.display = "block"; document.getElementById('clientTitle').innerText="تعديل بيانات: " + c.name; window.scrollTo(0,0);[span_105](end_span)
+        const c = cloudData.clients[i];
+        document.getElementById('editClientIndex').value = i;
+        ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        document.getElementById('cancelBtn').style.display = "block"; document.getElementById('clientTitle').innerText="تعديل: " + c.name;
     }
 
-    function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; [span_106](start_span)}
-    function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readA
+    function renderApps() {
+        const list = document.getElementById('appList');
+        list.innerHTML = (cloudData.apps || []).map((a, i) => `
+            <div class="app-card" data-id="${i}">
+                <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                <img src="${a.img || ''}">
+                <div style="text-align:center; font-weight:bold; font-size:0.9rem;">${a.name}</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px;">
+                    <button class="btn btn-view" onclick="alert('كود: ${a.ad}')"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-edit" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-del" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>`).join('');
+        new Sortable(list, { animation: 150, handle: '.drag-handle' });
+    }
+
+    /* إصلاح دالة تعديل التطبيق */
+    function editApp(i) {
+        const a = cloudData.apps[i];
+        document.getElementById('editAppIndex').value = i;
+        document.getElementById('an').value = a.name || "";
+        document.getElementById('ad').value = a.ad || "";
+        document.getElementById('al').value = a.al || "";
+        document.getElementById('at').value = a.at || "";
+        document.getElementById('appTitle').innerText = "تعديل تطبيق: " + a.name;
+        document.getElementById('saveAppBtn').innerText = "تحديث التطبيق ✨";
+        document.getElementById('cancelAppBtn').style.display = "block";
+        window.scrollTo(0,0);
+    }
+
+    function clearAppForm() {
+        ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = "");
+        document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
+        document.getElementById('saveAppBtn').innerText = "حفظ في المتجر ✨";
+        document.getElementById('cancelAppBtn').style.display = "none";
+    }
+
+    async function saveApp() {
+        const idx = document.getElementById('editAppIndex').value;
+        const file = document.getElementById('appIcon').files[0];
+        const doSave = async (img) => {
+            const a = { name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img: img || (idx!==""?cloudData.apps[idx].img:"") };
+            if(idx==="") cloudData.apps.push(a); else cloudData.apps[idx]=a;
+            await sync(); load(); clearAppForm();
+        };
+        if(file) { const r=new FileReader(); r.onload=()=>doSave(r.result); r.readAsDataURL(file); } else doSave();
+    }
+
+    async function saveOrder() {
+        const items = document.querySelectorAll('#appList .app-card');
+        let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
+        cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); load();
+    }
+
+    function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
+    function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
+    async function saveSettings() { cloudData.logo = document.getElementById('currentLogoPreview').src; cloudData.logoSize = document.getElementById('logoSize').value; await sync(); alert("تم الحفظ!"); }
+    
+    async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
+    function v(id) { return document.getElementById(id).value; }
+    function switchTab(id, btn) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active'); btn.classList.add('active');
+    }
+    async function delClient(i) { if(confirm("حذف المشترك؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
+    async function delApp(i) { if(confirm("حذف التطبيق؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
+</script>
+</body>
+</html>
