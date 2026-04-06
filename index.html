@@ -38,11 +38,11 @@
         
         .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
-        .btn-wa { background: var(--wa); } /* لون الواتساب */
+        .btn-wa { background: var(--wa); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block;}
         .btn-save-img { background: #f59e0b; color: white; width: 100%; padding: 12px; font-size: 0.9rem; margin-top: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer;}
 
-        #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+        #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; }
         .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
         .view-body { padding: 15px 20px; background: white; }
@@ -68,13 +68,10 @@
     <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
         <div style="width: 95%; max-width: 400px; margin-bottom: 10px; display: flex; gap: 10px;">
             <button class="btn btn-main" style="background:var(--d); margin:0;" onclick="closeView()">إغلاق</button>
-            <button id="saveImgBtn" class="btn-save-img" style="margin:0;" onclick="saveCardAsImage()">حفظ للأسوديو</button>
+            <button id="saveImgBtn" class="btn-save-img" style="margin:0;" onclick="saveCardAsImage()">حفظ للأسوديو 📸</button>
         </div>
         <div class="view-card-container" id="captureTarget">
-            <div class="view-header">
-                <h3 id="v_title" style="margin:0; font-size: 1.1rem;">بيانات المشترك</h3>
-                <small>فولتشر 🦅</small>
-            </div>
+            <div class="view-header"><h3 id="v_title" style="margin:0; font-size: 1.1rem;">بيانات فولتشر</h3><small>🦅 Vulture System</small></div>
             <div class="view-body" id="v_content"></div>
         </div>
     </div>
@@ -116,7 +113,7 @@
                 <input type="text" id="ad" placeholder="كود دونلودر">
                 <input type="text" id="al" placeholder="رابط التحميل المباشر">
                 <textarea id="at" placeholder="وصف التطبيق"></textarea>
-                <button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>
+                <button id="saveAppBtn" class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>
                 <button id="cancelAppBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none; margin-top:5px;" onclick="clearAppForm()">إلغاء التعديل</button>
             </div>
             <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px;" onclick="saveOrder()"><i class="fas fa-save"></i> حفظ الترتيب الحالي</button>
@@ -127,13 +124,8 @@
             <div class="modal" style="text-align:center;">
                 <h3>تنسيق شعار فولتشر 🦅</h3>
                 <input type="file" id="logoFile" accept="image/*" onchange="previewNewLogo(this)">
-                <div style="margin:20px 0;">
-                    <label>الحجم: <b id="sizeVal">70</b>px</label>
-                    <input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)">
-                </div>
-                <div style="border:1px dashed #ddd; padding:10px; display:inline-block; border-radius:15px; margin-bottom:15px;">
-                    <img id="currentLogoPreview" src="" style="width:70px; object-fit: contain;">
-                </div>
+                <div style="margin:20px 0;"><label>الحجم: <b id="sizeVal">70</b>px</label><input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)"></div>
+                <div style="border:1px dashed #ddd; padding:10px; display:inline-block; border-radius:15px; margin-bottom:15px;"><img id="currentLogoPreview" src="" style="width:70px; object-fit: contain;"></div>
                 <button class="btn btn-main" onclick="saveSettings()">حفظ الإعدادات 🚀</button>
             </div>
         </div>
@@ -172,33 +164,26 @@
         const grid = document.getElementById('clientGrid');
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
             const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
-            // التحقق إذا كان العميل يحتاج تنبيه (باقي 5 أيام أو أقل)
             const showWA = (days <= 5 && days > 0);
-            
             return `<div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <b>${c.name}</b> <span class="days-highlight">${days} يوم</span>
-                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;"><b>${c.name}</b> <span class="days-highlight">${days} يوم</span></div>
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
                     <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
                     <button class="btn btn-view" onclick="openView(${i})">بيانات</button>
                     <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
-                    ${showWA ? `<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 4; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه بقرب الانتهاء</button>` : ''}
+                    ${showWA ? `<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 2; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه بقرب الانتهاء</button>` : ''}
                 </div>
             </div>`;
         }).join('');
     }
 
-    /* وظيفة إرسال التنبيه عبر الواتساب */
     function sendReminder(name, phone, days) {
         if(!phone || phone === "--") return alert("رقم العميل غير متوفر!");
-        // تنظيف رقم الهاتف من الفواصل أو العلامات
         let cleanPhone = phone.replace(/\D/g, '');
-        if(!cleanPhone.startsWith('966')) cleanPhone = '966' + cleanPhone; // إضافة مفتاح السعودية افتراضياً
-
-        const msg = `مرحباً ${name}، نود تذكيرك بأن اشتراكك في فولتشر 🦅 أوشك على الانتهاء (باقي ${days} أيام). لتجديد الاشتراك يرجى التواصل معنا. تحياتنا، إدارة فولتشر.`;
+        if(!cleanPhone.startsWith('966')) cleanPhone = '966' + cleanPhone;
+        const msg = `مرحباً ${name}، نود تذكيرك بأن اشتراكك في فولتشر 🦅 أوشك على الانتهاء (باقي ${days} أيام). لتجديد الاشتراك يرجى التواصل معنا.`;
         const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
         window.open(waLink, '_blank');
     }
@@ -211,43 +196,31 @@
         document.getElementById('viewModal').style.display = 'flex';
     }
 
+    function viewApp(i) {
+        const a = cloudData.apps[i];
+        document.getElementById('v_title').innerText = "معاينة التطبيق";
+        const fields = [['الاسم', a.name],['كود دونلودر', a.ad],['الرابط المباشر', a.al],['الوصف', a.at]];
+        document.getElementById('v_content').innerHTML = `<img src="${a.img}" style="width:75px; display:block; margin:0 auto 15px; border-radius:15px;">` + fields.map(f => `<div class="view-row"><div class="v-label">${f[0]}</div><div class="v-text">${f[1] || '--'}</div></div>`).join('');
+        document.getElementById('viewModal').style.display = 'flex';
+    }
+
     function closeView() { document.getElementById('viewModal').style.display = 'none'; }
 
     function saveCardAsImage() {
         const target = document.getElementById('captureTarget');
         html2canvas(target, {scale: 3}).then(canvas => {
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL("image/png");
-            link.download = `Vulture_Card.png`;
-            link.click();
+            const link = document.createElement('a'); link.href = canvas.toDataURL("image/png"); link.download = `Vulture_Card.png`; link.click();
         });
     }
 
+    // --- توليد رابط العميل بشكل صحيح ---
     function copyL(name) {
-        let baseUrl = window.location.href.split('?')[0].replace('index.html', 'user.html');
-        if (!baseUrl.includes('user.html')) baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf("/") + 1) + "user.html";
+        let currentUrl = window.location.href;
+        let baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf("/") + 1) + "user.html";
         navigator.clipboard.writeText(baseUrl + '?name=' + encodeURIComponent(name));
-        alert("تم نسخ رابط العميل!");
+        alert("تم نسخ رابط العميل لصفحة user.html بنجاح! ✅");
     }
 
-    async function saveClient() {
-        const idx = document.getElementById('editClientIndex').value;
-        const c = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };
-        if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
-        await sync(); clearClientForm(); load();
-    }
-
-    function clearClientForm() { ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cancelBtn').style.display="none"; document.getElementById('clientTitle').innerText="إضافة مشترك جديد";}
-    function editClient(i) {
-        const c = cloudData.clients[i]; document.getElementById('editClientIndex').value = i;
-        ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
-        document.getElementById('cancelBtn').style.display = "block"; document.getElementById('clientTitle').innerText="تعديل بيانات: " + c.name; window.scrollTo(0,0);
-    }
-
-    function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
-    function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
-    async function saveSettings() { cloudData.logo = document.getElementById('currentLogoPreview').src; cloudData.logoSize = document.getElementById('logoSize').value; await sync(); alert("تم الحفظ!"); }
-    
     function renderApps() {
         const list = document.getElementById('appList');
         list.innerHTML = (cloudData.apps || []).map((a, i) => `
@@ -256,12 +229,22 @@
                 <img src="${a.img || ''}">
                 <div style="text-align:center; font-weight:bold; font-size:0.9rem;">${a.name}</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px;">
-                    <button class="btn btn-view" onclick="alert('كود: ${a.ad}')"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-view" onclick="viewApp(${i})"><i class="fas fa-eye"></i></button>
                     <button class="btn btn-edit" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
                     <button class="btn btn-del" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
                 </div>
             </div>`).join('');
         new Sortable(list, { animation: 150, handle: '.drag-handle' });
+    }
+
+    // --- تعديل التطبيق ---
+    function editApp(i) {
+        const a = cloudData.apps[i];
+        document.getElementById('editAppIndex').value = i;
+        document.getElementById('an').value = a.name; document.getElementById('ad').value = a.ad;
+        document.getElementById('al').value = a.al; document.getElementById('at').value = a.at;
+        document.getElementById('appTitle').innerText = "تعديل تطبيق: " + a.name;
+        document.getElementById('cancelAppBtn').style.display = "block"; window.scrollTo(0,0);
     }
 
     async function saveApp() {
@@ -275,12 +258,29 @@
         if(file) { const r=new FileReader(); r.onload=()=>doSave(r.result); r.readAsDataURL(file); } else doSave();
     }
 
+    function clearAppForm() {
+        ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = "");
+        document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
+        document.getElementById('cancelAppBtn').style.display = "none";
+    }
+
+    async function saveClient() {
+        const idx = document.getElementById('editClientIndex').value;
+        const c = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };
+        if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
+        await sync(); clearClientForm(); load();
+    }
+    function clearClientForm() { ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cancelBtn').style.display="none"; document.getElementById('clientTitle').innerText="إضافة مشترك جديد";}
+    function editClient(i) {
+        const c = cloudData.clients[i]; document.getElementById('editClientIndex').value = i;
+        ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        document.getElementById('cancelBtn').style.display = "block"; document.getElementById('clientTitle').innerText="تعديل: " + c.name; window.scrollTo(0,0);
+    }
     async function saveOrder() {
         const items = document.querySelectorAll('#appList .app-card');
         let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
         cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); load();
     }
-
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
     function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
@@ -290,6 +290,9 @@
     }
     async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
     async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
+    function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
+    function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
+    async function saveSettings() { cloudData.logo = document.getElementById('currentLogoPreview').src; cloudData.logoSize = document.getElementById('logoSize').value; await sync(); alert("تم الحفظ!"); }
 </script>
 </body>
 </html>
