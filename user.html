@@ -6,32 +6,126 @@
     <title>بطاقة اشتراك فولتشر 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; --soft-red: #f87171; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        /* شاشة القفل */
-        #lockScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        .lock-card { background: white; padding: 35px 20px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--main); }
-        .pin-input { width: 80%; padding: 15px; border-radius: 15px; border: 2px solid #ddd; text-align: center; font-size: 1.5rem; margin: 20px 0; outline: none; }
+        :root {
+            --main: #4a4ae2;
+            --success: #28a745;
+            --danger: #dc3545;
+            --bg: #f0f2f5;
+            --wa: #075E54;
+            --soft-red: #f87171;
+        }
 
-        /* البطاقة كاملة */
-        .card { display: none; background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); border-bottom: 8px solid var(--success); }
-        .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
-        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; }
-        .date-box b { font-size: 1.8rem; color: #f87171; line-height: 1; display: block; }
-        .main-logo { width: 70px; height: auto; border-radius: 15px; object-fit: contain; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #lockScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lock-card {
+            background: white;
+            padding: 35px 20px;
+            border-radius: 25px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border-top: 8px solid var(--main);
+        }
+
+        .pin-input {
+            width: 80%;
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid #ddd;
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 20px 0;
+            outline: none;
+        }
+
+        .card {
+            display: none;
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border-top: 8px solid var(--success);
+            border-bottom: 8px solid var(--success);
+        }
+
+        .top-info {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+
+        .date-box {
+            border: 2.5px solid var(--danger);
+            border-radius: 18px;
+            padding: 10px 15px;
+            text-align: center;
+            min-width: 90px;
+        }
+
+        .date-box b {
+            font-size: 1.8rem;
+            color: #f87171;
+            line-height: 1;
+            display: block;
+        }
+
+        .main-logo {
+            width: 70px;
+            height: auto;
+            border-radius: 15px;
+            object-fit: contain;
+        }
 
         .welcome-msg { padding: 20px; text-align: center; }
-        .v-family { color: var(--danger); font-weight: bold; font-size: 1.4rem; display: block; margin: 8px 0 15px 0; padding-bottom: 15px; border-bottom: 1px solid #eee; }
-        
+        .v-family {
+            color: var(--danger);
+            font-weight: bold;
+            font-size: 1.4rem;
+            display: block;
+            margin-top: 8px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+
         @keyframes warmHandshake { 0%, 100% { transform: scale(1); } 30% { transform: scale(1.3); } 80% { transform: scale(1.15); } }
         .pulsing-handshake { display: inline-block; font-size: 1.3rem; animation: warmHandshake 2s infinite ease-in-out; }
         @keyframes strongGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--danger); } 50% { transform: scale(1.2); text-shadow: 0 0 10px var(--danger); } }
         .days-glow { display: inline-block; color: var(--danger); font-weight: 900; font-size: 1.3rem; animation: strongGlow 1.2s infinite ease-in-out; margin: 0 5px; }
 
+        .status-line { font-weight: bold; font-size: 0.95rem; color: #333; padding: 0 20px; text-align: right; }
         .prog-static { height: 14px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 20px; position: relative; }
         .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s linear; }
 
+        .data-section { padding: 0 20px; }
         .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         .data-label { font-size: 0.75rem; color: var(--soft-red); font-weight: 600; }
         .data-value { font-size: 0.85rem; font-weight: bold; color: #333; word-break: break-all; }
@@ -43,11 +137,41 @@
         .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
 
         .action-btns { padding: 10px 25px 25px 25px; }
-        .btn { display: block; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 12px; text-decoration: none; text-align: center; font-size: 0.95rem; border: none; cursor: pointer; }
+        
+        /* إصلاح الأيقونات لضمان ظهور الأطراف */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .btn i { font-size: 1.2rem; min-width: 20px; } /* ضمان مساحة كافية للأيقونة */
         .btn-support { background: var(--success); }
         .btn-wa-channel { background: var(--wa); }
         .btn-store { background: #5e4cc1; }
         .btn-reset { background: #6c757d; font-size: 0.8rem; padding: 10px; }
+
+        /* جعل التوقيع والحقوق رمادي فاتح جداً */
+        .footer-rights {
+            margin-top: 10px;
+            text-align: center;
+            color: #d1d1d1; /* رمادي فاتح جداً */
+            font-size: 0.75rem;
+            padding-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -55,7 +179,7 @@
     <div id="lockScreen">
         <div class="lock-card">
             <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--main);"></i>
-            <h2 id="lockTitle">تحقق آمن</h2>
+            <h2 id="lockTitle" style="margin-top:15px;">تحقق آمن</h2>
             <p id="lockDesc">يرجى إدخال الرمز الخاص بك</p>
             <input type="password" id="pinInput" class="pin-input" placeholder="****">
             <button onclick="handleAuth()" class="btn" style="background: var(--main);">دخول</button>
@@ -79,7 +203,7 @@
             <div class="v-family">أسرة فولتشر 🦅</div>
         </div>
 
-        <div style="font-weight:bold; padding:0 20px; text-align:right;">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
+        <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
         <div class="prog-static"><div id="barConsumed" class="fill-red"></div></div>
 
         <div class="data-section">
@@ -102,14 +226,14 @@
         const MASTER_KEY = "Aztlg1512";
         let clientIdx = -1, user = null, target = new URLSearchParams(window.location.search).get('name');
 
-        document.getElementById('dayNum').innerText = new Date().getDate();
-        document.getElementById('dayName').innerText = new Date().toLocaleString('ar-SA', {weekday: 'long'});
-        document.getElementById('monthName').innerText = new Date().toLocaleString('ar-SA', {month: 'long'});
+        const d = new Date();
+        document.getElementById('dayNum').innerText = d.getDate();
+        document.getElementById('dayName').innerText = d.toLocaleString('ar-SA', {weekday: 'long'});
+        document.getElementById('monthName').innerText = d.toLocaleString('ar-SA', {month: 'long'});
 
         async function init() {
             if(!target) return;
             try {
-                // جلب فريش لإلغاء الكاش تماماً
                 const res = await fetch(`${DB_URL}.json?t=${Date.now()}`);
                 const data = await res.json();
                 if(data.logo) document.getElementById('userLogo').src = data.logo;
@@ -127,7 +251,6 @@
         }
 
         async function handleAuth() {
-            // جلب لحظي قبل التحقق لحل مشكلة تعدد الأجهزة
             const res = await fetch(`${DB_URL}clients/${clientIdx}.json?t=${Date.now()}`);
             user = await res.json();
             const val = document.getElementById('pinInput').value.trim();
@@ -146,8 +269,6 @@
         function bootApp() {
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainCard').style.display = 'block';
-            
-            // استعادة كامل الحقول الستة
             const fields = [
                 ['الجوال', user.cp || '--'],
                 ['اسم المستخدم', user.cu || '--'],
