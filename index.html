@@ -3,259 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم فولتشر المطورة 🦅</title>
+    <title>بطاقة اشتراك فولتشر 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; --soft-red: #f87171; --wa: #25D366; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
-        #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
-        .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
-        .tab-btn { padding: 10px 18px; border-radius: 12px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; font-size: 0.85rem; color: #555; }
-        .tab-btn.active { background: var(--link); color: white; border-color: var(--link); }
-        .container { padding: 20px; max-width: 1200px; margin: auto; }
-        .section { display: none; }
-        .section.active { display: block; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
-        .stat-card { background: white; border-radius: 15px; padding: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-top: 4px solid var(--link); }
-        .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
-        input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
-        .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
-        .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
-        .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block;}
-        #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-        .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; }
-        .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
-        .view-body { padding: 15px 20px; background: white; }
-        .view-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-        .v-label { font-size: 0.7rem; color: var(--soft-red); font-weight: bold; min-width: 90px; text-align: right; }
-        .v-text { font-size: 0.85rem; color: #333; font-weight: bold; text-align: left; flex: 1; word-break: break-all; }
-        .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; }
-        .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
-        .drag-handle { position: absolute; top: 12px; left: 12px; cursor: grab; color: #cbd5e0; font-size: 1.2rem; }
+        :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; --soft-red: #f87171; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        #lockScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .lock-card { background: white; padding: 35px 20px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--main); }
+        .pin-input { width: 80%; padding: 15px; border-radius: 15px; border: 2px solid #ddd; text-align: center; font-size: 1.5rem; margin: 20px 0; outline: none; }
+
+        .card { display: none; background: white; width: 100%; max-width: 400px; border-radius: 25px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--success); border-bottom: 8px solid var(--success); }
+        .top-info { display: flex; justify-content: center; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; align-items: center; }
+        .date-box { border: 2.5px solid var(--danger); border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 90px; }
+        .date-box b { font-size: 1.8rem; color: #f87171; line-height: 1; display: block; }
+        
+        .welcome-msg { padding: 20px; text-align: center; }
+        .v-family { color: var(--danger); font-weight: bold; font-size: 1.4rem; display: block; margin: 8px 0; }
+
+        /* حركة نبض الأيام */
+        @keyframes strongGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--danger); } 50% { transform: scale(1.1); text-shadow: 0 0 10px var(--danger); } }
+        .days-glow { color: var(--danger); font-weight: 900; font-size: 1.3rem; display: inline-block; animation: strongGlow 1.2s infinite ease-in-out; margin: 0 5px; }
+
+        /* شريط التقدم */
+        .prog-static { height: 16px; background: var(--success); border-radius: 10px; overflow: hidden; margin: 10px 20px; border: 1px solid #eee; position: relative; }
+        .fill-red { height: 100%; background: var(--danger); width: 0%; float: right; transition: 0.5s linear; }
+
+        .data-row { background: #f9f9f9; border-radius: 12px; padding: 10px 15px; margin: 8px 20px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
+        
+        /* عداد الوقت الرقمي */
+        .timer-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 15px 20px; direction: ltr; }
+        .t-box { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 8px 2px; text-align: center; }
+        .t-box b { display: block; color: var(--soft-red); font-size: 1rem; }
+        .t-box span { font-size: 0.6rem; color: #666; font-weight: bold; }
+
+        .btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 90%; margin: 10px auto; padding: 14px; border-radius: 12px; color: white; font-weight: bold; text-decoration: none; border: none; cursor: pointer; }
+        .footer-rights { margin-top: 15px; text-align: center; color: #d1d1d1; font-size: 0.75rem; padding-bottom: 20px; }
     </style>
 </head>
 <body>
 
-<div id="loginOverlay">
-    <i class="fas fa-user-shield" style="font-size: 4rem; margin-bottom: 20px;"></i>
-    <h2>إدارة فولتشر 🦅</h2>
-    <input type="password" id="passInput" placeholder="كلمة المرور">
-    <button onclick="checkPass()">دخول</button>
-</div>
-
-<div id="viewModal">
-    <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-        <div style="width: 95%; max-width: 400px; margin-bottom: 10px; display: flex; gap: 10px;">
-            <button class="btn btn-main" style="background:var(--d); margin:0;" onclick="closeView()">إغلاق</button>
-            <button class="btn btn-main" style="background:#f59e0b; margin:0;" onclick="saveCardAsImage()">حفظ للأسوديو 📸</button>
-        </div>
-        <div class="view-card-container" id="captureTarget">
-            <div class="view-header"><h3 id="v_title" style="margin:0; font-size: 1.1rem;">بيانات فولتشر</h3><small>🦅 Vulture System</small></div>
-            <div class="view-body" id="v_content"></div>
-        </div>
-    </div>
-</div>
-
-<div id="adminApp" style="display:none;">
-    <div class="header">
-        <b>لوحة تحكم فولتشر 🦅</b>
-        <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>
-            <button class="tab-btn" onclick="switchTab('store', this)">المتجر</button>
-            <button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات</button>
+    <div id="lockScreen">
+        <div class="lock-card">
+            <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--main);"></i>
+            <h2 id="lockTitle">تحقق آمن 🦅</h2>
+            <p id="lockDesc">أدخل رمز القفل الخاص بك</p>
+            <input type="password" id="pinInput" class="pin-input" placeholder="****" maxlength="4">
+            <button onclick="handleAuth()" class="btn" style="background: var(--main); width: 100%;">دخول</button>
+            <div id="errorMsg" style="color:var(--danger); margin-top:10px; display:none;"></div>
         </div>
     </div>
 
-    <div class="container">
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
-            <div class="stat-card" style="border-color: var(--s);"> <small>نشط</small> <div id="sActive" style="color:var(--s); font-weight:bold; font-size:1.2rem;">0</div> </div>
-            <div class="stat-card" style="border-color: var(--d);"> <small>سينتهي</small> <div id="sWarning" style="color:var(--d); font-weight:bold; font-size:1.2rem;">0</div> </div>
-            <div class="stat-card"> <small>التطبيقات</small> <div id="sApps" style="color:var(--link); font-weight:bold; font-size:1.2rem;">0</div> </div>
+    <div id="ticker" style="display:none; width:100%; background:#fff; padding:8px 0; border-bottom:1px solid #eee;">
+        <marquee behavior="scroll" direction="right" id="msgText" style="color:var(--danger); font-weight:bold; font-size:0.9rem;"></marquee>
+    </div>
+
+    <div id="mainCard" class="card">
+        <div class="top-info">
+            <div class="date-box">
+                <span id="dayName" style="font-size:0.7rem; color:#666; font-weight:bold;"></span><br>
+                <b id="dayNum"></b>
+                <span id="monthName" style="font-size:0.7rem; color:#666; font-weight:bold;"></span>
+            </div>
+            <img id="userLogo" src="" style="width:70px; border-radius:12px;">
         </div>
 
-        <div id="clients" class="section active">
-            <div style="position: relative; margin-bottom: 15px;">
-                <input type="text" id="searchInput" oninput="filterClients()" placeholder="ابحث عن اسم العميل..." style="margin:0; padding-right:40px;">
-                <i class="fas fa-search" style="position:absolute; right:15px; top:15px; color:#aaa;"></i>
-            </div>
-
-            <div class="modal">
-                <h3 id="clientTitle">إضافة مشترك جديد</h3>
-                <input type="hidden" id="editClientIndex">
-                <input type="text" id="cn" placeholder="اسم العميل">
-                <input type="text" id="cp" placeholder="رقم الجوال">
-                <input type="text" id="cu" placeholder="اسم المستخدم">
-                <input type="text" id="ck" placeholder="الرقم السري">
-                <input type="text" id="cl" placeholder="رابط الدخول">
-                <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
-                <button class="btn btn-main" onclick="saveClient()">حفظ في السحابة ☁️</button>
-                <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#333; display:none;" onclick="clearClientForm()">إلغاء</button>
-            </div>
-            <div class="grid" id="clientGrid"></div>
+        <div class="welcome-msg">
+            <div style="font-size: 1.1rem;">مرحباً بك <span id="userName" style="font-weight:bold;"></span> 🤝</div>
+            <div class="v-family">أسرة فولتشر 🦅</div>
         </div>
 
-        <div id="store" class="section">
-            <div class="modal">
-                <h3 id="appTitle">+ إضافة تطبيق للمتجر</h3>
-                <input type="hidden" id="editAppIndex">
-                <input type="file" id="appIcon" accept="image/*">
-                <input type="text" id="an" placeholder="اسم التطبيق">
-                <input type="text" id="ad" placeholder="كود دونلودر">
-                <input type="text" id="al" placeholder="رابط التحميل المباشر">
-                <textarea id="at" placeholder="وصف التطبيق"></textarea>
-                <button id="saveAppBtn" class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>
-                <button id="cancelAppBtn" class="btn btn-main" style="background:#edf2f7; color:#333; display:none;" onclick="clearAppForm()">إلغاء</button>
-            </div>
-            <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px;" onclick="saveOrder()">حفظ الترتيب الحالي</button>
-            <div class="grid" id="appList"></div>
+        <div style="font-weight:bold; padding:0 20px; text-align:right; font-size:0.9rem;">
+            ✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم
         </div>
 
-        <div id="settings" class="section">
-            <div class="modal">
-                <h3>شريط الأخبار للعملاء 📢</h3>
-                <textarea id="newsInput" placeholder="اكتب خبراً ليظهر في شريط متحرك لجميع العملاء..."></textarea>
-                <hr>
-                <h3>تنسيق شعار فولتشر 🦅</h3>
-                <input type="file" onchange="previewNewLogo(this)">
-                <div style="margin:20px 0;"><label>الحجم: <b id="sizeVal">70</b>px</label><input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)"></div>
-                <center><img id="currentLogoPreview" src="" style="width:70px; object-fit: contain;"></center>
-                <button class="btn btn-main" onclick="saveSettings()">حفظ كافة الإعدادات 🚀</button>
-            </div>
+        <div class="prog-static"><div id="barConsumed" class="fill-red"></div></div>
+
+        <div id="dataFields"></div>
+        
+        <div class="timer-grid" id="timerGrid"></div>
+
+        <div class="action-btns" style="padding: 10px 0;">
+            <a href="https://wa.me/966594393012" class="btn" style="background:var(--success)"><i class="fab fa-whatsapp"></i> الدعم الفني</a>
+            <a href="store.html" class="btn" style="background:#5e4cc1"><i class="fas fa-th-large"></i> متجر التطبيقات</a>
         </div>
     </div>
-</div>
+    <div class="footer-rights">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
 
-<script>
-    const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
-    const MASTER_PASS = "Aztlg1512";
-    let cloudData = { clients: [], apps: [], logo: "", logoSize: "70", news: "" };
+    <script>
+        const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
+        const MASTER = "Aztlg1512";
+        let clientIdx = -1, user = null, target = new URLSearchParams(window.location.search).get('name');
 
-    async function checkPass() { if(document.getElementById('passInput').value === MASTER_PASS) { document.getElementById('loginOverlay').style.display="none"; document.getElementById('adminApp').style.display="block"; await load(); } else alert("خطأ!"); }
-    
-    async function load() {
-        try {
-            const r = await fetch(DB); const d = await r.json();
-            if (d) {
-                cloudData = d;
-                if(!cloudData.clients) cloudData.clients = [];
-                if(!cloudData.apps) cloudData.apps = [];
-                document.getElementById('currentLogoPreview').src = cloudData.logo || "";
-                document.getElementById('newsInput').value = cloudData.news || "";
-                renderClients(); renderApps(); updateStats();
+        // تحديث التاريخ في الكرت
+        const d = new Date();
+        document.getElementById('dayNum').innerText = d.getDate();
+        document.getElementById('dayName').innerText = d.toLocaleString('ar-SA', {weekday: 'long'});
+        document.getElementById('monthName').innerText = d.toLocaleString('ar-SA', {month: 'long'});
+
+        async function init() {
+            if(!target) return;
+            const res = await fetch(`${DB_URL}.json?t=${Date.now()}`); 
+            const cloud = await res.json();
+            if(cloud.logo) document.getElementById('userLogo').src = cloud.logo;
+            if(cloud.news) { document.getElementById('msgText').innerText = cloud.news; document.getElementById('ticker').style.display = 'block'; }
+            clientIdx = (cloud.clients || []).findIndex(u => u.name === target);
+            if(clientIdx !== -1) { 
+                user = cloud.clients[clientIdx]; 
+                document.getElementById('userName').innerText = user.name; 
+                if(!user.private_pin) { document.getElementById('lockTitle').innerText = "تفعيل القفل"; document.getElementById('lockDesc').innerText = "اختر 4 أرقام لحماية بياناتك"; }
             }
-        } catch(e) { console.log("خطأ تحميل"); }
-    }
+        }
 
-    function updateStats() {
-        const now = new Date();
-        const active = cloudData.clients.filter(c => new Date(c.ce) > now).length;
-        const warning = cloudData.clients.filter(c => { const d = Math.ceil((new Date(c.ce)-now)/86400000); return d <= 5 && d > 0; }).length;
-        document.getElementById('sActive').innerText = active;
-        document.getElementById('sWarning').innerText = warning;
-        document.getElementById('sApps').innerText = cloudData.apps.length;
-    }
+        async function handleAuth() {
+            const res = await fetch(`${DB_URL}clients/${clientIdx}.json?t=${Date.now()}`); 
+            user = await res.json();
+            const val = document.getElementById('pinInput').value;
+            if(val === MASTER || (user.private_pin && val === user.private_pin)) { bootApp(); }
+            else if(!user.private_pin && val.length === 4) { 
+                await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'PUT', body: JSON.stringify(val) }); 
+                user.private_pin = val; bootApp(); 
+            } else { document.getElementById('errorMsg').innerText = "الرمز غير صحيح!"; document.getElementById('errorMsg').style.display = 'block'; }
+        }
 
-    function filterClients() {
-        const term = document.getElementById('searchInput').value.toLowerCase();
-        document.querySelectorAll('#clientGrid .card').forEach(card => {
-            card.style.display = card.querySelector('b').innerText.toLowerCase().includes(term) ? 'block' : 'none';
-        });
-    }
+        function bootApp() {
+            document.getElementById('lockScreen').style.display='none'; 
+            document.getElementById('mainCard').style.display='block';
+            
+            const fields = [['الجوال', user.cp],['اليوزر', user.cu],['الباسورد', user.ck],['تاريخ النهاية', user.ce]];
+            document.getElementById('dataFields').innerHTML = fields.map(x => `
+                <div class="data-row"><div><small style="color:var(--soft-red); font-weight:bold;">${x[0]}</small><div style="font-weight:bold;">${x[1]||'--'}</div></div></div>
+            `).join('');
 
-    function renderClients() {
-        document.getElementById('clientGrid').innerHTML = (cloudData.clients || []).map((c, i) => {
-            const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
-            const showWA = (days <= 5 && days > 0);
-            return `<div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center;"><b>${c.name}</b> <span style="color:var(--d); font-weight:bold;">${days} يوم</span></div>
-                <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
-                    <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
-                    <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
-                    <button class="btn btn-view" onclick="openView(${i})">بيانات</button>
-                    <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
-                    ${showWA ? `<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 2; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه بالواتساب</button>` : ''}
-                </div>
-            </div>`;
-        }).join('');
-    }
+            // محرك العداد المصلح
+            const updateUI = () => {
+                const now = Date.now(), startT = new Date(user.cs).getTime(), endT = new Date(user.ce).getTime();
+                const total = endT - startT, left = endT - now;
+                const days = Math.max(0, Math.ceil(left / 86400000));
+                
+                // تحديث نبض الأيام وشريط التقدم
+                document.getElementById('daysCount').innerText = days;
+                const consumedPercent = Math.max(0, Math.min(100, 100 - (left / total * 100)));
+                document.getElementById('barConsumed').style.width = consumedPercent + "%";
 
-    function renderApps() {
-        document.getElementById('appList').innerHTML = (cloudData.apps || []).map((a, i) => `
-            <div class="card app-card" data-id="${i}">
-                <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
-                <img src="${a.img || ''}" style="width:60px; border-radius:10px; display:block; margin:auto;">
-                <center><b>${a.name}</b></center>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px; margin-top:10px;">
-                    <button class="btn btn-view" onclick="viewApp(${i})"><i class="fas fa-eye"></i></button>
-                    <button class="btn btn-edit" onclick="editApp(${i})"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-del" onclick="delApp(${i})"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>`).join('');
-        new Sortable(document.getElementById('appList'), { animation: 150, handle: '.drag-handle' });
-    }
-
-    function viewApp(i) {
-        const a = cloudData.apps[i]; document.getElementById('v_title').innerText = "معاينة التطبيق";
-        const f = [['الاسم', a.name],['كود', a.ad],['رابط', a.al],['وصف', a.at]];
-        document.getElementById('v_content').innerHTML = `<img src="${a.img}" style="width:75px; display:block; margin:0 auto 15px; border-radius:15px;">` + f.map(x => `<div class="view-row"><div class="v-label">${x[0]}</div><div class="v-text">${x[1] || '--'}</div></div>`).join('');
-        document.getElementById('viewModal').style.display = 'flex';
-    }
-
-    function openView(i) {
-        const c = cloudData.clients[i]; document.getElementById('v_title').innerText = c.name;
-        const f = [['الاسم', c.name],['جوال', c.cp],['يوزر', c.cu],['باسورد', c.ck],['رابط', c.cl],['بداية', c.cs],['نهاية', c.ce]];
-        document.getElementById('v_content').innerHTML = f.map(x => `<div class="view-row"><div class="v-label">${x[0]}</div><div class="v-text">${x[1] || '--'}</div></div>`).join('');
-        document.getElementById('viewModal').style.display = 'flex';
-    }
-
-    function copyL(name) { let u = window.location.href.split('?')[0].replace('index.html', 'user.html'); navigator.clipboard.writeText(u + '?name=' + encodeURIComponent(name)); alert("تم النسخ!"); }
-
-    async function saveClient() {
-        const idx = document.getElementById('editClientIndex').value;
-        const c = { name:v('cn'), cp:v('cp'), cu:v('cu'), ck:v('ck'), cl:v('cl'), cs:v('cs'), ce:v('ce') };
-        if(idx==="") cloudData.clients.push(c); else cloudData.clients[idx]=c;
-        await sync(); clearClientForm(); load();
-    }
-
-    async function saveApp() {
-        const idx = document.getElementById('editAppIndex').value; const file = document.getElementById('appIcon').files[0];
-        const doSave = async (img) => {
-            const a = { name:v('an'), ad:v('ad'), al:v('al'), at:v('at'), img: img || (idx!==""?cloudData.apps[idx].img:"") };
-            if(idx==="") cloudData.apps.push(a); else cloudData.apps[idx]=a;
-            await sync(); load(); clearAppForm();
-        };
-        if(file) { const r=new FileReader(); r.onload=()=>doSave(r.result); r.readAsDataURL(file); } else doSave();
-    }
-
-    function editApp(i) {
-        const a = cloudData.apps[i]; document.getElementById('editAppIndex').value = i;
-        document.getElementById('an').value = a.name; document.getElementById('ad').value = a.ad;
-        document.getElementById('al').value = a.al; document.getElementById('at').value = a.at;
-        document.getElementById('appTitle').innerText = "تعديل: " + a.name; document.getElementById('cancelAppBtn').style.display = "block"; window.scrollTo(0,0);
-    }
-
-    function clearAppForm() { ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = ""); document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر"; document.getElementById('cancelAppBtn').style.display = "none"; }
-    function editClient(i) { const c=cloudData.clients[i]; document.getElementById('editClientIndex').value=i; ['cn','cp','cu','ck','cl','cs','ce'].forEach(id=>document.getElementById(id).value=c[id]||""); document.getElementById('cancelBtn').style.display="block"; document.getElementById('clientTitle').innerText="تعديل: "+c.name; window.scrollTo(0,0); }
-    function clearClientForm() { ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cancelBtn').style.display="none"; document.getElementById('clientTitle').innerText="إضافة مشترك جديد"; }
-    async function saveSettings() { cloudData.logo = document.getElementById('currentLogoPreview').src; cloudData.logoSize = document.getElementById('logoSize').value; cloudData.news = document.getElementById('newsInput').value; await sync(); alert("تم حفظ الإعدادات! 🦅"); }
-    async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
-    function v(id) { return document.getElementById(id).value; }
-    function closeView() { document.getElementById('viewModal').style.display='none'; }
-    function switchTab(id, b) { document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active'); b.classList.add('active'); }
-    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
-    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
-    function saveOrder() { const items = document.querySelectorAll('#appList .app-card'); let n=[]; items.forEach(it=>n.push(cloudData.apps[it.getAttribute('data-id')])); cloudData.apps=n; sync(); alert("تم حفظ الترتيب!"); load(); }
-    function previewNewLogo(i) { if(i.files && i.files[0]) { const r=new FileReader(); r.onload=(e)=>document.getElementById('currentLogoPreview').src=e.target.result; r.readAsDataURL(i.files[0]); } }
-    function updateLogoPreview(v) { document.getElementById('sizeVal').innerText=v; document.getElementById('currentLogoPreview').style.width=v+"px"; }
-    function saveCardAsImage() { html2canvas(document.getElementById('captureTarget'),{scale:3}).then(c=>{ const l=document.createElement('a'); l.href=c.toDataURL(); l.download='Vulture_Card.png'; l.click(); }); }
-    function sendReminder(n,p,d) { if(!p||p==="--") return alert("لا يوجد رقم!"); let cp=p.replace(/\D/g,''); if(!cp.startsWith('966')) cp='966'+cp; window.open(`https://wa.me/${cp}?text=${encodeURIComponent('مرحباً '+n+'، اشتراكك ينتهي خلال '+d+' أيام.')}`); }
-</script>
+                if(left > 0) {
+                    const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
+                    const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
+                    document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
+                }
+            };
+            updateUI(); setInterval(updateUI, 1000);
+        }
+        init();
+    </script>
 </body>
 </html>
