@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم فولتشر الشاملة 🦅</title>
+    <title>لوحة تحكم فولتشر المطورة 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -122,9 +122,9 @@
                 <textarea id="newsInput" placeholder="اكتب خبراً ليظهر في شريط متحرك لجميع العملاء..."></textarea>
                 <hr>
                 <h3>تنسيق شعار فولتشر 🦅</h3>
-                <input type="file" id="logoFile" accept="image/*" onchange="previewNewLogo(this)">
+                <input type="file" onchange="previewNewLogo(this)">
                 <div style="margin:20px 0;"><label>الحجم: <b id="sizeVal">70</b>px</label><input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)"></div>
-                <div style="border:1px dashed #ddd; padding:10px; display:inline-block; border-radius:15px; margin-bottom:15px;"><img id="currentLogoPreview" src="" style="width:70px; object-fit: contain;"></div>
+                <center><img id="currentLogoPreview" src="" style="width:70px; object-fit: contain;"></center>
                 <button class="btn btn-main" onclick="saveSettings()">حفظ كافة الإعدادات 🚀</button>
             </div>
         </div>
@@ -180,7 +180,7 @@
                     <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
                     <button class="btn btn-view" onclick="openView(${i})">بيانات</button>
                     <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
-                    ${showWA ? `<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 2; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه بقرب الانتهاء</button>` : ''}
+                    ${showWA ? `<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 2; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه بالواتساب</button>` : ''}
                 </div>
             </div>`;
         }).join('');
@@ -188,9 +188,9 @@
 
     function renderApps() {
         document.getElementById('appList').innerHTML = (cloudData.apps || []).map((a, i) => `
-            <div class="app-card" data-id="${i}">
+            <div class="card app-card" data-id="${i}">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
-                <img src="${a.img || ''}">
+                <img src="${a.img || ''}" style="width:60px; border-radius:10px; display:block; margin:auto;">
                 <center><b>${a.name}</b></center>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px; margin-top:10px;">
                     <button class="btn btn-view" onclick="viewApp(${i})"><i class="fas fa-eye"></i></button>
@@ -203,8 +203,8 @@
 
     function viewApp(i) {
         const a = cloudData.apps[i]; document.getElementById('v_title').innerText = "معاينة التطبيق";
-        const fields = [['الاسم', a.name],['كود دونلودر', a.ad],['الرابط', a.al],['الوصف', a.at]];
-        document.getElementById('v_content').innerHTML = `<img src="${a.img}" style="width:75px; display:block; margin:0 auto 15px; border-radius:15px;">` + fields.map(f => `<div class="view-row"><div class="v-label">${f[0]}</div><div class="v-text">${f[1] || '--'}</div></div>`).join('');
+        const f = [['الاسم', a.name],['كود', a.ad],['رابط', a.al],['وصف', a.at]];
+        document.getElementById('v_content').innerHTML = `<img src="${a.img}" style="width:75px; display:block; margin:0 auto 15px; border-radius:15px;">` + f.map(x => `<div class="view-row"><div class="v-label">${x[0]}</div><div class="v-text">${x[1] || '--'}</div></div>`).join('');
         document.getElementById('viewModal').style.display = 'flex';
     }
 
@@ -215,7 +215,7 @@
         document.getElementById('viewModal').style.display = 'flex';
     }
 
-    function copyL(name) { let u = window.location.href.split('?')[0].replace('index.html', 'user.html'); navigator.clipboard.writeText(u + '?name=' + encodeURIComponent(name)); alert("تم نسخ رابط العميل لصفحة user.html بنجاح! ✅"); }
+    function copyL(name) { let u = window.location.href.split('?')[0].replace('index.html', 'user.html'); navigator.clipboard.writeText(u + '?name=' + encodeURIComponent(name)); alert("تم النسخ!"); }
 
     async function saveClient() {
         const idx = document.getElementById('editClientIndex').value;
@@ -236,7 +236,6 @@
 
     function editApp(i) {
         const a = cloudData.apps[i]; document.getElementById('editAppIndex').value = i;
-        ['an','ad','al','at'].forEach(id => document.getElementById(id).value = a[id.replace('a','')] || a.name || a.ad || a.al || a.at || "");
         document.getElementById('an').value = a.name; document.getElementById('ad').value = a.ad;
         document.getElementById('al').value = a.al; document.getElementById('at').value = a.at;
         document.getElementById('appTitle').innerText = "تعديل: " + a.name; document.getElementById('cancelAppBtn').style.display = "block"; window.scrollTo(0,0);
@@ -245,15 +244,18 @@
     function clearAppForm() { ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = ""); document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر"; document.getElementById('cancelAppBtn').style.display = "none"; }
     function editClient(i) { const c=cloudData.clients[i]; document.getElementById('editClientIndex').value=i; ['cn','cp','cu','ck','cl','cs','ce'].forEach(id=>document.getElementById(id).value=c[id]||""); document.getElementById('cancelBtn').style.display="block"; document.getElementById('clientTitle').innerText="تعديل: "+c.name; window.scrollTo(0,0); }
     function clearClientForm() { ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cancelBtn').style.display="none"; document.getElementById('clientTitle').innerText="إضافة مشترك جديد"; }
-    async function saveSettings() { cloudData.logo = document.getElementById('currentLogoPreview').src; cloudData.logoSize = document.getElementById('logoSize').value; cloudData.news = document.getElementById('newsInput').value; await sync(); alert("تم حفظ كافة الإعدادات!"); }
+    async function saveSettings() { cloudData.logo = document.getElementById('currentLogoPreview').src; cloudData.logoSize = document.getElementById('logoSize').value; cloudData.news = document.getElementById('newsInput').value; await sync(); alert("تم حفظ الإعدادات! 🦅"); }
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
     function v(id) { return document.getElementById(id).value; }
     function closeView() { document.getElementById('viewModal').style.display='none'; }
     function switchTab(id, b) { document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active'); b.classList.add('active'); }
     async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
     async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
-    function saveOrder() { const items = document.querySelectorAll('#appList .app-card'); let n=[]; items.forEach(it=>n.push(cloudData.apps[it.getAttribute('data-id')])); cloudData.apps=n; sync(); alert("تم!"); }
+    function saveOrder() { const items = document.querySelectorAll('#appList .app-card'); let n=[]; items.forEach(it=>n.push(cloudData.apps[it.getAttribute('data-id')])); cloudData.apps=n; sync(); alert("تم حفظ الترتيب!"); load(); }
     function previewNewLogo(i) { if(i.files && i.files[0]) { const r=new FileReader(); r.onload=(e)=>document.getElementById('currentLogoPreview').src=e.target.result; r.readAsDataURL(i.files[0]); } }
     function updateLogoPreview(v) { document.getElementById('sizeVal').innerText=v; document.getElementById('currentLogoPreview').style.width=v+"px"; }
     function saveCardAsImage() { html2canvas(document.getElementById('captureTarget'),{scale:3}).then(c=>{ const l=document.createElement('a'); l.href=c.toDataURL(); l.download='Vulture_Card.png'; l.click(); }); }
-    function sendReminder(n,p,d) { if(!p||p==="--") return alert("لا يوجد رقم!"); let cp=p.replace(/\D/g,''); if(!cp.startsWith('966')) cp='
+    function sendReminder(n,p,d) { if(!p||p==="--") return alert("لا يوجد رقم!"); let cp=p.replace(/\D/g,''); if(!cp.startsWith('966')) cp='966'+cp; window.open(`https://wa.me/${cp}?text=${encodeURIComponent('مرحباً '+n+'، اشتراكك ينتهي خلال '+d+' أيام.')}`); }
+</script>
+</body>
+</html>
