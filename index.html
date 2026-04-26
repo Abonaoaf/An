@@ -41,15 +41,14 @@
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); } .btn-wa { background: var(--wa); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block; color: white; border: none; }
 
+        /* تعديلات صندوق المعاينة ليتطابق مع الصورة */
         #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; position: relative; }
         .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
         .view-body { padding: 15px 20px; background: white; }
-        
-        /* تنسيق الأسطر تحت بعضها */
-        .view-field { border-bottom: 1px solid #f7f7f7; padding: 10px 0; }
-        .v-label { font-size: 0.75rem; color: var(--soft-red); font-weight: bold; display: block; margin-bottom: 3px; }
-        .v-text { font-size: 1rem; color: #333; font-weight: bold; display: block; word-break: break-all; }
+        .view-row { border-bottom: 1px solid #f0f0f0; padding: 12px 0; display: flex; justify-content: space-between; align-items: center; }
+        .v-label { font-size: 0.75rem; color: var(--soft-red); font-weight: bold; }
+        .v-text { font-size: 0.9rem; color: #333; font-weight: bold; text-align: left; }
 
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; text-align: center; }
         .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
@@ -72,7 +71,7 @@
             <button class="btn-main" style="background:#f59e0b; margin:0; border:none; border-radius:12px; cursor:pointer;" onclick="saveCardAsImage()">حفظ للأستوديو 📸</button>
         </div>
         <div class="view-card-container" id="captureTarget">
-            <div class="view-header"><h3 id="v_title" style="margin:0;">بيانات المشترك</h3><small>🦅 Vulture System</small></div>
+            <div class="view-header"><h3 id="v_title" style="margin:0;">بيانات فولتشر</h3><small>🦅 Vulture System</small></div>
             <div class="view-body" id="v_content"></div>
         </div>
     </div>
@@ -176,39 +175,6 @@
         }).join('');
     }
 
-    // --- التعديل: نسخ رابط مختصر عبر مشروعك An1 ---
-    function copyL(name) {
-        const shortUrl = "https://abonaoaf.github.io/An1/?id=" + encodeURIComponent(name);
-        navigator.clipboard.writeText(shortUrl);
-        alert("تم نسخ رابط المشترك المختصر (عبر An1) بنجاح ✅");
-    }
-
-    function openView(i) {
-        const c = cloudData.clients[i];
-        document.getElementById('v_title').innerText = "بيانات المشترك";
-        
-        // التعديل: ترتيب الحقول تحت بعضها لتسهيل القراءة والتصوير
-        const fields = [
-            ['اسم المشترك', c.name],
-            ['رقم الجوال', c.cp],
-            ['اسم المستخدم', c.cu],
-            ['كلمة السر', c.ck],
-            ['الرابط', c.cl],
-            ['بداية الاشتراك', c.cs],
-            ['نهاية الاشتراك', c.ce]
-        ];
-
-        document.getElementById('v_content').innerHTML = fields.map(f => `
-            <div class="view-field">
-                <span class="v-label">${f[0]}</span>
-                <span class="v-text">${f[1] || '---'}</span>
-            </div>
-        `).join('');
-        
-        document.getElementById('viewModal').style.display = 'flex';
-    }
-
-    // بقية الدوال البرمجية (حفظ، حذف، تعديل) تبقى كما هي لضمان استقرار النظام
     function editClient(i) {
         const c = cloudData.clients[i];
         document.getElementById('editClientIndex').value = i;
@@ -225,6 +191,12 @@
         document.getElementById('cn').disabled = false;
         document.getElementById('clientTitle').innerText = "إضافة مشترك جديد";
         document.getElementById('cancelBtn').style.display = "none";
+    }
+
+    function copyL(name) {
+        const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
+        navigator.clipboard.writeText(clientUrl);
+        alert("تم نسخ رابط المشترك الثابت ✅");
     }
 
     async function saveClient() {
@@ -268,6 +240,31 @@
         if(!cleanPhone.startsWith('966')) cleanPhone = '966' + cleanPhone;
         const msg = `مرحباً ${name}، اشتراكك في فولتشر ينتهي خلال ${days} أيام.`;
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function openView(i) {
+        const c = cloudData.clients[i];
+        document.getElementById('v_title').innerText = "بيانات المشترك";
+        
+        // ترتيب وتنسيق البيانات كما في صورتك الأصلية
+        const fields = [
+            ['اسم المشترك', c.name],
+            ['رقم الجوال', c.cp],
+            ['اسم المستخدم', c.cu],
+            ['كلمة السر', c.ck],
+            ['الرابط', c.cl],
+            ['بداية الاشتراك', c.cs],
+            ['نهاية الاشتراك', c.ce]
+        ];
+
+        document.getElementById('v_content').innerHTML = fields.map(f => `
+            <div class="view-row">
+                <span class="v-label">${f[0]}</span>
+                <span class="v-text">${f[1] || '---'}</span>
+            </div>
+        `).join('');
+        
+        document.getElementById('viewModal').style.display = 'flex';
     }
 
     function closeView() { document.getElementById('viewModal').style.display = 'none'; }
