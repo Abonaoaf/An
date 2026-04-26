@@ -24,24 +24,20 @@
         .section { display: none; }
         .section.active { display: block; }
         
-        /* تصميم بطاقة العميل مع شريط التقدم */
+        /* تصميم بطاقة العميل المحقون بنظام الأيام الملون والشريط */
         .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
-        .progress-container { background: #eee; height: 8px; border-radius: 10px; margin: 15px 0 10px 0; overflow: hidden; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--link), #818cf8); transition: 0.5s; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .days-badge { font-weight: bold; padding: 4px 12px; border-radius: 10px; font-size: 0.85rem; }
         
-        /* تأثير النبض للأيام */
-        .pulse-days { 
-            animation: pulse-red 1.5s infinite; 
-            font-weight: bold; 
-            padding: 2px 8px; 
-            border-radius: 8px;
-            background: #fff5f5;
-        }
-        @keyframes pulse-red {
-            0% { color: var(--d); transform: scale(1); }
-            50% { color: #ff0000; transform: scale(1.05); opacity: 0.7; }
-            100% { color: var(--d); transform: scale(1); }
-        }
+        .progress-container { background: #edf2f7; height: 10px; border-radius: 20px; margin: 10px 0; overflow: hidden; position: relative; }
+        .progress-bar { height: 100%; transition: width 0.5s; border-radius: 20px; }
+        
+        /* حالات الألوان */
+        .status-green { background: #c6f6d5; color: #22543d; } /* ساري */
+        .status-yellow { background: #feebc8; color: #744210; } /* قرب ينتهي */
+        .status-red { background: #fed7d7; color: #822727; animation: blink 1s infinite; } /* منتهي أو خطر */
+        
+        @keyframes blink { 50% { opacity: 0.6; } }
 
         .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
         input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
@@ -57,9 +53,6 @@
         .view-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
         .v-label { font-size: 0.7rem; color: var(--soft-red); font-weight: bold; }
         .v-text { font-size: 0.85rem; color: #333; font-weight: bold; }
-        
-        .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; text-align: center; }
-        .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
     </style>
 </head>
 <body>
@@ -102,7 +95,7 @@
             <div class="modal">
                 <h3 id="clientTitle">إضافة مشترك جديد</h3>
                 <input type="hidden" id="editClientIndex">
-                <input type="text" id="cn" placeholder="اسم العميل (الرابط يعتمد عليه)">
+                <input type="text" id="cn" placeholder="اسم العميل">
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
@@ -179,33 +172,30 @@
             const end = new Date(c.ce);
             const today = new Date();
             
-            // حساب الأيام المتبقية
-            const diffTime = end - today;
-            const daysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-            
-            // حساب نسبة التقدم للشريط
-            const totalDuration = end - start;
-            const elapsed = today - start;
-            let progress = (elapsed / totalDuration) * 100;
-            progress = Math.min(100, Math.max(0, progress)); // لضمان النسبة بين 0 و 100
+            const total = end - start;
+            const left = end - today;
+            const daysLeft = Math.max(0, Math.ceil(left / (1000 * 60 * 60 * 24)));
+            let prog = (left / total) * 100;
+            prog = Math.min(100, Math.max(0, prog));
+
+            // تحديد الحالة واللون
+            let statusClass = "status-green";
+            let barColor = "#28a745";
+            if (daysLeft <= 7) { statusClass = "status-yellow"; barColor = "#f6ad55"; }
+            if (daysLeft <= 2 || left <= 0) { statusClass = "status-red"; barColor = "#dc3545"; }
 
             return `
             <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <b>${c.name}</b> 
-                    <span class="${daysLeft <= 7 ? 'pulse-days' : ''}" style="color:var(--d); font-weight:bold;">
-                        ${daysLeft} يوم
-                    </span>
+                <div class="card-header">
+                    <b style="font-size:1.1rem">${c.name}</b>
+                    <span class="days-badge ${statusClass}">${daysLeft} يوم متبقي</span>
                 </div>
                 
                 <div class="progress-container">
-                    <div class="progress-bar" style="width: ${100 - progress}%"></div>
-                </div>
-                <div style="font-size:0.7rem; color:#888; text-align:left; margin-bottom:10px;">
-                    المتبقي: ${Math.round(100 - progress)}%
+                    <div class="progress-bar" style="width: ${prog}%; background: ${barColor};"></div>
                 </div>
 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
                     <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
                     <button class="btn btn-view" onclick="openView(${i})">بيانات</button>
@@ -218,7 +208,7 @@
     function copyL(name) {
         const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
         navigator.clipboard.writeText(clientUrl);
-        alert("تم نسخ رابط المشترك المخصص ✅");
+        alert("تم نسخ رابط العميل ✅");
     }
 
     function editClient(i) {
@@ -275,9 +265,9 @@
     function renderApps() {
         const grid = document.getElementById('appList');
         grid.innerHTML = cloudData.apps.map((app, i) => `
-            <div class="app-card">
-                <img src="${app.img || 'hdh.PNG'}">
-                <b>${app.name}</b>
+            <div class="app-card" style="background:white; border-radius:15px; padding:10px; text-align:center; border:1px solid #eee;">
+                <img src="${app.img || 'hdh.PNG'}" style="width:60px; height:60px; border-radius:12px;">
+                <div style="font-weight:bold; margin:5px 0;">${app.name}</div>
                 <button class="btn btn-del" onclick="delApp(${i})">حذف</button>
             </div>
         `).join('');
