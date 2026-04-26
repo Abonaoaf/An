@@ -10,23 +10,46 @@
     <style>
         :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; --soft-red: #f87171; --wa: #25D366; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
         #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; }
         #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
+        
         .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
         .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
         .tab-btn { padding: 10px 18px; border-radius: 12px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
         .tab-btn.active { background: var(--link); color: white; border-color: var(--link); }
+        
         .container { padding: 20px; max-width: 1200px; margin: auto; }
         .section { display: none; }
         .section.active { display: block; }
+        
+        /* تصميم بطاقة العميل مع شريط التقدم */
         .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
+        .progress-container { background: #eee; height: 8px; border-radius: 10px; margin: 15px 0 10px 0; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--link), #818cf8); transition: 0.5s; }
+        
+        /* تأثير النبض للأيام */
+        .pulse-days { 
+            animation: pulse-red 1.5s infinite; 
+            font-weight: bold; 
+            padding: 2px 8px; 
+            border-radius: 8px;
+            background: #fff5f5;
+        }
+        @keyframes pulse-red {
+            0% { color: var(--d); transform: scale(1); }
+            50% { color: #ff0000; transform: scale(1.05); opacity: 0.7; }
+            100% { color: var(--d); transform: scale(1); }
+        }
+
         .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
         input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
-        input:disabled { background: #f1f5f9; color: #888; cursor: not-allowed; }
+        
         .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; }
-        .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); } .btn-wa { background: var(--wa); }
+        .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block; color: white; border: none; border-radius: 12px; cursor: pointer; }
+        
         #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
         .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; position: relative; }
         .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
@@ -34,6 +57,7 @@
         .view-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
         .v-label { font-size: 0.7rem; color: var(--soft-red); font-weight: bold; }
         .v-text { font-size: 0.85rem; color: #333; font-weight: bold; }
+        
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; text-align: center; }
         .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
     </style>
@@ -90,7 +114,7 @@
                 <button class="btn btn-main" id="saveClientBtn" onclick="saveClient()">حفظ في السحابة ☁️</button>
                 <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
             </div>
-            <div class="grid" id="clientGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;"></div>
+            <div class="grid" id="clientGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;"></div>
         </div>
 
         <div id="store" class="section">
@@ -151,10 +175,37 @@
     function renderClients() {
         const grid = document.getElementById('clientGrid');
         grid.innerHTML = cloudData.clients.map((c, i) => {
-            const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
-            return `<div class="card">
-                <div style="display:flex; justify-content:space-between;"><b>${c.name}</b> <span style="color:var(--d); font-weight:bold;">${days} يوم</span></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
+            const start = new Date(c.cs);
+            const end = new Date(c.ce);
+            const today = new Date();
+            
+            // حساب الأيام المتبقية
+            const diffTime = end - today;
+            const daysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+            
+            // حساب نسبة التقدم للشريط
+            const totalDuration = end - start;
+            const elapsed = today - start;
+            let progress = (elapsed / totalDuration) * 100;
+            progress = Math.min(100, Math.max(0, progress)); // لضمان النسبة بين 0 و 100
+
+            return `
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <b>${c.name}</b> 
+                    <span class="${daysLeft <= 7 ? 'pulse-days' : ''}" style="color:var(--d); font-weight:bold;">
+                        ${daysLeft} يوم
+                    </span>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: ${100 - progress}%"></div>
+                </div>
+                <div style="font-size:0.7rem; color:#888; text-align:left; margin-bottom:10px;">
+                    المتبقي: ${Math.round(100 - progress)}%
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
                     <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
                     <button class="btn btn-view" onclick="openView(${i})">بيانات</button>
@@ -164,7 +215,6 @@
         }).join('');
     }
 
-    // تعديل دالة النسخ لترسل رابط صفحة العميل user.html حصراً
     function copyL(name) {
         const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
         navigator.clipboard.writeText(clientUrl);
@@ -222,16 +272,13 @@
         });
     }
 
-    // وظائف المتجر المحدثة
     function renderApps() {
         const grid = document.getElementById('appList');
         grid.innerHTML = cloudData.apps.map((app, i) => `
             <div class="app-card">
                 <img src="${app.img || 'hdh.PNG'}">
                 <b>${app.name}</b>
-                <div style="display:flex; gap:5px;">
-                    <button class="btn btn-del" style="flex:1" onclick="delApp(${i})">حذف</button>
-                </div>
+                <button class="btn btn-del" onclick="delApp(${i})">حذف</button>
             </div>
         `).join('');
     }
@@ -256,13 +303,11 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active'); btn.classList.add('active');
     }
-    async function delClient(i) { if(confirm("حذف المشترك؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
-    async function delApp(i) { if(confirm("حذف التطبيق؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
-    
+    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
+    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
     function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload=(e)=>document.getElementById('currentLogoPreview').src=e.target.result; reader.readAsDataURL(input.files[0]); } }
-    async function saveSettings() { cloudData.logoSize = document.getElementById('logoSize').value; await sync(); alert("تم حفظ الإعدادات"); }
+    async function saveSettings() { cloudData.logoSize = document.getElementById('logoSize').value; await sync(); alert("تم الحفظ"); }
     function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
-
 </script>
 </body>
 </html>
