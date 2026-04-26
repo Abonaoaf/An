@@ -30,6 +30,9 @@
         .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
         input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
         
+        /* شكل الحقل المعطل عند التعديل */
+        input:disabled { background: #f1f5f9; color: #888; cursor: not-allowed; border: 1px solid #cbd5e0; }
+
         .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; }
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; color: white; border-radius: 12px; border:none; cursor: pointer;}
@@ -38,7 +41,6 @@
         .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; background: #f9f9f9; }
         .drag-handle { position: absolute; top: 10px; left: 10px; cursor: grab; color: #ccc; }
 
-        /* نافذة العرض */
         #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .view-card { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; }
         .view-row { border-bottom: 1px solid #f0f0f0; padding: 10px 15px; display: flex; justify-content: space-between; }
@@ -83,7 +85,7 @@
             <div class="modal">
                 <h3 id="clientTitle">إضافة مشترك جديد</h3>
                 <input type="hidden" id="editIdx">
-                <input type="text" id="cn" placeholder="اسم العميل">
+                <input type="text" id="cn" placeholder="اسم العميل (يثبت عند التعديل)">
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
@@ -92,8 +94,8 @@
                     <input type="date" id="cs" title="بداية الاشتراك">
                     <input type="date" id="ce" title="نهاية الاشتراك">
                 </div>
-                <button class="btn btn-main" onclick="saveClient()">حفظ المشترك ☁️</button>
-                <button id="cancelBtn" class="btn btn-main" style="background:#eee; color:#666; display:none;" onclick="clearClientForm()">إلغاء</button>
+                <button class="btn btn-main" id="clientSubmitBtn" onclick="saveClient()">حفظ المشترك ☁️</button>
+                <button id="cancelBtn" class="btn btn-main" style="background:#eee; color:#666; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
             </div>
             <div class="grid" id="clientGrid"></div>
         </div>
@@ -170,12 +172,46 @@
         }).join('');
     }
 
+    // --- تعديل العميل مع تثبيت الاسم ---
+    function editClient(i) {
+        const c = cloudData.clients[i];
+        document.getElementById('editIdx').value = i;
+        ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id === 'cn' ? 'name' : id] || "");
+        
+        // تثبيت حقل الاسم
+        document.getElementById('cn').disabled = true;
+        
+        document.getElementById('clientTitle').innerText = "تعديل مشترك: " + c.name;
+        document.getElementById('clientSubmitBtn').innerText = "تحديث البيانات ✅";
+        document.getElementById('cancelBtn').style.display = "block";
+        window.scrollTo(0,0);
+    }
+
+    async function saveClient() {
+        const idx = document.getElementById('editIdx').value;
+        const c = { 
+            name: document.getElementById('cn').value, 
+            cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') 
+        };
+        if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
+        await sync(); load(); clearClientForm();
+    }
+
+    function clearClientForm() {
+        ['cn','cp','cu','ck','cl','cs','ce','editIdx'].forEach(id => document.getElementById(id).value = "");
+        document.getElementById('cn').disabled = false;
+        document.getElementById('clientTitle').innerText = "إضافة مشترك جديد";
+        document.getElementById('clientSubmitBtn').innerText = "حفظ المشترك ☁️";
+        document.getElementById('cancelBtn').style.display = "none";
+    }
+
+    // --- إدارة المتجر ---
     function renderApps() {
         const list = document.getElementById('appList');
-        list.innerHTML = cloudData.apps.map((a, i) => `
+        list.innerHTML = (cloudData.apps || []).map((a, i) => `
             <div class="app-card" data-id="${i}">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
-                <img src="${a.img || 'hdh.PNG'}">
+                <img src="${a.img || 'https://via.placeholder.com/65'}">
                 <b>${a.name}</b>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
                     <button class="btn btn-edit" onclick="editApp(${i})">تعديل</button>
@@ -185,11 +221,9 @@
         new Sortable(list, { animation: 150, handle: '.drag-handle' });
     }
 
-    // إدارة التطبيقات
     async function saveApp() {
         const idx = document.getElementById('editAppIdx').value;
         const file = document.getElementById('appIcon').files[0];
-        
         const save = async (imgBase64) => {
             const app = { 
                 name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), 
@@ -198,12 +232,7 @@
             if(idx === "") cloudData.apps.push(app); else cloudData.apps[idx] = app;
             await sync(); load(); clearAppForm();
         };
-
-        if(file) {
-            const reader = new FileReader();
-            reader.onload = () => save(reader.result);
-            reader.readAsDataURL(file);
-        } else { save(); }
+        if(file) { const reader = new FileReader(); reader.onload = () => save(reader.result); reader.readAsDataURL(file); } else { save(); }
     }
 
     function editApp(i) {
@@ -211,8 +240,9 @@
         document.getElementById('editAppIdx').value = i;
         document.getElementById('an').value = a.name; document.getElementById('ad').value = a.ad;
         document.getElementById('al').value = a.al; document.getElementById('at').value = a.at;
-        document.getElementById('appTitle').innerText = "تعديل تطبيق: " + a.name;
+        document.getElementById('appTitle').innerText = "تعديل: " + a.name;
         document.getElementById('cancelAppBtn').style.display = "block";
+        window.scrollTo(0,0);
     }
 
     function clearAppForm() {
@@ -221,7 +251,7 @@
         document.getElementById('cancelAppBtn').style.display = "none";
     }
 
-    // وظائف مشتركة
+    // وظائف عامة
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
     function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
@@ -229,34 +259,10 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active'); btn.classList.add('active');
     }
-
-    // إدارة المشتركين (كما في كودك السابق مع تحسينات)
-    async function saveClient() {
-        const idx = document.getElementById('editIdx').value;
-        const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') };
-        if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
-        await sync(); load(); clearClientForm();
-    }
-
-    function editClient(i) {
-        const c = cloudData.clients[i];
-        document.getElementById('editIdx').value = i;
-        ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
-        document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
-        document.getElementById('cancelBtn').style.display = "block";
-    }
-
-    function clearClientForm() {
-        ['cn','cp','cu','ck','cl','cs','ce','editIdx'].forEach(id => document.getElementById(id).value = "");
-        document.getElementById('clientTitle').innerText = "إضافة مشترك جديد";
-        document.getElementById('cancelBtn').style.display = "none";
-    }
-
     function copyL(name) {
         const url = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
         navigator.clipboard.writeText(url); alert("تم نسخ الرابط ✅");
     }
-
     function openView(i) {
         const c = cloudData.clients[i];
         document.getElementById('v_title').innerText = c.name;
@@ -264,21 +270,26 @@
         document.getElementById('v_content').innerHTML = f.map(x => `<div class="view-row"><b>${x[0]}</b><span>${x[1]||'--'}</span></div>`).join('');
         document.getElementById('viewModal').style.display = 'flex';
     }
-
     function closeView() { document.getElementById('viewModal').style.display = 'none'; }
-
     async function saveOrder() {
         const items = document.querySelectorAll('#appList .app-card');
-        let newArr = [];
-        items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
+        let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
         cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب الجديد!"); load();
     }
-
     async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
     async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
     function previewLogo(i) { if(i.files[0]) { const r=new FileReader(); r.onload=(e)=>document.getElementById('currentLogo').src=e.target.result; r.readAsDataURL(i.files[0]); } }
     function updateLogoSize(v) { document.getElementById('sizeVal').innerText = v; document.getElementById('currentLogo').style.width = v+"px"; }
     async function saveSettings() { cloudData.logo = document.getElementById('currentLogo').src; cloudData.logoSize = document.getElementById('logoSize').value; await sync(); alert("تم الحفظ!"); }
+    
+    async function saveCardAsImage() {
+        const target = document.getElementById('captureTarget');
+        const canvas = await html2canvas(target, { backgroundColor: null, scale: 2 });
+        const link = document.createElement('a');
+        link.download = 'vulture_client.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
 </script>
 </body>
 </html>
