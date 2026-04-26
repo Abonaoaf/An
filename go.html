@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        // الحصول على اسم العميل من الرابط (مثلاً id=aziz)
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get('id');
+
+        if (clientId) {
+            // التحويل التلقائي للرابط الطويل الخاص بصفحة العميل
+            window.location.href = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(clientId);
+        } else {
+            document.write("عذراً، الرابط غير صحيح.");
+        }
+    </script>
+</head>
+<body>
+    جارٍ توجيهك إلى صفحة اشتراكك...
+</body>
+</html>
