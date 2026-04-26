@@ -10,42 +10,23 @@
     <style>
         :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; --soft-red: #f87171; --wa: #25D366; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
-        
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
         #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; }
         #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
-        
         .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
         .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
         .tab-btn { padding: 10px 18px; border-radius: 12px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
         .tab-btn.active { background: var(--link); color: white; border-color: var(--link); }
-        
         .container { padding: 20px; max-width: 1200px; margin: auto; }
         .section { display: none; }
         .section.active { display: block; }
-        
-        /* تصميم بطاقة العميل المحقون بنظام الأيام الملون والشريط */
         .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .days-badge { font-weight: bold; padding: 4px 12px; border-radius: 10px; font-size: 0.85rem; }
-        
-        .progress-container { background: #edf2f7; height: 10px; border-radius: 20px; margin: 10px 0; overflow: hidden; position: relative; }
-        .progress-bar { height: 100%; transition: width 0.5s; border-radius: 20px; }
-        
-        /* حالات الألوان */
-        .status-green { background: #c6f6d5; color: #22543d; } /* ساري */
-        .status-yellow { background: #feebc8; color: #744210; } /* قرب ينتهي */
-        .status-red { background: #fed7d7; color: #822727; animation: blink 1s infinite; } /* منتهي أو خطر */
-        
-        @keyframes blink { 50% { opacity: 0.6; } }
-
         .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
         input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
-        
+        input:disabled { background: #f1f5f9; color: #888; cursor: not-allowed; }
         .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; }
-        .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); }
+        .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); } .btn-wa { background: var(--wa); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block; color: white; border: none; border-radius: 12px; cursor: pointer; }
-        
         #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
         .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; position: relative; }
         .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
@@ -53,6 +34,8 @@
         .view-row { border-bottom: 1px solid #f0f0f0; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
         .v-label { font-size: 0.7rem; color: var(--soft-red); font-weight: bold; }
         .v-text { font-size: 0.85rem; color: #333; font-weight: bold; }
+        .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; text-align: center; }
+        .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
     </style>
 </head>
 <body>
@@ -95,7 +78,7 @@
             <div class="modal">
                 <h3 id="clientTitle">إضافة مشترك جديد</h3>
                 <input type="hidden" id="editClientIndex">
-                <input type="text" id="cn" placeholder="اسم العميل">
+                <input type="text" id="cn" placeholder="اسم العميل (الرابط يعتمد عليه)">
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
@@ -107,7 +90,7 @@
                 <button class="btn btn-main" id="saveClientBtn" onclick="saveClient()">حفظ في السحابة ☁️</button>
                 <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
             </div>
-            <div class="grid" id="clientGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;"></div>
+            <div class="grid" id="clientGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;"></div>
         </div>
 
         <div id="store" class="section">
@@ -168,33 +151,9 @@
     function renderClients() {
         const grid = document.getElementById('clientGrid');
         grid.innerHTML = cloudData.clients.map((c, i) => {
-            const start = new Date(c.cs);
-            const end = new Date(c.ce);
-            const today = new Date();
-            
-            const total = end - start;
-            const left = end - today;
-            const daysLeft = Math.max(0, Math.ceil(left / (1000 * 60 * 60 * 24)));
-            let prog = (left / total) * 100;
-            prog = Math.min(100, Math.max(0, prog));
-
-            // تحديد الحالة واللون
-            let statusClass = "status-green";
-            let barColor = "#28a745";
-            if (daysLeft <= 7) { statusClass = "status-yellow"; barColor = "#f6ad55"; }
-            if (daysLeft <= 2 || left <= 0) { statusClass = "status-red"; barColor = "#dc3545"; }
-
-            return `
-            <div class="card">
-                <div class="card-header">
-                    <b style="font-size:1.1rem">${c.name}</b>
-                    <span class="days-badge ${statusClass}">${daysLeft} يوم متبقي</span>
-                </div>
-                
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: ${prog}%; background: ${barColor};"></div>
-                </div>
-
+            const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
+            return `<div class="card">
+                <div style="display:flex; justify-content:space-between;"><b>${c.name}</b> <span style="color:var(--d); font-weight:bold;">${days} يوم</span></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
                     <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
@@ -205,10 +164,11 @@
         }).join('');
     }
 
+    // تعديل دالة النسخ لترسل رابط صفحة العميل user.html حصراً
     function copyL(name) {
         const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
         navigator.clipboard.writeText(clientUrl);
-        alert("تم نسخ رابط العميل ✅");
+        alert("تم نسخ رابط المشترك المخصص ✅");
     }
 
     function editClient(i) {
@@ -262,13 +222,16 @@
         });
     }
 
+    // وظائف المتجر المحدثة
     function renderApps() {
         const grid = document.getElementById('appList');
         grid.innerHTML = cloudData.apps.map((app, i) => `
-            <div class="app-card" style="background:white; border-radius:15px; padding:10px; text-align:center; border:1px solid #eee;">
-                <img src="${app.img || 'hdh.PNG'}" style="width:60px; height:60px; border-radius:12px;">
-                <div style="font-weight:bold; margin:5px 0;">${app.name}</div>
-                <button class="btn btn-del" onclick="delApp(${i})">حذف</button>
+            <div class="app-card">
+                <img src="${app.img || 'hdh.PNG'}">
+                <b>${app.name}</b>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn btn-del" style="flex:1" onclick="delApp(${i})">حذف</button>
+                </div>
             </div>
         `).join('');
     }
@@ -293,11 +256,13 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active'); btn.classList.add('active');
     }
-    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
-    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
+    async function delClient(i) { if(confirm("حذف المشترك؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
+    async function delApp(i) { if(confirm("حذف التطبيق؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
+    
     function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload=(e)=>document.getElementById('currentLogoPreview').src=e.target.result; reader.readAsDataURL(input.files[0]); } }
-    async function saveSettings() { cloudData.logoSize = document.getElementById('logoSize').value; await sync(); alert("تم الحفظ"); }
+    async function saveSettings() { cloudData.logoSize = document.getElementById('logoSize').value; await sync(); alert("تم حفظ الإعدادات"); }
     function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
+
 </script>
 </body>
 </html>
