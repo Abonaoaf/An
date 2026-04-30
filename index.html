@@ -41,7 +41,6 @@
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); } .btn-wa { background: var(--wa); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block; color: white; border: none; }
 
-        /* تعديلات صندوق المعاينة ليتطابق مع الصورة */
         #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; position: relative; }
         .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
@@ -113,7 +112,8 @@
                 <input type="text" id="ad" placeholder="كود دونلودر">
                 <input type="text" id="al" placeholder="رابط التحميل المباشر">
                 <textarea id="at" placeholder="وصف التطبيق"></textarea>
-                <button class="btn btn-main" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>
+                <button class="btn btn-main" id="saveAppBtn" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>
+                <button id="cancelAppBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none; margin-top:5px;" onclick="clearAppForm()">إلغاء التعديل</button>
             </div>
             <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px;" onclick="saveOrder()"><i class="fas fa-save"></i> حفظ الترتيب الحالي</button>
             <div class="grid" id="appList"></div>
@@ -175,6 +175,61 @@
         }).join('');
     }
 
+    function renderApps() {
+        const list = document.getElementById('appList');
+        list.innerHTML = (cloudData.apps || []).map((a, i) => `
+            <div class="app-card" data-id="${i}">
+                <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                <img src="${a.img || ''}">
+                <b>${a.name}</b>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
+                    <button class="btn btn-edit" onclick="editApp(${i})">تعديل</button>
+                    <button class="btn btn-del" onclick="delApp(${i})">حذف</button>
+                </div>
+            </div>`).join('');
+        new Sortable(list, { animation: 150, handle: '.drag-handle' });
+    }
+
+    function editApp(i) {
+        const a = cloudData.apps[i];
+        document.getElementById('editAppIndex').value = i;
+        document.getElementById('an').value = a.name;
+        document.getElementById('ad').value = a.ad || "";
+        document.getElementById('al').value = a.al || "";
+        document.getElementById('at').value = a.at || "";
+        document.getElementById('appTitle').innerText = "تعديل تطبيق: " + a.name;
+        document.getElementById('saveAppBtn').innerText = "تحديث في المتجر ✨";
+        document.getElementById('cancelAppBtn').style.display = "block";
+        window.scrollTo(0,0);
+    }
+
+    function clearAppForm() {
+        ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = "");
+        document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
+        document.getElementById('saveAppBtn').innerText = "حفظ في المتجر ✨";
+        document.getElementById('cancelAppBtn').style.display = "none";
+    }
+
+    async function saveApp() {
+        const idx = document.getElementById('editAppIndex').value;
+        const iconFile = document.getElementById('appIcon').files[0];
+        let imgBase64 = "";
+
+        if (iconFile) {
+            const reader = new FileReader();
+            imgBase64 = await new Promise(r => { reader.onload=()=>r(reader.result); reader.readAsDataURL(iconFile); });
+        } else if (idx !== "") {
+            imgBase64 = cloudData.apps[idx].img;
+        }
+
+        const appData = { name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 };
+
+        if (idx === "") { cloudData.apps.push(appData); } 
+        else { cloudData.apps[idx] = appData; }
+
+        await sync(); clearAppForm(); load(); alert("تم الحفظ بنجاح ✨");
+    }
+
     function editClient(i) {
         const c = cloudData.clients[i];
         document.getElementById('editClientIndex').value = i;
@@ -206,29 +261,6 @@
         await sync(); clearClientForm(); load();
     }
 
-    function renderApps() {
-        const list = document.getElementById('appList');
-        list.innerHTML = (cloudData.apps || []).map((a, i) => `
-            <div class="app-card" data-id="${i}">
-                <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
-                <img src="${a.img || ''}">
-                <b>${a.name}</b>
-                <div style="display:flex; gap:5px;"><button class="btn btn-del" style="flex:1" onclick="delApp(${i})">حذف</button></div>
-            </div>`).join('');
-        new Sortable(list, { animation: 150, handle: '.drag-handle' });
-    }
-
-    async function saveApp() {
-        const iconFile = document.getElementById('appIcon').files[0];
-        let imgBase64 = "";
-        if (iconFile) {
-            const reader = new FileReader();
-            imgBase64 = await new Promise(r => { reader.onload=()=>r(reader.result); reader.readAsDataURL(iconFile); });
-        }
-        cloudData.apps.push({ name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 });
-        await sync(); renderApps();
-    }
-
     async function saveOrder() {
         const items = document.querySelectorAll('#appList .app-card');
         let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
@@ -245,25 +277,8 @@
     function openView(i) {
         const c = cloudData.clients[i];
         document.getElementById('v_title').innerText = "بيانات المشترك";
-        
-        // ترتيب وتنسيق البيانات كما في صورتك الأصلية
-        const fields = [
-            ['اسم المشترك', c.name],
-            ['رقم الجوال', c.cp],
-            ['اسم المستخدم', c.cu],
-            ['كلمة السر', c.ck],
-            ['الرابط', c.cl],
-            ['بداية الاشتراك', c.cs],
-            ['نهاية الاشتراك', c.ce]
-        ];
-
-        document.getElementById('v_content').innerHTML = fields.map(f => `
-            <div class="view-row">
-                <span class="v-label">${f[0]}</span>
-                <span class="v-text">${f[1] || '---'}</span>
-            </div>
-        `).join('');
-        
+        const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['كلمة السر', c.ck],['الرابط', c.cl],['بداية الاشتراك', c.cs],['نهاية الاشتراك', c.ce]];
+        document.getElementById('v_content').innerHTML = fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
         document.getElementById('viewModal').style.display = 'flex';
     }
 
