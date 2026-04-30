@@ -35,7 +35,6 @@
 
         .modal { background: #fff; border-radius: 25px; padding: 25px; margin-bottom: 30px; border: 2px dashed #cbd5e0; }
         input, textarea { width: 100%; padding: 14px; margin: 6px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
-        input:disabled { background: #f1f5f9; color: #888; cursor: not-allowed; }
 
         .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); } .btn-wa { background: var(--wa); }
@@ -45,9 +44,9 @@
         .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; position: relative; }
         .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
         .view-body { padding: 15px 20px; background: white; }
-        .view-row { border-bottom: 1px solid #f0f0f0; padding: 12px 0; display: flex; justify-content: space-between; align-items: center; }
-        .v-label { font-size: 0.75rem; color: var(--soft-red); font-weight: bold; }
-        .v-text { font-size: 0.9rem; color: #333; font-weight: bold; text-align: left; }
+        .view-row { border-bottom: 1px solid #f0f0f0; padding: 12px 0; display: flex; flex-direction: column; align-items: flex-start; }
+        .v-label { font-size: 0.75rem; color: var(--soft-red); font-weight: bold; margin-bottom: 4px; }
+        .v-text { font-size: 0.9rem; color: #333; font-weight: bold; text-align: right; word-break: break-all; width: 100%; }
 
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; text-align: center; }
         .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
@@ -91,7 +90,7 @@
             <div class="modal">
                 <h3 id="clientTitle">إضافة مشترك جديد</h3>
                 <input type="hidden" id="editClientIndex">
-                <input type="text" id="cn" placeholder="اسم العميل (الرابط يعتمد عليه)">
+                <input type="text" id="cn" placeholder="اسم العميل">
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
@@ -160,16 +159,14 @@
         const grid = document.getElementById('clientGrid');
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
             const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
-            const showWA = (days <= 5 && days > 0);
             return `<div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center;"><b>${c.name}</b> <span class="days-highlight">${days} يوم</span></div>
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
                     <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
-                    <button class="btn btn-view" onclick="openView(${i})">بيانات</button>
+                    <button class="btn btn-view" onclick="openView(${i}, 'client')">بيانات</button>
                     <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
-                    ${showWA ? `<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 2; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه واتساب</button>` : ''}
                 </div>
             </div>`;
         }).join('');
@@ -184,10 +181,28 @@
                 <b>${a.name}</b>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
                     <button class="btn btn-edit" onclick="editApp(${i})">تعديل</button>
+                    <button class="btn btn-view" onclick="openView(${i}, 'app')">معاينة</button>
                     <button class="btn btn-del" onclick="delApp(${i})">حذف</button>
                 </div>
             </div>`).join('');
         new Sortable(list, { animation: 150, handle: '.drag-handle' });
+    }
+
+    function openView(i, type) {
+        const vContent = document.getElementById('v_content');
+        if(type === 'client') {
+            const c = cloudData.clients[i];
+            document.getElementById('v_title').innerText = "بيانات المشترك";
+            const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['كلمة السر', c.ck],['الرابط', c.cl],['بداية الاشتراك', c.cs],['نهاية الاشتراك', c.ce]];
+            vContent.innerHTML = fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
+        } else {
+            const a = cloudData.apps[i];
+            document.getElementById('v_title').innerText = "معاينة التطبيق";
+            const fields = [['اسم التطبيق', a.name],['كود دونلودر', a.ad],['رابط التحميل', a.al],['الوصف', a.at]];
+            vContent.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><img src="${a.img}" style="width:80px; height:80px; border-radius:15px; object-fit:cover;"></div>` + 
+                               fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
+        }
+        document.getElementById('viewModal').style.display = 'flex';
     }
 
     function editApp(i) {
@@ -203,6 +218,19 @@
         window.scrollTo(0,0);
     }
 
+    async function saveApp() {
+        const idx = document.getElementById('editAppIndex').value;
+        const iconFile = document.getElementById('appIcon').files[0];
+        let imgBase64 = "";
+        if (iconFile) {
+            const reader = new FileReader();
+            imgBase64 = await new Promise(r => { reader.onload=()=>r(reader.result); reader.readAsDataURL(iconFile); });
+        } else if (idx !== "") { imgBase64 = cloudData.apps[idx].img; }
+        const appData = { name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 };
+        if (idx === "") cloudData.apps.push(appData); else cloudData.apps[idx] = appData;
+        await sync(); clearAppForm(); load();
+    }
+
     function clearAppForm() {
         ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = "");
         document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
@@ -210,32 +238,11 @@
         document.getElementById('cancelAppBtn').style.display = "none";
     }
 
-    async function saveApp() {
-        const idx = document.getElementById('editAppIndex').value;
-        const iconFile = document.getElementById('appIcon').files[0];
-        let imgBase64 = "";
-
-        if (iconFile) {
-            const reader = new FileReader();
-            imgBase64 = await new Promise(r => { reader.onload=()=>r(reader.result); reader.readAsDataURL(iconFile); });
-        } else if (idx !== "") {
-            imgBase64 = cloudData.apps[idx].img;
-        }
-
-        const appData = { name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 };
-
-        if (idx === "") { cloudData.apps.push(appData); } 
-        else { cloudData.apps[idx] = appData; }
-
-        await sync(); clearAppForm(); load(); alert("تم الحفظ بنجاح ✨");
-    }
-
     function editClient(i) {
         const c = cloudData.clients[i];
         document.getElementById('editClientIndex').value = i;
-        document.getElementById('cn').value = c.name;
-        document.getElementById('cn').disabled = true; 
-        ['cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        document.getElementById('cn').disabled = true;
         document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
         document.getElementById('cancelBtn').style.display = "block";
         window.scrollTo(0,0);
@@ -248,17 +255,17 @@
         document.getElementById('cancelBtn').style.display = "none";
     }
 
-    function copyL(name) {
-        const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
-        navigator.clipboard.writeText(clientUrl);
-        alert("تم نسخ رابط المشترك الثابت ✅");
-    }
-
     async function saveClient() {
         const idx = document.getElementById('editClientIndex').value;
         const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
         await sync(); clearClientForm(); load();
+    }
+
+    function copyL(name) {
+        const url = "https://abonaoaf.github.io/An1/?id=" + encodeURIComponent(name);
+        navigator.clipboard.writeText(url);
+        alert("تم نسخ الرابط المختصر ✅");
     }
 
     async function saveOrder() {
@@ -267,23 +274,8 @@
         cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); load();
     }
 
-    function sendReminder(name, phone, days) {
-        let cleanPhone = phone.replace(/\D/g, '');
-        if(!cleanPhone.startsWith('966')) cleanPhone = '966' + cleanPhone;
-        const msg = `مرحباً ${name}، اشتراكك في فولتشر ينتهي خلال ${days} أيام.`;
-        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function openView(i) {
-        const c = cloudData.clients[i];
-        document.getElementById('v_title').innerText = "بيانات المشترك";
-        const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['كلمة السر', c.ck],['الرابط', c.cl],['بداية الاشتراك', c.cs],['نهاية الاشتراك', c.ce]];
-        document.getElementById('v_content').innerHTML = fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
-        document.getElementById('viewModal').style.display = 'flex';
-    }
-
     function closeView() { document.getElementById('viewModal').style.display = 'none'; }
-    function saveCardAsImage() { html2canvas(document.getElementById('captureTarget'), {scale: 3}).then(canvas => { const link = document.createElement('a'); link.href = canvas.toDataURL(); link.download = `Vulture_Client.png`; link.click(); }); }
+    function saveCardAsImage() { html2canvas(document.getElementById('captureTarget'), {scale: 3}).then(canvas => { const link = document.createElement('a'); link.href = canvas.toDataURL(); link.download = `Vulture_Preview.png`; link.click(); }); }
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
     function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
