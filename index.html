@@ -41,6 +41,7 @@
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); } .btn-wa { background: var(--wa); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block; color: white; border: none; }
 
+        /* نافذة المعاينة الموحدة */
         #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; position: relative; }
         .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
@@ -91,7 +92,7 @@
             <div class="modal">
                 <h3 id="clientTitle">إضافة مشترك جديد</h3>
                 <input type="hidden" id="editClientIndex">
-                <input type="text" id="cn" placeholder="اسم العميل">
+                <input type="text" id="cn" placeholder="اسم العميل (الرابط يعتمد عليه)">
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
@@ -160,6 +161,7 @@
         const grid = document.getElementById('clientGrid');
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
             const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
+            const showWA = (days <= 5 && days > 0);
             return `<div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center;"><b>${c.name}</b> <span class="days-highlight">${days} يوم</span></div>
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
@@ -168,6 +170,7 @@
                     <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
                     <button class="btn btn-view" onclick="openView(${i}, 'client')">بيانات</button>
                     <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
+                    ${showWA ? `<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 2; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه واتساب</button>` : ''}
                 </div>
             </div>`;
         }).join('');
@@ -219,6 +222,13 @@
         window.scrollTo(0,0);
     }
 
+    function clearAppForm() {
+        ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = "");
+        document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
+        document.getElementById('saveAppBtn').innerText = "حفظ في المتجر ✨";
+        document.getElementById('cancelAppBtn').style.display = "none";
+    }
+
     async function saveApp() {
         const idx = document.getElementById('editAppIndex').value;
         const iconFile = document.getElementById('appIcon').files[0];
@@ -232,18 +242,12 @@
         await sync(); clearAppForm(); load(); alert("تم الحفظ بنجاح ✨");
     }
 
-    function clearAppForm() {
-        ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = "");
-        document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
-        document.getElementById('saveAppBtn').innerText = "حفظ في المتجر ✨";
-        document.getElementById('cancelAppBtn').style.display = "none";
-    }
-
     function editClient(i) {
         const c = cloudData.clients[i];
         document.getElementById('editClientIndex').value = i;
-        ['cn','cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
-        document.getElementById('cn').disabled = true;
+        document.getElementById('cn').value = c.name;
+        document.getElementById('cn').disabled = true; 
+        ['cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
         document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
         document.getElementById('cancelBtn').style.display = "block";
         window.scrollTo(0,0);
@@ -256,17 +260,17 @@
         document.getElementById('cancelBtn').style.display = "none";
     }
 
+    function copyL(name) {
+        const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
+        navigator.clipboard.writeText(clientUrl);
+        alert("تم نسخ رابط المشترك الثابت ✅");
+    }
+
     async function saveClient() {
         const idx = document.getElementById('editClientIndex').value;
         const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
         await sync(); clearClientForm(); load();
-    }
-
-    function copyL(name) {
-        const url = "https://abonaoaf.github.io/An1/?id=" + encodeURIComponent(name);
-        navigator.clipboard.writeText(url);
-        alert("تم نسخ الرابط المختصر ✅");
     }
 
     async function saveOrder() {
@@ -275,8 +279,15 @@
         cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); load();
     }
 
+    function sendReminder(name, phone, days) {
+        let cleanPhone = phone.replace(/\D/g, '');
+        if(!cleanPhone.startsWith('966')) cleanPhone = '966' + cleanPhone;
+        const msg = `مرحباً ${name}، اشتراكك في فولتشر ينتهي خلال ${days} أيام.`;
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
     function closeView() { document.getElementById('viewModal').style.display = 'none'; }
-    function saveCardAsImage() { html2canvas(document.getElementById('captureTarget'), {scale: 3}).then(canvas => { const link = document.createElement('a'); link.href = canvas.toDataURL(); link.download = `Vulture_Preview.png`; link.click(); }); }
+    function saveCardAsImage() { html2canvas(document.getElementById('captureTarget'), {scale: 3}).then(canvas => { const link = document.createElement('a'); link.href = canvas.toDataURL(); link.download = `Vulture_Card.png`; link.click(); }); }
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
     function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
