@@ -41,13 +41,11 @@
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); } .btn-wa { background: var(--wa); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block; color: white; border: none; }
 
-        /* نافذة المعاينة الموحدة - تم تعديل التوزيع هنا */
         #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; position: relative; }
         .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
         .view-body { padding: 15px 20px; background: white; }
         
-        /* هذا الجزء يعيد النص والبيانات ليكونوا متقابلين (واحد يمين وواحد يسار) */
         .view-row { border-bottom: 1px solid #f0f0f0; padding: 12px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .v-label { font-size: 0.8rem; color: var(--soft-red); font-weight: bold; white-space: nowrap; }
         .v-text { font-size: 0.9rem; color: #333; font-weight: bold; text-align: left; word-break: break-all; }
@@ -98,7 +96,6 @@
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
-                <input type="text" id="cl" placeholder="رابط الدخول">
                 <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
                 <button class="btn btn-main" id="saveClientBtn" onclick="saveClient()">حفظ في السحابة ☁️</button>
                 <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
@@ -124,6 +121,12 @@
 
         <div id="settings" class="section">
             <div class="modal" style="text-align:center;">
+                <h3>الإعدادات العامة ⚙️</h3>
+                <div style="text-align:right; margin-bottom:15px;">
+                    <label><b>الرابط الموحد للمشتركين:</b></label>
+                    <input type="text" id="globalLink" placeholder="أدخل الرابط الذي سيظهر لجميع المشتركين">
+                </div>
+                <hr>
                 <h3>تنسيق شعار فولتشر 🦅</h3>
                 <input type="file" id="logoFile" accept="image/*" onchange="previewNewLogo(this)">
                 <div style="margin:20px 0;"><label>الحجم: <b id="sizeVal">70</b>px</label><input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)"></div>
@@ -137,7 +140,8 @@
 <script>
     const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     const MASTER_PASS = "Aztlg1512";
-    let cloudData = { clients: [], apps: [], logo: "", logoSize: "70" };
+    // إضافة خاصية globalLink للبيانات السحابية
+    let cloudData = { clients: [], apps: [], logo: "", logoSize: "70", globalLink: "" };
 
     async function checkPass() {
         if(document.getElementById('passInput').value === MASTER_PASS) {
@@ -154,7 +158,13 @@
             cloudData = d;
             if(!cloudData.clients) cloudData.clients = [];
             if(!cloudData.apps) cloudData.apps = [];
+            if(!cloudData.globalLink) cloudData.globalLink = "";
+            
             if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;
+            document.getElementById('globalLink').value = cloudData.globalLink;
+            document.getElementById('logoSize').value = cloudData.logoSize || 70;
+            updateLogoPreview(cloudData.logoSize || 70);
+            
             renderClients(); renderApps();
         }
     }
@@ -199,7 +209,16 @@
         if(type === 'client') {
             const c = cloudData.clients[i];
             document.getElementById('v_title').innerText = "بيانات المشترك";
-            const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['كلمة السر', c.ck],['الرابط', c.cl],['بداية الاشتراك', c.cs],['نهاية الاشتراك', c.ce]];
+            // هنا نستخدم cloudData.globalLink بدلاً من الرابط الفردي
+            const fields = [
+                ['اسم المشترك', c.name],
+                ['رقم الجوال', c.cp],
+                ['اسم المستخدم', c.cu],
+                ['كلمة السر', c.ck],
+                ['الرابط', cloudData.globalLink || '---'], 
+                ['بداية الاشتراك', c.cs],
+                ['نهاية الاشتراك', c.ce]
+            ];
             vContent.innerHTML = fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
         } else {
             const a = cloudData.apps[i];
@@ -209,6 +228,53 @@
                                fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
         }
         document.getElementById('viewModal').style.display = 'flex';
+    }
+
+    function editClient(i) {
+        const c = cloudData.clients[i];
+        document.getElementById('editClientIndex').value = i;
+        document.getElementById('cn').value = c.name;
+        document.getElementById('cn').disabled = true; 
+        ['cp','cu','ck','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
+        document.getElementById('cancelBtn').style.display = "block";
+        window.scrollTo(0,0);
+    }
+
+    function clearClientForm() {
+        ['cn','cp','cu','ck','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value="");
+        document.getElementById('cn').disabled = false;
+        document.getElementById('clientTitle').innerText = "إضافة مشترك جديد";
+        document.getElementById('cancelBtn').style.display = "none";
+    }
+
+    async function saveClient() {
+        const idx = document.getElementById('editClientIndex').value;
+        const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cs: v('cs'), ce: v('ce') };
+        if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
+        await sync(); clearClientForm(); load();
+    }
+
+    // بقية الدوال البرمجية (حفظ التطبيق، الترتيب، إلخ) تبقى كما هي
+    async function saveApp() {
+        const idx = document.getElementById('editAppIndex').value;
+        const iconFile = document.getElementById('appIcon').files[0];
+        let imgBase64 = "";
+        if (iconFile) {
+            const reader = new FileReader();
+            imgBase64 = await new Promise(r => { reader.onload=()=>r(reader.result); reader.readAsDataURL(iconFile); });
+        } else if (idx !== "") { imgBase64 = cloudData.apps[idx].img; }
+        const appData = { name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 };
+        if (idx === "") cloudData.apps.push(appData); else cloudData.apps[idx] = appData;
+        await sync(); clearAppForm(); load(); alert("تم الحفظ بنجاح ✨");
+    }
+
+    async function saveSettings() {
+        cloudData.logo = document.getElementById('currentLogoPreview').src;
+        cloudData.logoSize = document.getElementById('logoSize').value;
+        cloudData.globalLink = document.getElementById('globalLink').value; // حفظ الرابط الموحد
+        await sync();
+        alert("تم حفظ الإعدادات بنجاح! 🚀");
     }
 
     function editApp(i) {
@@ -231,48 +297,10 @@
         document.getElementById('cancelAppBtn').style.display = "none";
     }
 
-    async function saveApp() {
-        const idx = document.getElementById('editAppIndex').value;
-        const iconFile = document.getElementById('appIcon').files[0];
-        let imgBase64 = "";
-        if (iconFile) {
-            const reader = new FileReader();
-            imgBase64 = await new Promise(r => { reader.onload=()=>r(reader.result); reader.readAsDataURL(iconFile); });
-        } else if (idx !== "") { imgBase64 = cloudData.apps[idx].img; }
-        const appData = { name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 };
-        if (idx === "") cloudData.apps.push(appData); else cloudData.apps[idx] = appData;
-        await sync(); clearAppForm(); load(); alert("تم الحفظ بنجاح ✨");
-    }
-
-    function editClient(i) {
-        const c = cloudData.clients[i];
-        document.getElementById('editClientIndex').value = i;
-        document.getElementById('cn').value = c.name;
-        document.getElementById('cn').disabled = true; 
-        ['cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
-        document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
-        document.getElementById('cancelBtn').style.display = "block";
-        window.scrollTo(0,0);
-    }
-
-    function clearClientForm() {
-        ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value="");
-        document.getElementById('cn').disabled = false;
-        document.getElementById('clientTitle').innerText = "إضافة مشترك جديد";
-        document.getElementById('cancelBtn').style.display = "none";
-    }
-
     function copyL(name) {
         const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
         navigator.clipboard.writeText(clientUrl);
         alert("تم نسخ رابط المشترك الثابت ✅");
-    }
-
-    async function saveClient() {
-        const idx = document.getElementById('editClientIndex').value;
-        const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') };
-        if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
-        await sync(); clearClientForm(); load();
     }
 
     async function saveOrder() {
@@ -301,7 +329,6 @@
     async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
     function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
     function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
-    async function saveSettings() { cloudData.logo = document.getElementById('currentLogoPreview').src; cloudData.logoSize = document.getElementById('logoSize').value; await sync(); alert("تم الحفظ!"); }
 </script>
 </body>
 </html>
