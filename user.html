@@ -313,6 +313,7 @@
         const MASTER_KEY = "Aztlg1512";
         let clientIdx = -1;
         let user = null;
+        let cloudData = null; // تعريف متغير البيانات العامة لمنع أي تعارض
 
         const d = new Date();
         document.getElementById('dayNum').innerText = d.getDate();
@@ -324,11 +325,11 @@
             if(!target) return;
             try {
                 const res = await fetch(DB_URL + ".json");
-                const data = await res.json();
-                if(data.logo) document.getElementById('userLogo').src = data.logo;
-                clientIdx = (data.clients || []).findIndex(u => u.name === target);
+                cloudData = await res.json(); // تخزين البيانات هنا لتشمل الرابط الموحد للكل
+                if(cloudData.logo) document.getElementById('userLogo').src = cloudData.logo;
+                clientIdx = (cloudData.clients || []).findIndex(u => u.name === target);
                 if(clientIdx !== -1) {
-                    user = data.clients[clientIdx];
+                    user = cloudData.clients[clientIdx];
                     document.getElementById('userName').innerText = user.name;
                     if(!user.private_pin) {
                         document.getElementById('lockTitle').innerText = "إنشاء رمز خاص";
@@ -355,82 +356,21 @@
         }
 
         function bootApp() {
-    document.getElementById('lockScreen').style.display = 'none';
-    document.getElementById('mainCard').style.display = 'block';
-    
-    // التعديل: تحويل الرابط إلى نص ذكي قابل للنقر بدلاً من النص الطويل
-    const displayLink = (user.cl && user.cl !== '--') ? `<a href="${user.cl}" target="_blank" style="color: var(--main); text-decoration: underline;">اضغط هنا لفتح الرابط</a>` : '--';
+            document.getElementById('lockScreen').style.display = 'none';
+            document.getElementById('mainCard').style.display = 'block';
+            
+            // قراءة رابط المشترك أولاً، وإذا لم يوجد يقرأ الرابط الموحد للكل من السحابة تلقائياً
+            const rawLink = (user.cl && user.cl !== '--' && user.cl.trim() !== '') ? user.cl : (cloudData && cloudData.globalLink ? cloudData.globalLink : '');
+            const displayLink = rawLink ? `<a href="${rawLink}" target="_blank" style="color: var(--main); text-decoration: underline;">اضغط هنا لفتح الرابط</a>` : '--';
 
-    function bootApp() {
-    document.getElementById('lockScreen').style.display = 'none';
-    document.getElementById('mainCard').style.display = 'block';
-    
-    // تعديل ذكي: قراءة رابط المشترك أولاً، وإذا لم يوجد يقرأ الرابط العام من السحابة (cloudData.globalLink)
-    const rawLink = (user.cl && user.cl !== '--' && user.cl.trim() !== '') ? user.cl : (cloudData && cloudData.globalLink ? cloudData.globalLink : '');
-    const displayLink = rawLink ? `<a href="${rawLink}" target="_blank" style="color: var(--main); text-decoration: underline;">اضغط هنا لفتح الرابط</a>` : '--';
-
-    function bootApp() {
-    document.getElementById('lockScreen').style.display = 'none';
-    document.getElementById('mainCard').style.display = 'block';
-    
-    // تعديل ذكي: قراءة رابط المشترك أولاً، وإذا لم يوجد يقرأ الرابط العام من السحابة (cloudData.globalLink)
-    const rawLink = (user.cl && user.cl !== '--' && user.cl.trim() !== '') ? user.cl : (cloudData && cloudData.globalLink ? cloudData.globalLink : '');
-    const displayLink = rawLink ? `<a href="${rawLink}" target="_blank" style="color: var(--main); text-decoration: underline;">اضغط هنا لفتح الرابط</a>` : '--';
-
-    const fields = [
-        ['الجوال', user.cp || '--'],
-        ['اسم المستخدم', user.cu || '--'],
-        ['الرقم السري', user.ck || '--'],
-        ['رابط الدخول', displayLink], // الآن يعرض الرابط الفعال الموحد بشكل نظيف للكل
-        ['تاريخ البداية', user.cs || '--'],
-        ['تاريخ النهاية', user.ce || '--']
-    ];
-
-    document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
-        <div class="data-row">
-            <div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div>
-            <i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i>
-        </div>
-    `).join('');
-
-    const updateUI = () => {
-        const now = new Date().getTime(), end = new Date(user.ce).getTime();
-        const left = end - now, days = Math.max(0, Math.ceil(left / 86400000));
-        document.getElementById('daysCount').innerText = days;
-        document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%";
-        if(left > 0) {
-            const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
-            const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
-            document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
-        } else {
-            document.getElementById('timerGrid').innerHTML = "<b style='color:red;width:100%'>انتهى الاشتراك</b>";
-        }
-    };
-    updateUI(); setInterval(updateUI, 1000);
-}
-
-    document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
-        <div class="data-row">
-            <div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div>
-            <i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i>
-        </div>
-    `).join('');
-
-    const updateUI = () => {
-        const now = new Date().getTime(), end = new Date(user.ce).getTime();
-        const left = end - now, days = Math.max(0, Math.ceil(left / 86400000));
-        document.getElementById('daysCount').innerText = days;
-        document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%";
-        if(left > 0) {
-            const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
-            const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
-            document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
-        } else {
-            document.getElementById('timerGrid').innerHTML = "<b style='color:red;width:100%'>انتهى الاشتراك</b>";
-        }
-    };
-    updateUI(); setInterval(updateUI, 1000);
-}
+            const fields = [
+                ['الجوال', user.cp || '--'],
+                ['اسم المستخدم', user.cu || '--'],
+                ['الرقم السري', user.ck || '--'],
+                ['رابط الدخول', displayLink], 
+                ['تاريخ البداية', user.cs || '--'],
+                ['تاريخ النهاية', user.ce || '--']
+            ];
 
             document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
                 <div class="data-row">
@@ -471,7 +411,10 @@
         }
 
         function copyText(id) {
-            navigator.clipboard.writeText(document.getElementById(id).innerText);
+            // كود ذكي يضمن نسخ الرابط الحقيقي المخفي عند النقر على أيقونة النسخ
+            const linkEl = document.getElementById(id).querySelector('a');
+            const txt = linkEl ? linkEl.href : document.getElementById(id).innerText;
+            navigator.clipboard.writeText(txt);
             alert("تم النسخ!");
         }
 
