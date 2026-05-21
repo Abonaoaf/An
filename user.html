@@ -59,7 +59,6 @@
             text-align: center;
             font-size: 1.2rem;
             box-sizing: border-box;
-            letter-spacing: 4px;
         }
 
         .lock-card button {
@@ -210,8 +209,8 @@
     <div class="lock-card">
         <i class="fas fa-lock" style="font-size: 3rem; color: var(--main);"></i>
         <h3 style="margin: 15px 0 5px 0; color:#2d3748;">رمز التحقق الخاص</h3>
-        <p style="margin:0; font-size:0.85rem; color:#718096;">يرجى تعيين أو إدخال رمز الدخول السري</p>
-        <input type="password" id="pinInput" maxlength="6" placeholder="------" pattern="\d*"/>
+        <p style="margin:0; font-size:0.85rem; color:#718096;">يرجى تعيين أو إدخال رمز الدخول السري (4 أرقام)</p>
+        <input type="tel" id="pinInput" placeholder="أدخل 4 أرقام هنا">
         <button onclick="verifyPin()">تأكيد الدخول</button>
         <p id="lockMsg" style="color:var(--danger); font-size:0.85rem; margin-top:10px; display:none;"></p>
     </div>
@@ -252,6 +251,9 @@
 
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    // رابط السيرفر الأساسي بدون كود الـ .json لاستخدامه في الطلبات الفردية بدقة
+    const BASE_FIREBASE_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
+    
     let cloudData = null;
     let clientIdx = -1;
     let user = null;
@@ -279,7 +281,6 @@
                 img.style.display = "inline-block";
             }
 
-            // التحقق والفتح المباشر إذا كان الرمز مسجلاً مسبقاً بجهاز العميل
             if(!user.private_pin) {
                 document.getElementById('lockScreen').style.display = "flex";
             } else {
@@ -297,24 +298,24 @@
         const pin = document.getElementById('pinInput').value.trim();
         const err = document.getElementById('lockMsg');
         
-        // تعديل الشرط ليقبل من 4 خانات فما فوق
+        // التحقق من أن الرمز لا يقل عن 4 أرقام
         if(pin.length < 4) { 
             err.innerText = "الرمز يجب ألا يقل عن 4 أرقام"; 
-            err.style.display="block"; 
+            err.style.display = "block"; 
             return; 
         }
 
         if(!user.private_pin) {
             user.private_pin = pin;
             try {
-                // إصلاح كود الـ Firebase ليعمل الـ PATCH بشكل دقيق
-                await fetch(`https://aziztest-a0f6c-default-rtdb.firebaseio.com/clients/${clientIdx}.json`, {
+                // إصلاح المسار البرمجي لـ Firebase لتجنب تكرار وتضارب الامتدادات
+                await fetch(`${BASE_FIREBASE_URL}clients/${clientIdx}.json`, {
                     method: 'PATCH',
                     body: JSON.stringify({ private_pin: pin })
                 });
                 localStorage.setItem(`vulture_pin_${user.name}`, pin);
                 showDashboard();
-            } catch(errEv) {
+            } catch(e) {
                 alert("خطأ أثناء مزامنة الرمز مع السحابة، حاول مجدداً.");
             }
         } else {
@@ -323,7 +324,7 @@
                 showDashboard();
             } else {
                 err.innerText = "رمز التحقق غير صحيح! راجع الإدارة";
-                err.style.display="block";
+                err.style.display = "block";
             }
         }
     }
@@ -338,7 +339,7 @@
         document.getElementById('infoEnd').innerText = user.ce || '---';
         document.getElementById('storeBtn').href = `store.html?name=${encodeURIComponent(user.name)}`;
 
-        // قراءة الرابط الخاص أو التوجه تلقائياً للرابط العام الموحد إذا كان العميل جديد وحقله فارغ
+        // الفحص التلقائي للروابط لعرض الرابط الموحد عند غياب الرابط الخاص للعملاء الجدد
         const activeLink = (user.cl && user.cl.trim() !== "") ? user.cl : (cloudData.globalLink || "");
         const linkContainer = document.getElementById('activeLinkContainer');
         
@@ -366,19 +367,4 @@
             if(left > 0) {
                 const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
                 const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
-                document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
-            } else {
-                document.getElementById('timerGrid').innerHTML = "<p style='color:var(--danger); grid-column:span 5; font-weight:bold; margin:5px 0 0 0;'>انتهت مدة الاشتراك!</p>";
-            }
-        };
-        updateUI(); setInterval(updateUI, 1000);
-    }
-
-    async function triggerReset() {
-        if(confirm("هل تريد إعادة تعيين الرمز لهذا الجهاز؟")) {
-            try {
-                await fetch(`https://aziztest-a0f6c-default-rtdb.firebaseio.com/clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
-                localStorage.removeItem(`vulture_pin_${user.name}`);
-                window.location.reload();
-            } catch(e) {
-                alert("فشل الاتصال ل
+                document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().
