@@ -83,7 +83,7 @@
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>
             <button class="tab-btn" onclick="switchTab('store', this)">المتجر</button>
-            <button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات العامة ⚙️</button>
+            <button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات</button>
         </div>
     </div>
 
@@ -96,7 +96,7 @@
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
-                <input type="text" id="cl" placeholder="رابط خاص بالعميل فقط (اتركه فارغاً ليعتمد الرابط العام للكل)">
+                <input type="text" id="cl" placeholder="رابط خاص بالعميل فقط (اتركه فارغاً ليعتمد الرابط العام الموحد)">
                 <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
                 <button class="btn btn-main" id="saveClientBtn" onclick="saveClient()">حفظ في السحابة ☁️</button>
                 <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
@@ -124,8 +124,8 @@
             <div class="modal" style="text-align:center;">
                 <h3>الإعدادات العامة ⚙️</h3>
                 <div style="text-align:right; margin-bottom:15px;">
-                    <label><b>الرابط الموحد لجميع المشتركين (للكل):</b></label>
-                    <input type="text" id="globalLink" placeholder="أدخل الرابط العام لجميع المشتركين">
+                    <label><b>الرابط الموحد للمشتركين (للكل):</b></label>
+                    <input type="text" id="globalLink" placeholder="أدخل الرابط الذي سيظهر لجميع المشتركين">
                 </div>
                 <hr>
                 <h3>تنسيق شعار فولتشر 🦅</h3>
@@ -145,6 +145,7 @@
 
     async function checkPass() {
         if(document.getElementById('passInput').value === MASTER_PASS) {
+            // الإخفاء الفوري لمنع توقف الشاشة
             document.getElementById('loginOverlay').style.display = "none";
             document.getElementById('adminApp').style.display = "block";
             await load();
@@ -161,19 +162,21 @@
                 if(!cloudData.apps) cloudData.apps = [];
                 if(!cloudData.globalLink) cloudData.globalLink = "";
                 
-                if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;
+                if(cloudData.logo && document.getElementById('currentLogoPreview')) {
+                    document.getElementById('currentLogoPreview').src = cloudData.logo;
+                }
                 if(document.getElementById('globalLink')) document.getElementById('globalLink').value = cloudData.globalLink;
                 if(document.getElementById('logoSize')) document.getElementById('logoSize').value = cloudData.logoSize || 70;
                 updateLogoPreview(cloudData.logoSize || 70);
                 
-                renderClients();
+                renderClients(); 
                 renderApps();
             }
         } catch(e) {
-            console.log("خطأ أثناء التحميل، سيتم استخدام المصفوفات الافتراضية.");
+            console.log("خطأ في الاتصال، تم تفعيل مصفوفات الطوارئ الأمنية.");
             cloudData.clients = cloudData.clients || [];
             cloudData.apps = cloudData.apps || [];
-            renderClients();
+            renderClients(); 
             renderApps();
         }
     }
@@ -190,7 +193,7 @@
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
-                    <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط الثابت</button>
+                    <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
                     <button class="btn btn-view" onclick="openView(${i}, 'client')">بيانات</button>
                     <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
                     ${showWA ? `<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 2; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه واتساب</button>` : ''}
@@ -207,7 +210,7 @@
             return `
             <div class="app-card" data-id="${i}">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
-                <img src="${a.img || ''}" onerror="this.src='https://placehold.co/65'">
+                <img src="${a.img || 'https://placehold.co/65'}" onerror="this.src='https://placehold.co/65'">
                 <b>${a.name || ''}</b>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
                     <button class="btn btn-edit" onclick="editApp(${i})">تعديل</button>
@@ -228,8 +231,8 @@
             const c = cloudData.clients[i];
             document.getElementById('v_title').innerText = "بيانات المشترك";
             
-            // هنا الفحص الذكي: إذا كان العميل الجديد لا يملك رابط خاص (cl فارغ)، يظهر له الرابط العام للكل تلقائياً
-            const linkToShow = (c.cl && c.cl.trim() !== "") ? c.cl : (cloudData.globalLink || '---');
+            // الفحص الذكي للرابط: إذا كان الرابط الخاص cl فارغاً، يستبدل تلقائياً بالرابط الموحد العام للكل
+            const activeLink = (c.cl && c.cl.trim() !== "") ? c.cl : (cloudData.globalLink || '---');
             const linkType = (c.cl && c.cl.trim() !== "") ? 'رابط خاص بالعميل 👤' : 'الرابط الموحد للكل 👥';
 
             const fields = [
@@ -237,8 +240,8 @@
                 ['رقم الجوال', c.cp],
                 ['اسم المستخدم', c.cu],
                 ['كلمة السر', c.ck],
-                ['الرابط الفعال', linkToShow], 
-                ['نوع الرابط', linkType],
+                ['الرابط الفعال', activeLink], 
+                ['نوع الرابط المعتمد', linkType],
                 ['بداية الاشتراك', c.cs],
                 ['نهاية الاشتراك', c.ce]
             ];
@@ -247,7 +250,7 @@
             const a = cloudData.apps[i];
             document.getElementById('v_title').innerText = "معاينة التطبيق";
             const fields = [['اسم التطبيق', a.name],['كود دونلودر', a.ad],['رابط التحميل', a.al],['الوصف', a.at]];
-            vContent.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><img src="${a.img || ''}" style="width:80px; height:80px; border-radius:15px; object-fit:cover; border:1px solid #eee;"></div>` + 
+            vContent.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><img src="${a.img || 'https://placehold.co/65'}" style="width:80px; height:80px; border-radius:15px; object-fit:cover; border:1px solid #eee;"></div>` + 
                                fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
         }
         document.getElementById('viewModal').style.display = 'flex';
@@ -258,14 +261,18 @@
         document.getElementById('editClientIndex').value = i;
         document.getElementById('cn').value = c.name || "";
         document.getElementById('cn').disabled = true; 
-        ['cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        ['cp','cu','ck','cl','cs','ce'].forEach(id => {
+            if(document.getElementById(id)) document.getElementById(id).value = c[id] || "";
+        });
         document.getElementById('clientTitle').innerText = "تعديل: " + (c.name || "");
         document.getElementById('cancelBtn').style.display = "block";
         window.scrollTo(0,0);
     }
 
     function clearClientForm() {
-        ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value="");
+        ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id => {
+            if(document.getElementById(id)) document.getElementById(id).value = "";
+        });
         document.getElementById('cn').disabled = false;
         document.getElementById('clientTitle').innerText = "إضافة مشترك جديد";
         document.getElementById('cancelBtn').style.display = "none";
@@ -278,14 +285,14 @@
             cp: v('cp'), 
             cu: v('cu'), 
             ck: v('ck'), 
-            cl: v('cl'), // يتم حفظ الرابط الخاص هنا (قد يكون فارغاً للعميل الجديد)
+            cl: v('cl'), // حفظ الرابط الخاص إذا تم تعبئته
             cs: v('cs'), 
             ce: v('ce') 
         };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
         await sync(); 
         clearClientForm(); 
-        await load(); 
+        await load();
     }
 
     async function saveApp() {
@@ -298,7 +305,19 @@
         } else if (idx !== "" && cloudData.apps[idx]) { imgBase64 = cloudData.apps[idx].img || ""; }
         const appData = { name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 };
         if (idx === "") cloudData.apps.push(appData); else cloudData.apps[idx] = appData;
-        await sync(); clearAppForm(); await load(); alert("تم حفظ التطبيق في المتجر ✨");
+        await sync(); 
+        clearAppForm(); 
+        await load(); 
+        alert("تم الحفظ بنجاح ✨");
+    }
+
+    async function saveSettings() {
+        cloudData.logo = document.getElementById('currentLogoPreview').src;
+        cloudData.logoSize = document.getElementById('logoSize').value;
+        cloudData.globalLink = document.getElementById('globalLink').value; 
+        await sync();
+        alert("تم حفظ الإعدادات بنجاح! 🚀");
+        await load();
     }
 
     function editApp(i) {
@@ -315,31 +334,24 @@
     }
 
     function clearAppForm() {
-        ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = "");
+        ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => {
+            if(document.getElementById(id)) document.getElementById(id).value = "";
+        });
         document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
         document.getElementById('saveAppBtn').innerText = "حفظ في المتجر ✨";
         document.getElementById('cancelAppBtn').style.display = "none";
     }
 
-    async function saveOrder() {
-        const items = document.querySelectorAll('#appList .app-card');
-        let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
-        cloudData.apps = newArr; await sync(); alert("تم حفظ ترتيب المتجر الجديد!"); await load();
-    }
-
-    async function saveSettings() {
-        cloudData.logo = document.getElementById('currentLogoPreview').src;
-        cloudData.logoSize = document.getElementById('logoSize').value;
-        cloudData.globalLink = document.getElementById('globalLink').value;
-        await sync();
-        alert("تم حفظ الإعدادات بنجاح! 🚀");
-        await load();
-    }
-
     function copyL(name) {
         const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
         navigator.clipboard.writeText(clientUrl);
-        alert("تم نسخ رابط المشترك الثابت بنجاح ✅");
+        alert("تم نسخ رابط المشترك الثابت ✅");
+    }
+
+    async function saveOrder() {
+        const items = document.querySelectorAll('#appList .app-card');
+        let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
+        cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); await load();
     }
 
     function sendReminder(name, phone, days) {
@@ -358,8 +370,8 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active'); btn.classList.add('active');
     }
-    async function delClient(i) { if(confirm("هل أنت متأكد من حذف هذا المشترك؟")) { cloudData.clients.splice(i,1); await sync(); await load(); } }
-    async function delApp(i) { if(confirm("هل أنت متأكد من حذف هذا التطبيق؟")) { cloudData.apps.splice(i,1); await sync(); await load(); } }
+    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); await load(); } }
+    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); await load(); } }
     function updateLogoPreview(val) { if(document.getElementById('sizeVal')) document.getElementById('sizeVal').innerText = val; if(document.getElementById('currentLogoPreview')) document.getElementById('currentLogoPreview').style.width = val + "px"; }
     function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
 </script>
