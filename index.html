@@ -81,7 +81,7 @@
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
-                <input type="text" id="cl" placeholder="رابط الدخول الخاص (اتركه فارغاً للاعتماد على الرابط الموحد)">
+                <input type="text" id="cl" placeholder="رابط مخصص (اتركه فارغاً للاعتماد على الرابط الموحد)">
                 <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
                 <button class="btn btn-main" id="saveClientBtn" onclick="saveClient()">حفظ في السحابة ☁️</button>
                 <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
@@ -180,9 +180,10 @@
         const vContent = document.getElementById('v_content');
         if(type === 'client') {
             const c = cloudData.clients[i];
-            const activeLink = c.cl || cloudData.globalLink || '---';
+            // إصلاح هنا: يعرض الرابط الموحد المحدث بالسحابة إذا كان حقل رابط العميل المخصص فارغاً
+            const activeLink = (c.cl && c.cl.trim() !== "") ? c.cl : (cloudData.globalLink || '---');
             document.getElementById('v_title').innerText = "بيانات المشترك";
-            const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['كلمة السر', c.ck],['الرابط', activeLink],['بداية الاشتراك', c.cs],['نهاية الاشتراك', c.ce]];
+            const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['كلمة السر', c.ck],['الرابط المعتمد', activeLink],['بداية الاشتراك', c.cs],['نهاية الاشتراك', c.ce]];
             vContent.innerHTML = fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
         } else {
             const a = cloudData.apps[i];
@@ -248,7 +249,7 @@
         const idx = document.getElementById('editClientIndex').value;
         const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
-        await sync(); clearClientForm(); load();
+        await sync(); clearClientForm(); load(); alert("تم حفظ العميل بالسحابة ✅");
     }
     async function saveOrder() {
         const items = document.querySelectorAll('#appList .app-card');
@@ -277,9 +278,10 @@
     async function saveSettings() { 
         cloudData.logo = document.getElementById('currentLogoPreview').src;
         cloudData.logoSize = document.getElementById('logoSize').value; 
-        cloudData.globalLink = document.getElementById('globalLink').value; // حفظ الرابط الجديد للسحابة
+        cloudData.globalLink = document.getElementById('globalLink').value; 
         await sync(); 
-        alert("تم الحفظ!"); 
+        alert("تم حفظ الرابط الموحد والإعدادات بنجاح! 🚀");
+        await load();
     }
 </script>
 </body>
