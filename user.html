@@ -6,7 +6,7 @@
     <title>بطاقة اشتراك فولتشر 🦅</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { var(--main): #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; --soft-red: #f87171; }
+        :root { --main: #4a4ae2; --success: #28a745; --danger: #dc3545; --bg: #f0f2f5; --wa: #075E54; --soft-red: #f87171; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         #lockScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .lock-card { background: white; padding: 35px 20px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-top: 8px solid var(--main); }
@@ -45,7 +45,6 @@
     </style>
 </head>
 <body>
-
     <div id="lockScreen">
         <div class="lock-card">
             <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: #4a4ae2;"></i>
@@ -56,7 +55,6 @@
             <div id="errorMsg" style="color:var(--danger); margin-top:10px; font-weight:bold; display:none;"></div>
         </div>
     </div>
-
     <div id="mainCard" class="card">
         <div class="top-info">
             <div class="date-box">
@@ -66,21 +64,17 @@
             </div>
             <img id="userLogo" src="" class="main-logo">
         </div>
-
         <div class="welcome-msg">
             <div style="font-size: 1.1rem;">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" style="font-weight:bold;"></span></div>
             <div style="margin: 10px 0;">سعدنا بانضمامك معنا في</div>
             <div class="v-family">أسرة فولتشر 🦅</div>
         </div>
-
         <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
         <div class="prog-static"><div id="barConsumed" class="fill-red"></div></div>
-
         <div class="data-section">
             <div id="dataFields"></div>
             <div class="timer-grid" id="timerGrid"></div>
         </div>
-
         <div class="action-btns">
             <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
             <a href="https://whatsapp.com/channel/0029VaFYcHcAO7RGw0O0QM1E" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة فولتشر بالواتساب</a>
@@ -88,14 +82,12 @@
             <button onclick="triggerReset()" class="btn btn-reset"><i class="fas fa-key"></i> إعادة تعيين الرمز الخاص</button>
         </div>
     </div>
-
     <div class="footer-rights">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
-
     <script>
         const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
         const MASTER_KEY = "Aztlg1512";
         let clientIdx = -1, user = null, target = new URLSearchParams(window.location.search).get('name');
-        let globalLink = "---"; // متغير لحفظ الرابط الموحد
+        let globalLink = "---";
 
         const d = new Date();
         document.getElementById('dayNum').innerText = d.getDate();
@@ -108,7 +100,7 @@
                 const res = await fetch(`${DB_URL}.json?t=${Date.now()}`);
                 const data = await res.json();
                 if(data.logo) document.getElementById('userLogo').src = data.logo;
-                if(data.globalLink) globalLink = data.globalLink; // جلب الرابط الموحد من قاعدة البيانات
+                if(data.globalLink) globalLink = data.globalLink;
                 
                 clientIdx = (data.clients || []).findIndex(u => u.name === target);
                 if(clientIdx !== -1) {
@@ -143,7 +135,6 @@
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainCard').style.display = 'block';
             
-            // هنا الذكاء: إذا كان للعميل رابط مخصص سيعرضه، وإذا كان فارغاً سيعرض الرابط الموحد
             const finalLink = user.cl && user.cl.trim() !== "" ? user.cl : globalLink;
 
             const fields = [
