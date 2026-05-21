@@ -10,7 +10,6 @@
     <style>
         :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; --soft-red: #f87171; --wa: #25D366; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
-        
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
         #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
@@ -33,13 +32,10 @@
         .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); } .btn-wa { background: var(--wa); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block; color: white; border: none; }
-        /* نافذة المعاينة الموحدة - تم تعديل التوزيع هنا */
         #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; position: relative; }
         .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
         .view-body { padding: 15px 20px; background: white; }
-        
-        /* هذا الجزء يعيد النص والبيانات ليكونوا متقابلين (واحد يمين وواحد يسار) */
         .view-row { border-bottom: 1px solid #f0f0f0; padding: 12px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .v-label { font-size: 0.8rem; color: var(--soft-red); font-weight: bold; white-space: nowrap; }
         .v-text { font-size: 0.9rem; color: #333; font-weight: bold; text-align: left; word-break: break-all; }
@@ -85,7 +81,7 @@
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
-                <input type="text" id="cl" placeholder="رابط الدخول">
+                <input type="text" id="cl" placeholder="رابط مخصص (اتركه فارغاً للاعتماد على الرابط الموحد)">
                 <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
                 <button class="btn btn-main" id="saveClientBtn" onclick="saveClient()">حفظ في السحابة ☁️</button>
                 <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
@@ -109,6 +105,12 @@
         </div>
         <div id="settings" class="section">
             <div class="modal" style="text-align:center;">
+                <h3>إعدادات المنصة الموحدة ⚙️</h3>
+                <div style="text-align: right; margin-bottom: 15px;">
+                    <label><b>رابط التشغيل الموحد لكل المشتركين:</b></label>
+                    <input type="text" id="globalLink" placeholder="ضع هنا الرابط العام الذي سينعكس للجميع">
+                </div>
+                <hr style="border: 0; border-top: 1px dashed #ddd; margin: 20px 0;">
                 <h3>تنسيق شعار فولتشر 🦅</h3>
                 <input type="file" id="logoFile" accept="image/*" onchange="previewNewLogo(this)">
                 <div style="margin:20px 0;"><label>الحجم: <b id="sizeVal">70</b>px</label><input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)"></div>
@@ -119,9 +121,12 @@
     </div>
 </div>
 <script>
-    const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    const BASE_DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
+    const DB = BASE_DB + ".json";
     const MASTER_PASS = "Aztlg1512";
     let cloudData = { clients: [], apps: [], logo: "", logoSize: "70" };
+    let globalLinkStr = "";
+
     async function checkPass() {
         if(document.getElementById('passInput').value === MASTER_PASS) {
             document.getElementById('loginOverlay').style.display = "none";
@@ -132,6 +137,13 @@
     async function load() {
         const r = await fetch(DB);
         const d = await r.json();
+        
+        try {
+            const rLink = await fetch(BASE_DB + "globalLink.json");
+            globalLinkStr = await rLink.json() || "";
+            document.getElementById('globalLink').value = globalLinkStr;
+        } catch(e) { console.log(e); }
+
         if (d) {
             cloudData = d;
             if(!cloudData.clients) cloudData.clients = [];
@@ -177,8 +189,9 @@
         const vContent = document.getElementById('v_content');
         if(type === 'client') {
             const c = cloudData.clients[i];
+            const activeLink = (c.cl && c.cl.trim() !== "") ? c.cl : (globalLinkStr || '---');
             document.getElementById('v_title').innerText = "بيانات المشترك";
-            const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['كلمة السر', c.ck],['الرابط', c.cl],['بداية الاشتراك', c.cs],['نهاية الاشتراك', c.ce]];
+            const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['كلمة السر', c.ck],['الرابط المعتمد', activeLink],['بداية الاشتراك', c.cs],['نهاية الاشتراك', c.ce]];
             vContent.innerHTML = fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
         } else {
             const a = cloudData.apps[i];
@@ -244,7 +257,7 @@
         const idx = document.getElementById('editClientIndex').value;
         const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
-        await sync(); clearClientForm(); load();
+        await sync(); clearClientForm(); load(); alert("تم حفظ العميل بالسحابة ✅");
     }
     async function saveOrder() {
         const items = document.querySelectorAll('#appList .app-card');
@@ -270,7 +283,18 @@
     async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
     function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
     function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
-    async function saveSettings() { cloudData.logo = document.getElementById('currentLogoPreview').src; cloudData.logoSize = document.getElementById('logoSize').value; await sync(); alert("تم الحفظ!"); }
+    
+    async function saveSettings() { 
+        cloudData.logo = document.getElementById('currentLogoPreview').src;
+        cloudData.logoSize = document.getElementById('logoSize').value; 
+        
+        const newGlobalLink = document.getElementById('globalLink').value;
+        await fetch(BASE_DB + "globalLink.json", { method: 'PUT', body: JSON.stringify(newGlobalLink) });
+        
+        await sync(); 
+        alert("تم حفظ الرابط الموحد والإعدادات بنجاح! 🚀");
+        await load();
+    }
 </script>
 </body>
 </html>
