@@ -59,6 +59,7 @@
             text-align: center;
             font-size: 1.2rem;
             box-sizing: border-box;
+            letter-spacing: 4px;
         }
 
         .lock-card button {
@@ -209,8 +210,8 @@
     <div class="lock-card">
         <i class="fas fa-lock" style="font-size: 3rem; color: var(--main);"></i>
         <h3 style="margin: 15px 0 5px 0; color:#2d3748;">رمز التحقق الخاص</h3>
-        <p style="margin:0; font-size:0.85rem; color:#718096;">يرجى تعيين أو إدخال رمز الدخول السري (4 أرقام)</p>
-        <input type="tel" id="pinInput" placeholder="أدخل 4 أرقام هنا">
+        <p style="margin:0; font-size:0.85rem; color:#718096;">يرجى تعيين أو إدخال رمز الدخول السري</p>
+        <input type="password" id="pinInput" maxlength="6" placeholder="------" pattern="\d*"/>
         <button onclick="verifyPin()">تأكيد الدخول</button>
         <p id="lockMsg" style="color:var(--danger); font-size:0.85rem; margin-top:10px; display:none;"></p>
     </div>
@@ -240,7 +241,7 @@
         <div class="info-row"><span class="info-label">تاريخ نهاية الاشتراك:</span><span class="info-value" id="infoEnd">---</span></div>
     </div>
 
-    <div id="activeLinkContainer"></div>
+    <div id="activeLinksContainer"></div>
 
     <a id="storeBtn" href="#" class="btn-store">
         <i class="fas fa-store"></i> متجر التطبيقات فولتشر
@@ -251,9 +252,6 @@
 
 <script>
     const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
-    // رابط السيرفر الأساسي بدون كود الـ .json لاستخدامه في الطلبات الفردية بدقة
-    const BASE_FIREBASE_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
-    
     let cloudData = null;
     let clientIdx = -1;
     let user = null;
@@ -295,36 +293,21 @@
     }
 
     async function verifyPin() {
-        const pin = document.getElementById('pinInput').value.trim();
+        const pin = document.getElementById('pinInput').value;
         const err = document.getElementById('lockMsg');
-        
-        // التحقق من أن الرمز لا يقل عن 4 أرقام
-        if(pin.length < 4) { 
-            err.innerText = "الرمز يجب ألا يقل عن 4 أرقام"; 
-            err.style.display = "block"; 
-            return; 
-        }
+        if(pin.length < 4) { err.innerText = "الرمز يجب ألا يقل عن 4 أرقام"; err.style.display="block"; return; }
 
         if(!user.private_pin) {
             user.private_pin = pin;
-            try {
-                // إصلاح المسار البرمجي لـ Firebase لتجنب تكرار وتضارب الامتدادات
-                await fetch(`${BASE_FIREBASE_URL}clients/${clientIdx}.json`, {
-                    method: 'PATCH',
-                    body: JSON.stringify({ private_pin: pin })
-                });
-                localStorage.setItem(`vulture_pin_${user.name}`, pin);
-                showDashboard();
-            } catch(e) {
-                alert("خطأ أثناء مزامنة الرمز مع السحابة، حاول مجدداً.");
-            }
+            await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'PUT', body: JSON.stringify(pin) });
+            localStorage.setItem(`vulture_pin_${user.name}`, pin);
+            showDashboard();
         } else {
             if(pin === user.private_pin) {
                 localStorage.setItem(`vulture_pin_${user.name}`, pin);
                 showDashboard();
             } else {
-                err.innerText = "رمز التحقق غير صحيح! راجع الإدارة";
-                err.style.display = "block";
+                err.innerText = "رمز التحقق غير صحيح! راجع الإدارة"; err.style.display="block";
             }
         }
     }
@@ -339,32 +322,39 @@
         document.getElementById('infoEnd').innerText = user.ce || '---';
         document.getElementById('storeBtn').href = `store.html?name=${encodeURIComponent(user.name)}`;
 
-        // الفحص التلقائي للروابط لعرض الرابط الموحد عند غياب الرابط الخاص للعملاء الجدد
-        const activeLink = (user.cl && user.cl.trim() !== "") ? user.cl : (cloudData.globalLink || "");
-        const linkContainer = document.getElementById('activeLinkContainer');
-        
-        if(activeLink && activeLink.trim() !== "") {
-            linkContainer.innerHTML = `
-                <a href="${activeLink}" target="_blank" class="btn-download">
-                    <i class="fas fa-link"></i> الدخول إلى الرابط الفعال
-                </a>
-            `;
-        } else {
-            linkContainer.innerHTML = `
-                <div style="background:white; border-radius:16px; padding:15px; text-align:center; border:1px dashed #cbd5e1; color:#718096; font-size:0.9rem;">
-                    <i class="fas fa-exclamation-circle" style="margin-bottom:5px; font-size:1.2rem; color:var(--main);"></i><br>
-                    لا يوجد رابط نشط متاح لحسابك حالياً.
-                </div>
-            `;
-        }
+        // التعديل هنا فقط: إذا كان رابط المشترك فارغ، يسحب الرابط العام (cloudData.globalLink)
+        const myLink = (user.cl && user.cl.trim() !== "") ? user.cl : (cloudData.globalLink || "");
+
+        document.getElementById('activeLinksContainer').innerHTML = `
+            <a href="${myLink}" target="_blank" class="btn-download">
+                <i class="fas fa-link"></i> الدخول إلى الرابط الفعال
+            </a>
+        `;
 
         const updateUI = () => {
             const now = Date.now(), end = new Date(user.ce).getTime(), left = end - now;
             const days = Math.max(0, Math.ceil(left / 86400000));
             document.getElementById('daysCount').innerText = days;
             document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%";
-            
             if(left > 0) {
                 const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
                 const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
-                document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().
+                document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
+            }
+        };
+        updateUI(); setInterval(updateUI, 1000);
+    }
+
+    async function triggerReset() {
+        if(confirm("هل تريد إعادة تعيين الرمز؟")) {
+            await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
+            window.location.reload();
+        }
+    }
+
+    function msg(t) { const e = document.getElementById('lockScreen'); if(e) e.innerHTML = `<div class="lock-card" style="color:var(--danger); font-weight:bold;"><i class="fas fa-exclamation-triangle" style="font-size:2.5rem; margin-bottom:10px;"></i><br>${t}</div>`; }
+
+    init();
+</script>
+</body>
+</html>
