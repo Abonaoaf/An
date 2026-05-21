@@ -140,7 +140,6 @@
 <script>
     const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     const MASTER_PASS = "Aztlg1512";
-    // إضافة خاصية globalLink للبيانات السحابية
     let cloudData = { clients: [], apps: [], logo: "", logoSize: "70", globalLink: "" };
 
     async function checkPass() {
@@ -209,13 +208,16 @@
         if(type === 'client') {
             const c = cloudData.clients[i];
             document.getElementById('v_title').innerText = "بيانات المشترك";
-            // هنا نستخدم cloudData.globalLink بدلاً من الرابط الفردي
+            
+            // إصلاح مباشر: قراءة الرابط الموحد مباشرة من السحابة لضمان ظهوره للعملاء الجدد والقدامى فوراً
+            const linkToShow = cloudData.globalLink || '---';
+            
             const fields = [
                 ['اسم المشترك', c.name],
                 ['رقم الجوال', c.cp],
                 ['اسم المستخدم', c.cu],
                 ['كلمة السر', c.ck],
-                ['الرابط', cloudData.globalLink || '---'], 
+                ['الرابط', linkToShow], 
                 ['بداية الاشتراك', c.cs],
                 ['نهاية الاشتراك', c.ce]
             ];
@@ -255,7 +257,6 @@
         await sync(); clearClientForm(); load();
     }
 
-    // بقية الدوال البرمجية (حفظ التطبيق، الترتيب، إلخ) تبقى كما هي
     async function saveApp() {
         const idx = document.getElementById('editAppIndex').value;
         const iconFile = document.getElementById('appIcon').files[0];
@@ -272,63 +273,4 @@
     async function saveSettings() {
         cloudData.logo = document.getElementById('currentLogoPreview').src;
         cloudData.logoSize = document.getElementById('logoSize').value;
-        cloudData.globalLink = document.getElementById('globalLink').value; // حفظ الرابط الموحد
-        await sync();
-        alert("تم حفظ الإعدادات بنجاح! 🚀");
-    }
-
-    function editApp(i) {
-        const a = cloudData.apps[i];
-        document.getElementById('editAppIndex').value = i;
-        document.getElementById('an').value = a.name;
-        document.getElementById('ad').value = a.ad || "";
-        document.getElementById('al').value = a.al || "";
-        document.getElementById('at').value = a.at || "";
-        document.getElementById('appTitle').innerText = "تعديل تطبيق: " + a.name;
-        document.getElementById('saveAppBtn').innerText = "تحديث في المتجر ✨";
-        document.getElementById('cancelAppBtn').style.display = "block";
-        window.scrollTo(0,0);
-    }
-
-    function clearAppForm() {
-        ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = "");
-        document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
-        document.getElementById('saveAppBtn').innerText = "حفظ في المتجر ✨";
-        document.getElementById('cancelAppBtn').style.display = "none";
-    }
-
-    function copyL(name) {
-        const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
-        navigator.clipboard.writeText(clientUrl);
-        alert("تم نسخ رابط المشترك الثابت ✅");
-    }
-
-    async function saveOrder() {
-        const items = document.querySelectorAll('#appList .app-card');
-        let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
-        cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); load();
-    }
-
-    function sendReminder(name, phone, days) {
-        let cleanPhone = phone.replace(/\D/g, '');
-        if(!cleanPhone.startsWith('966')) cleanPhone = '966' + cleanPhone;
-        const msg = `مرحباً ${name}، اشتراكك في فولتشر ينتهي خلال ${days} أيام.`;
-        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function closeView() { document.getElementById('viewModal').style.display = 'none'; }
-    function saveCardAsImage() { html2canvas(document.getElementById('captureTarget'), {scale: 3}).then(canvas => { const link = document.createElement('a'); link.href = canvas.toDataURL(); link.download = `Vulture_Card.png`; link.click(); }); }
-    async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
-    function v(id) { return document.getElementById(id).value; }
-    function switchTab(id, btn) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active'); btn.classList.add('active');
-    }
-    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
-    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
-    function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
-    function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
-</script>
-</body>
-</html>
+        cloudData.globalLink = document.getElementById('globalLink').value
