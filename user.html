@@ -38,7 +38,7 @@
         .btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; border-radius: 12px; color: white; font-weight: bold; margin-bottom: 12px; text-decoration: none; text-align: center; font-size: 0.95rem; border: none; cursor: pointer; box-sizing: border-box; }
         .btn i { font-size: 1.2rem; min-width: 20px; }
         .btn-support { background: var(--success); }
-        .btn-wa-channel { background: #075E54; }
+        .btn-wa-channel { background: var(--wa); }
         .btn-store { background: #5e4cc1; }
         .btn-reset { background: #6c757d; font-size: 0.8rem; padding: 10px; }
         .footer-rights { margin-top: 10px; text-align: center; color: #d1d1d1; font-size: 0.75rem; padding-bottom: 20px; }
@@ -47,11 +47,11 @@
 <body>
     <div id="lockScreen">
         <div class="lock-card">
-            <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: #4a4ae2;"></i>
+            <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--main);"></i>
             <h2 id="lockTitle" style="margin-top:15px;">تحقق آمن</h2>
             <p id="lockDesc">يرجى إدخال الرمز الخاص بك</p>
             <input type="password" id="pinInput" class="pin-input" placeholder="****">
-            <button onclick="handleAuth()" class="btn" style="background: #4a4ae2;">دخول</button>
+            <button onclick="handleAuth()" class="btn" style="background: var(--main);">دخول</button>
             <div id="errorMsg" style="color:var(--danger); margin-top:10px; font-weight:bold; display:none;"></div>
         </div>
     </div>
@@ -135,7 +135,7 @@
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainCard').style.display = 'block';
             
-            const finalLink = user.cl && user.cl.trim() !== "" ? user.cl : globalLink;
+            const finalLink = (user.cl && user.cl.trim() !== "") ? user.cl : globalLink;
 
             const fields = [
                 ['الجوال', user.cp || '--'],
