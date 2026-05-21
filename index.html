@@ -145,6 +145,7 @@
 
     async function checkPass() {
         if(document.getElementById('passInput').value === MASTER_PASS) {
+            // الإخفاء الفوري لشاشة القفل لمنع التجمد نهائياً وعرض اللوحة فوراً
             document.getElementById('loginOverlay').style.display = "none";
             document.getElementById('adminApp').style.display = "block";
             await load();
@@ -170,7 +171,7 @@
                 renderApps();
             }
         } catch(e) {
-            console.log("خطأ أثناء التحميل، سيتم استخدام المصفوفات الافتراضية.");
+            console.log("خطأ في جلب البيانات، سيتم الاعتماد على المصفوفات الفارغة مؤقتاً لتجنب التعليق.");
             cloudData.clients = cloudData.clients || [];
             cloudData.apps = cloudData.apps || [];
             renderClients();
@@ -227,18 +228,14 @@
         if(type === 'client') {
             const c = cloudData.clients[i];
             document.getElementById('v_title').innerText = "بيانات المشترك";
-            
-            // هنا الفحص الذكي: إذا كان العميل الجديد لا يملك رابط خاص (cl فارغ)، يظهر له الرابط العام للكل تلقائياً
-            const linkToShow = (c.cl && c.cl.trim() !== "") ? c.cl : (cloudData.globalLink || '---');
-            const linkType = (c.cl && c.cl.trim() !== "") ? 'رابط خاص بالعميل 👤' : 'الرابط الموحد للكل 👥';
-
+            const linkToShow = c.cl || cloudData.globalLink || '---';
             const fields = [
                 ['اسم المشترك', c.name],
                 ['رقم الجوال', c.cp],
                 ['اسم المستخدم', c.cu],
                 ['كلمة السر', c.ck],
                 ['الرابط الفعال', linkToShow], 
-                ['نوع الرابط', linkType],
+                ['نوع الرابط', c.cl ? 'رابط خاص بالعميل 👤' : 'الرابط الموحد للكل 👥'],
                 ['بداية الاشتراك', c.cs],
                 ['نهاية الاشتراك', c.ce]
             ];
@@ -273,15 +270,7 @@
 
     async function saveClient() {
         const idx = document.getElementById('editClientIndex').value;
-        const c = { 
-            name: v('cn'), 
-            cp: v('cp'), 
-            cu: v('cu'), 
-            ck: v('ck'), 
-            cl: v('cl'), // يتم حفظ الرابط الخاص هنا (قد يكون فارغاً للعميل الجديد)
-            cs: v('cs'), 
-            ce: v('ce') 
-        };
+        const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
         await sync(); 
         clearClientForm(); 
@@ -350,4 +339,18 @@
     }
 
     function closeView() { document.getElementById('viewModal').style.display = 'none'; }
-    function saveCardAsImage() { html2canvas(document.getElementById('captureTarget'), {scale: 3}).then(canvas => {
+    function saveCardAsImage() { html2canvas(document.getElementById('captureTarget'), {scale: 3}).then(canvas => { const link = document.createElement('a'); link.href = canvas.toDataURL(); link.download = `Vulture_Card.png`; link.click(); }); }
+    async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
+    function v(id) { return document.getElementById(id) ? document.getElementById(id).value : ""; }
+    function switchTab(id, btn) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active'); btn.classList.add('active');
+    }
+    async function delClient(i) { if(confirm("هل أنت متأكد من حذف هذا المشترك؟")) { cloudData.clients.splice(i,1); await sync(); await load(); } }
+    async function delApp(i) { if(confirm("هل أنت متأكد من حذف هذا التطبيق؟")) { cloudData.apps.splice(i,1); await sync(); await load(); } }
+    function updateLogoPreview(val) { if(document.getElementById('sizeVal')) document.getElementById('sizeVal').innerText = val; if(document.getElementById('currentLogoPreview')) document.getElementById('currentLogoPreview').style.width = val + "px"; }
+    function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
+</script>
+</body>
+</html>
