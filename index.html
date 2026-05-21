@@ -209,7 +209,7 @@
             const c = cloudData.clients[i];
             document.getElementById('v_title').innerText = "بيانات المشترك";
             
-            // إصلاح مباشر: قراءة الرابط الموحد مباشرة من السحابة لضمان ظهوره للعملاء الجدد والقدامى فوراً
+            // قراءة الرابط الموحد مباشرة وثابتة لضمان الظهور الفوري للعميل الجديد والقديم
             const linkToShow = cloudData.globalLink || '---';
             
             const fields = [
@@ -254,7 +254,9 @@
         const idx = document.getElementById('editClientIndex').value;
         const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cs: v('cs'), ce: v('ce') };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
-        await sync(); clearClientForm(); load();
+        await sync(); 
+        clearClientForm(); 
+        await load(); // إعادة جلب البيانات فوراً لضمان تحديث الذاكرة المحلية بالروابط الموحدة للعميل الجديد
     }
 
     async function saveApp() {
@@ -267,10 +269,12 @@
         } else if (idx !== "") { imgBase64 = cloudData.apps[idx].img; }
         const appData = { name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 };
         if (idx === "") cloudData.apps.push(appData); else cloudData.apps[idx] = appData;
-        await sync(); clearAppForm(); load(); alert("تم الحفظ بنجاح ✨");
+        await sync(); clearAppForm(); await load(); alert("تم الحفظ بنجاح ✨");
     }
 
     async function saveSettings() {
         cloudData.logo = document.getElementById('currentLogoPreview').src;
         cloudData.logoSize = document.getElementById('logoSize').value;
-        cloudData.globalLink = document.getElementById('globalLink').value
+        cloudData.globalLink = document.getElementById('globalLink').value;
+        await sync();
+        alert("تم حفظ الإعدادات
