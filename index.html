@@ -76,8 +76,7 @@
         <div id="clients" class="section active">
             <div class="modal">
                 <h3 id="clientTitle">إضافة مشترك جديد</h3>
-                <input type="hidden" id="editClientIndex">
-                <input type="text" id="cn" placeholder="اسم العميل (الرابط يعتمد عليه)">
+                <input type="text" id="editClientIndex" style="display:none;"> <input type="text" id="cn" placeholder="اسم العميل (الرابط يعتمد عليه)">
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
@@ -232,7 +231,7 @@
     }
     function editClient(i) {
         const c = cloudData.clients[i];
-        document.getElementById('editClientIndex').value = i;
+        document.getElementById('editClientIndex').value = i.toString(); // تخزين صريح كـ نص
         document.getElementById('cn').value = c.name;
         document.getElementById('cn').disabled = true; 
         ['cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
@@ -252,22 +251,23 @@
         alert("تم نسخ رابط المشترك الثابت ✅");
     }
     async function saveClient() {
-        const idx = document.getElementById('editClientIndex').value;
-        
-        // جلب البيانات من الحقول
+        const rawIdx = document.getElementById('editClientIndex').value.trim();
         let c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') };
         
-        if(idx === "") {
-            // إضافة عميل جديد بالكامل
+        if(rawIdx === "") {
+            // إضافة عميل جديد بالكامل في نهاية المصفوفة
             cloudData.clients.push(c);
         } else {
-            // تعديل عميل حالي: نقوم بدمج البيانات الجديدة مع الحفاظ التام على الرمز الخاص الحالي private_pin
-            const oldPin = cloudData.clients[idx].private_pin || null;
-            if(oldPin) { c.private_pin = oldPin; }
-            cloudData.clients[idx] = c;
+            // تعديل العميل المحدد صراحة بتحويل الفهرس إلى رقم صحيح مؤكد
+            const idx = parseInt(rawIdx, 10);
+            if (!isNaN(idx) && cloudData.clients[idx]) {
+                const oldPin = cloudData.clients[idx].private_pin || null;
+                if(oldPin) { c.private_pin = oldPin; }
+                cloudData.clients[idx] = c; // استبدال وتعديل العميل في مكانه الدقيق بالمنتصف
+            }
         }
         
-        await sync(); clearClientForm(); load(); alert("تم حفظ العميل بالسحابة وحماية بياناته ✅");
+        await sync(); clearClientForm(); load(); alert("تم التحديث والحفظ بالسحابة لجميع المشتركين بثبات ✅");
     }
     async function saveOrder() {
         const items = document.querySelectorAll('#appList .app-card');
