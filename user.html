@@ -49,7 +49,7 @@
         <div class="lock-card">
             <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: #4a4ae2;"></i>
             <h2 id="lockTitle" style="margin-top:15px;">تحقق آمن</h2>
-            <p id="lockDesc">يرجى إدخل الرمز الخاص بك</p>
+            <p id="lockDesc">يرجى إدخال الرمز الخاص بك</p>
             <input type="password" id="pinInput" class="pin-input" placeholder="****">
             <button onclick="handleAuth()" class="btn" style="background: #4a4ae2;">دخول</button>
             <div id="errorMsg" style="color:var(--danger); margin-top:10px; font-weight:bold; display:none;"></div>
@@ -108,7 +108,6 @@
                     
                     globalLink = fullData.globalUrl || "---";
                     
-                    // تحديد العميل الصحيح من المصفوفة
                     clientIdx = (fullData.clients || []).findIndex(u => u && u.name === target);
                     if(clientIdx !== -1) {
                         user = fullData.clients[clientIdx];
@@ -137,7 +136,6 @@
             if(!user.private_pin) {
                 if(val.length !== 4) { msg("يجب أن يكون الرمز 4 أرقام"); return; }
                 
-                // تحديث الرمز الخاص للعميل المحدد بدقة داخل المصفوفة الكاملة لمنع الخلط
                 fullData.clients[clientIdx].private_pin = val;
                 await fetch("https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json", { method: 'PUT', body: JSON.stringify(fullData) });
                 
