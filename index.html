@@ -145,7 +145,6 @@
 
     async function checkPass() {
         if(document.getElementById('passInput').value === MASTER_PASS) {
-            // الإخفاء الفوري لشاشة القفل لمنع التجمد نهائياً وعرض اللوحة فوراً
             document.getElementById('loginOverlay').style.display = "none";
             document.getElementById('adminApp').style.display = "block";
             await load();
@@ -171,7 +170,7 @@
                 renderApps();
             }
         } catch(e) {
-            console.log("خطأ في جلب البيانات، سيتم الاعتماد على المصفوفات الفارغة مؤقتاً لتجنب التعليق.");
+            console.log("خطأ أثناء التحميل، سيتم استخدام المصفوفات الافتراضية.");
             cloudData.clients = cloudData.clients || [];
             cloudData.apps = cloudData.apps || [];
             renderClients();
@@ -228,14 +227,18 @@
         if(type === 'client') {
             const c = cloudData.clients[i];
             document.getElementById('v_title').innerText = "بيانات المشترك";
-            const linkToShow = c.cl || cloudData.globalLink || '---';
+            
+            // هنا الفحص الذكي: إذا كان العميل الجديد لا يملك رابط خاص (cl فارغ)، يظهر له الرابط العام للكل تلقائياً
+            const linkToShow = (c.cl && c.cl.trim() !== "") ? c.cl : (cloudData.globalLink || '---');
+            const linkType = (c.cl && c.cl.trim() !== "") ? 'رابط خاص بالعميل 👤' : 'الرابط الموحد للكل 👥';
+
             const fields = [
                 ['اسم المشترك', c.name],
                 ['رقم الجوال', c.cp],
                 ['اسم المستخدم', c.cu],
                 ['كلمة السر', c.ck],
                 ['الرابط الفعال', linkToShow], 
-                ['نوع الرابط', c.cl ? 'رابط خاص بالعميل 👤' : 'الرابط الموحد للكل 👥'],
+                ['نوع الرابط', linkType],
                 ['بداية الاشتراك', c.cs],
                 ['نهاية الاشتراك', c.ce]
             ];
@@ -270,7 +273,15 @@
 
     async function saveClient() {
         const idx = document.getElementById('editClientIndex').value;
-        const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') };
+        const c = { 
+            name: v('cn'), 
+            cp: v('cp'), 
+            cu: v('cu'), 
+            ck: v('ck'), 
+            cl: v('cl'), // يتم حفظ الرابط الخاص هنا (قد يكون فارغاً للعميل الجديد)
+            cs: v('cs'), 
+            ce: v('ce') 
+        };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
         await sync(); 
         clearClientForm(); 
