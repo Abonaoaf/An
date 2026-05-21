@@ -140,7 +140,6 @@
 <script>
     const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     const MASTER_PASS = "Aztlg1512";
-    // إضافة خاصية globalLink للبيانات السحابية
     let cloudData = { clients: [], apps: [], logo: "", logoSize: "70", globalLink: "" };
 
     async function checkPass() {
@@ -206,16 +205,19 @@
 
     function openView(i, type) {
         const vContent = document.getElementById('v_content');
+        const currentGlobalLink = cloudData.globalLink || '';
+        
         if(type === 'client') {
             const c = cloudData.clients[i];
             document.getElementById('v_title').innerText = "بيانات المشترك";
-            // هنا نستخدم cloudData.globalLink بدلاً من الرابط الفردي
+            
+            // جعل حقل الرابط في لوحة البيانات ينعكس بالرابط الموحد المضاف في الإعدادات
             const fields = [
                 ['اسم المشترك', c.name],
                 ['رقم الجوال', c.cp],
                 ['اسم المستخدم', c.cu],
                 ['كلمة السر', c.ck],
-                ['الرابط', cloudData.globalLink || '---'], 
+                ['الرابط الموحد', currentGlobalLink || '---'], 
                 ['بداية الاشتراك', c.cs],
                 ['نهاية الاشتراك', c.ce]
             ];
@@ -255,7 +257,6 @@
         await sync(); clearClientForm(); load();
     }
 
-    // بقية الدوال البرمجية (حفظ التطبيق، الترتيب، إلخ) تبقى كما هي
     async function saveApp() {
         const idx = document.getElementById('editAppIndex').value;
         const iconFile = document.getElementById('appIcon').files[0];
@@ -272,9 +273,10 @@
     async function saveSettings() {
         cloudData.logo = document.getElementById('currentLogoPreview').src;
         cloudData.logoSize = document.getElementById('logoSize').value;
-        cloudData.globalLink = document.getElementById('globalLink').value; // حفظ الرابط الموحد
+        cloudData.globalLink = document.getElementById('globalLink').value.trim(); 
         await sync();
         alert("تم حفظ الإعدادات بنجاح! 🚀");
+        load();
     }
 
     function editApp(i) {
@@ -297,10 +299,25 @@
         document.getElementById('cancelAppBtn').style.display = "none";
     }
 
+    // تعديل دالة نسخ الرابط لكي تنسخ الرابط الموحد بدلاً من الرابط الثابت القديم
     function copyL(name) {
-        const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
-        navigator.clipboard.writeText(clientUrl);
-        alert("تم نسخ رابط المشترك الثابت ✅");
+        const baseGlobal = cloudData.globalLink ? cloudData.globalLink.trim() : "";
+        if(!baseGlobal) {
+            alert("تنبيه: لم تقم بإضافة رابط موحد في الإعدادات بعد!");
+            return;
+        }
+        
+        // إذا كان الرابط الموحد يحتوي على معيار الاسم نقوم ببنائه بشكل صحيح، وإذا كان جاهزاً ينسخه مباشرة للجميع
+        let finalUrl = baseGlobal;
+        if(baseGlobal.includes('user.html')) {
+            // للتأكد من عدم تكرار الاسم إذا كان الرابط الموحد يحتوي بالفعل على معامل الاسم
+            if(!baseGlobal.includes('name=')) {
+                finalUrl = baseGlobal + (baseGlobal.includes('?') ? '&' : '?') + "name=" + encodeURIComponent(name);
+            }
+        }
+        
+        navigator.clipboard.writeText(finalUrl);
+        alert("تم نسخ رابط العميل الموحد بنجاح ✅");
     }
 
     async function saveOrder() {
@@ -325,10 +342,20 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active'); btn.classList.add('active');
     }
-    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
-    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
-    function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
-    function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
+    async function delClient(i) { 
+        if(confirm("هل أنت متأكد من حذف هذا المشترك؟")) {
+            cloudData.clients.splice(i, 1);
+            await sync(); load(); alert("تم الحذف!");
+        }
+    }
+    async function delApp(i) { 
+        if(confirm("هل أنت متأكد من حذف هذا التطبيق؟")) {
+            cloudData.apps.splice(i, 1);
+            await sync(); load(); alert("تم الحذف!");
+        }
+    }
+    function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + 'px'; }
+    function previewNewLogo(input) { if (input.files && input.files[0]) { const r = new FileReader(); r.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; r.readAsDataURL(input.files[0]); } }
 </script>
 </body>
 </html>
