@@ -61,7 +61,6 @@
             outline: none;
         }
 
-        /* البطاقة مع الإطار العلوي والسفلي */
         .card {
             display: none;
             background: white;
@@ -71,7 +70,7 @@
             overflow: hidden;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             border-top: 8px solid var(--success);
-            border-bottom: 8px solid var(--success); /* الإطار السفلي الجديد */
+            border-bottom: 8px solid var(--success);
         }
 
         .top-info {
@@ -313,6 +312,7 @@
         const MASTER_KEY = "Aztlg1512";
         let clientIdx = -1;
         let user = null;
+        let globalLink = ""; // متغير لحفظ الرابط الموحد الجديد
 
         const d = new Date();
         document.getElementById('dayNum').innerText = d.getDate();
@@ -323,16 +323,21 @@
             const target = new URLSearchParams(window.location.search).get('name');
             if(!target) return;
             try {
-                const res = await fetch(DB_URL + ".json");
+                // هدم الكاش للتأكد من جلب التحديثات فوراً
+                const res = await fetch(DB_URL + ".json?t=" + Date.now());
                 const data = await res.json();
-                if(data.logo) document.getElementById('userLogo').src = data.logo;
-                clientIdx = (data.clients || []).findIndex(u => u.name === target);
-                if(clientIdx !== -1) {
-                    user = data.clients[clientIdx];
-                    document.getElementById('userName').innerText = user.name;
-                    if(!user.private_pin) {
-                        document.getElementById('lockTitle').innerText = "إنشاء رمز خاص";
-                        document.getElementById('lockDesc').innerText = "قم بتعيين رمز سري خاص بك لحماية الصفحة.";
+                if(data) {
+                    if(data.logo) document.getElementById('userLogo').src = data.logo;
+                    globalLink = data.globalLink || ""; // جلب الرابط الموحد من السحابة
+                    
+                    clientIdx = (data.clients || []).findIndex(u => u && u.name === target);
+                    if(clientIdx !== -1) {
+                        user = data.clients[clientIdx];
+                        document.getElementById('userName').innerText = user.name;
+                        if(!user.private_pin) {
+                            document.getElementById('lockTitle').innerText = "إنشاء رمز خاص";
+                            document.getElementById('lockDesc').innerText = "قم بتعيين رمز سري خاص بك لحماية الصفحة.";
+                        }
                     }
                 }
             } catch(e) { console.error(e); }
@@ -357,14 +362,17 @@
         function bootApp() {
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainCard').style.display = 'block';
+            
+            // هنا تم استبدال الحقل القديم بالمتغير العام globalLink المجلوب من السحابة
             const fields = [
                 ['الجوال', user.cp || '--'],
                 ['اسم المستخدم', user.cu || '--'],
                 ['الرقم السري', user.ck || '--'],
-                ['رابط الدخول', user.cl || '--'],
+                ['رابط الدخول', globalLink || '--'], 
                 ['تاريخ البداية', user.cs || '--'],
                 ['تاريخ النهاية', user.ce || '--']
             ];
+            
             document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
                 <div class="data-row">
                     <div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div>
