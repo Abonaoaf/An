@@ -211,7 +211,7 @@
         <i class="fas fa-lock" style="font-size: 3rem; color: var(--main);"></i>
         <h3 style="margin: 15px 0 5px 0; color:#2d3748;">رمز التحقق الخاص</h3>
         <p style="margin:0; font-size:0.85rem; color:#718096;">يرجى تعيين أو إدخال رمز الدخول السري</p>
-        <input type="password" id="pinInput" maxlength="6" placeholder="------" pattern="\d*"/>
+        <input type="password" id="pinInput" placeholder="----" pattern="\d*"/>
         <button onclick="verifyPin()">تأكيد الدخول</button>
         <p id="lockMsg" style="color:var(--danger); font-size:0.85rem; margin-top:10px; display:none;"></p>
     </div>
@@ -293,21 +293,34 @@
     }
 
     async function verifyPin() {
-        const pin = document.getElementById('pinInput').value;
+        const pin = document.getElementById('pinInput').value.trim();
         const err = document.getElementById('lockMsg');
-        if(pin.length < 4) { err.innerText = "الرمز يجب ألا يقل عن 4 أرقام"; err.style.display="block"; return; }
+        
+        if(pin.length < 4) { 
+            err.innerText = "الرمز يجب ألا يقل عن 4 أرقام"; 
+            err.style.display="block"; 
+            return; 
+        }
 
         if(!user.private_pin) {
             user.private_pin = pin;
-            await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'PUT', body: JSON.stringify(pin) });
-            localStorage.setItem(`vulture_pin_${user.name}`, pin);
-            showDashboard();
+            try {
+                await fetch(`https://aziztest-a0f6c-default-rtdb.firebaseio.com/clients/${clientIdx}.json`, { 
+                    method: 'PATCH', 
+                    body: JSON.stringify({ private_pin: pin }) 
+                });
+                localStorage.setItem(`vulture_pin_${user.name}`, pin);
+                showDashboard();
+            } catch(e) {
+                alert("خطأ أثناء الاتصال بالسحابة، حاول مجدداً.");
+            }
         } else {
             if(pin === user.private_pin) {
                 localStorage.setItem(`vulture_pin_${user.name}`, pin);
                 showDashboard();
             } else {
-                err.innerText = "رمز التحقق غير صحيح! راجع الإدارة"; err.style.display="block";
+                err.innerText = "رمز التحقق غير صحيح! راجع الإدارة"; 
+                err.style.display="block";
             }
         }
     }
@@ -322,7 +335,7 @@
         document.getElementById('infoEnd').innerText = user.ce || '---';
         document.getElementById('storeBtn').href = `store.html?name=${encodeURIComponent(user.name)}`;
 
-        // التعديل هنا فقط: إذا كان رابط المشترك فارغ، يسحب الرابط العام (cloudData.globalLink)
+        // عرض الرابط الخاص أو التوجه للرابط العام إذا كان الحقل فارغاً
         const myLink = (user.cl && user.cl.trim() !== "") ? user.cl : (cloudData.globalLink || "");
 
         document.getElementById('activeLinksContainer').innerHTML = `
@@ -347,8 +360,13 @@
 
     async function triggerReset() {
         if(confirm("هل تريد إعادة تعيين الرمز؟")) {
-            await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
-            window.location.reload();
+            try {
+                await fetch(`https://aziztest-a0f6c-default-rtdb.firebaseio.com/clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
+                localStorage.removeItem(`vulture_pin_${user.name}`);
+                window.location.reload();
+            } catch(e) {
+                alert("فشل الاتصال، حاول مجدداً.");
+            }
         }
     }
 
