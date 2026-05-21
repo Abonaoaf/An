@@ -272,7 +272,6 @@
 
             user = cloudData.clients[clientIdx];
 
-            // عرض الشعار المخصص وحجمه إن وُجد
             if(cloudData.logo) {
                 const img = document.getElementById('logoImg');
                 img.src = cloudData.logo;
@@ -280,7 +279,7 @@
                 img.style.display = "inline-block";
             }
 
-            // فحص وجود الرمز المخصص للجهاز مسبقاً
+            // التحقق والفتح المباشر إذا كان الرمز مسجلاً مسبقاً بجهاز العميل
             if(!user.private_pin) {
                 document.getElementById('lockScreen').style.display = "flex";
             } else {
@@ -295,21 +294,30 @@
     }
 
     async function verifyPin() {
-        const pin = document.getElementById('pinInput').value;
+        const pin = document.getElementById('pinInput').value.trim();
         const err = document.getElementById('lockMsg');
-        if(pin.length < 4) { err.innerText = "الرمز يجب ألا يقل عن 4 أرقام"; err.style.display="block"; return; }
+        
+        // تعديل الشرط ليقبل من 4 خانات فما فوق
+        if(pin.length < 4) { 
+            err.innerText = "الرمز يجب ألا يقل عن 4 أرقام"; 
+            err.style.display="block"; 
+            return; 
+        }
 
         if(!user.private_pin) {
-            // تعيين الرمز لأول مرة في السحابة وفي جهاز المشترك الحالي
             user.private_pin = pin;
-            await fetch(`https://aziztest-a0f6c-default-rtdb.firebaseio.com/clients/${clientIdx}.json`, {
-                method: 'PATCH',
-                body: JSON.stringify({ private_pin: pin })
-            });
-            localStorage.setItem(`vulture_pin_${user.name}`, pin);
-            showDashboard();
+            try {
+                // إصلاح كود الـ Firebase ليعمل الـ PATCH بشكل دقيق
+                await fetch(`https://aziztest-a0f6c-default-rtdb.firebaseio.com/clients/${clientIdx}.json`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ private_pin: pin })
+                });
+                localStorage.setItem(`vulture_pin_${user.name}`, pin);
+                showDashboard();
+            } catch(errEv) {
+                alert("خطأ أثناء مزامنة الرمز مع السحابة، حاول مجدداً.");
+            }
         } else {
-            // التحقق من الرمز المدخل مقارنة بالسحابة
             if(pin === user.private_pin) {
                 localStorage.setItem(`vulture_pin_${user.name}`, pin);
                 showDashboard();
@@ -330,8 +338,7 @@
         document.getElementById('infoEnd').innerText = user.ce || '---';
         document.getElementById('storeBtn').href = `store.html?name=${encodeURIComponent(user.name)}`;
 
-        // ================== [ المنطق الذكي والجديد لمعالجة الرابط ] ==================
-        // الفحص: إذا كان للمشترك رابط خاص يعرضه، وإذا كان فارغاً (كالعميل الجديد) يعرض الرابط الموحد المكتوب بالإعدادات
+        // قراءة الرابط الخاص أو التوجه تلقائياً للرابط العام الموحد إذا كان العميل جديد وحقله فارغ
         const activeLink = (user.cl && user.cl.trim() !== "") ? user.cl : (cloudData.globalLink || "");
         const linkContainer = document.getElementById('activeLinkContainer');
         
@@ -349,17 +356,17 @@
                 </div>
             `;
         }
-        // ============================================================================
 
         const updateUI = () => {
             const now = Date.now(), end = new Date(user.ce).getTime(), left = end - now;
             const days = Math.max(0, Math.ceil(left / 86400000));
             document.getElementById('daysCount').innerText = days;
-            document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%\";
+            document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%";
+            
             if(left > 0) {
                 const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
                 const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
-                document.getElementById('timerGrid').innerHTML = units.map(u => `<div class=\"t-box\"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
+                document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
             } else {
                 document.getElementById('timerGrid').innerHTML = "<p style='color:var(--danger); grid-column:span 5; font-weight:bold; margin:5px 0 0 0;'>انتهت مدة الاشتراك!</p>";
             }
@@ -369,17 +376,9 @@
 
     async function triggerReset() {
         if(confirm("هل تريد إعادة تعيين الرمز لهذا الجهاز؟")) {
-            await fetch(`https://aziztest-a0f6c-default-rtdb.firebaseio.com/clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
-            localStorage.removeItem(`vulture_pin_${user.name}`);
-            window.location.reload();
-        }
-    }
-
-    function msg(t) {
-        document.getElementById('lockScreen').innerHTML = `<div class="lock-card" style="color:var(--danger); font-weight:bold;"><i class="fas fa-exclamation-triangle" style="font-size:2.5rem; margin-bottom:10px;"></i><br>${t}</div>`;
-    }
-
-    init();
-</script>
-</body>
-</html>
+            try {
+                await fetch(`https://aziztest-a0f6c-default-rtdb.firebaseio.com/clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
+                localStorage.removeItem(`vulture_pin_${user.name}`);
+                window.location.reload();
+            } catch(e) {
+                alert("فشل الاتصال ل
