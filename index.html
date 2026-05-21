@@ -49,10 +49,6 @@
         .view-row { border-bottom: 1px solid #f0f0f0; padding: 12px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .v-label { font-size: 0.8rem; color: var(--soft-red); font-weight: bold; white-space: nowrap; }
         .v-text { font-size: 0.9rem; color: #333; font-weight: bold; text-align: left; word-break: break-all; }
-
-        .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; text-align: center; }
-        .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
-        .drag-handle { position: absolute; top: 12px; left: 12px; cursor: grab; color: #cbd5e0; }
     </style>
 </head>
 <body>
@@ -82,7 +78,6 @@
         <b>لوحة تحكم فولتشر 🦅</b>
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>
-            <button class="tab-btn" onclick="switchTab('store', this)">المتجر</button>
             <button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات</button>
         </div>
     </div>
@@ -101,22 +96,6 @@
                 <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
             </div>
             <div class="grid" id="clientGrid"></div>
-        </div>
-
-        <div id="store" class="section">
-            <div class="modal">
-                <h3 id="appTitle">+ إضافة تطبيق للمتجر</h3>
-                <input type="hidden" id="editAppIndex">
-                <input type="file" id="appIcon" accept="image/*">
-                <input type="text" id="an" placeholder="اسم التطبيق">
-                <input type="text" id="ad" placeholder="كود دونلودر">
-                <input type="text" id="al" placeholder="رابط التحميل المباشر">
-                <textarea id="at" placeholder="وصف التطبيق"></textarea>
-                <button class="btn btn-main" id="saveAppBtn" style="background:var(--s)" onclick="saveApp()">حفظ في المتجر ✨</button>
-                <button id="cancelAppBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none; margin-top:5px;" onclick="clearAppForm()">إلغاء التعديل</button>
-            </div>
-            <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px;" onclick="saveOrder()"><i class="fas fa-save"></i> حفظ الترتيب الحالي</button>
-            <div class="grid" id="appList"></div>
         </div>
 
         <div id="settings" class="section">
@@ -164,12 +143,15 @@
             document.getElementById('logoSize').value = cloudData.logoSize || 70;
             updateLogoPreview(cloudData.logoSize || 70);
             
-            renderClients(); renderApps();
+            renderClients();
+            // تم فحص وجود العنصر لضمان عدم حدوث تعليق عند الدخول واقلاع الصفحة بنجاح
+            if(document.getElementById('appList')) { renderApps(); }
         }
     }
 
     function renderClients() {
         const grid = document.getElementById('clientGrid');
+        if(!grid) return;
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
             const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
             const showWA = (days <= 5 && days > 0);
@@ -185,22 +167,6 @@
                 </div>
             </div>`;
         }).join('');
-    }
-
-    function renderApps() {
-        const list = document.getElementById('appList');
-        list.innerHTML = (cloudData.apps || []).map((a, i) => `
-            <div class="app-card" data-id="${i}">
-                <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
-                <img src="${a.img || ''}">
-                <b>${a.name}</b>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
-                    <button class="btn btn-edit" onclick="editApp(${i})">تعديل</button>
-                    <button class="btn btn-view" onclick="openView(${i}, 'app')">معاينة</button>
-                    <button class="btn btn-del" onclick="delApp(${i})">حذف</button>
-                </div>
-            </div>`).join('');
-        new Sortable(list, { animation: 150, handle: '.drag-handle' });
     }
 
     function openView(i, type) {
@@ -219,12 +185,6 @@
                 ['نهاية الاشتراك', c.ce]
             ];
             vContent.innerHTML = fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
-        } else {
-            const a = cloudData.apps[i];
-            document.getElementById('v_title').innerText = "معاينة التطبيق";
-            const fields = [['اسم التطبيق', a.name],['كود دونلودر', a.ad],['رابط التحميل', a.al],['الوصف', a.at]];
-            vContent.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><img src="${a.img}" style="width:80px; height:80px; border-radius:15px; object-fit:cover; border:1px solid #eee;"></div>` + 
-                               fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
         }
         document.getElementById('viewModal').style.display = 'flex';
     }
@@ -256,19 +216,6 @@
         await load(); 
     }
 
-    async function saveApp() {
-        const idx = document.getElementById('editAppIndex').value;
-        const iconFile = document.getElementById('appIcon').files[0];
-        let imgBase64 = "";
-        if (iconFile) {
-            const reader = new FileReader();
-            imgBase64 = await new Promise(r => { reader.onload=()=>r(reader.result); reader.readAsDataURL(iconFile); });
-        } else if (idx !== "") { imgBase64 = cloudData.apps[idx].img; }
-        const appData = { name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 };
-        if (idx === "") cloudData.apps.push(appData); else cloudData.apps[idx] = appData;
-        await sync(); clearAppForm(); await load(); alert("تم الحفظ بنجاح ✨");
-    }
-
     async function saveSettings() {
         cloudData.logo = document.getElementById('currentLogoPreview').src;
         cloudData.logoSize = document.getElementById('logoSize').value;
@@ -278,36 +225,10 @@
         await load();
     }
 
-    function editApp(i) {
-        const a = cloudData.apps[i];
-        document.getElementById('editAppIndex').value = i;
-        document.getElementById('an').value = a.name;
-        document.getElementById('ad').value = a.ad || "";
-        document.getElementById('al').value = a.al || "";
-        document.getElementById('at').value = a.at || "";
-        document.getElementById('appTitle').innerText = "تعديل تطبيق: " + a.name;
-        document.getElementById('saveAppBtn').innerText = "تحديث في المتجر ✨";
-        document.getElementById('cancelAppBtn').style.display = "block";
-        window.scrollTo(0,0);
-    }
-
-    function clearAppForm() {
-        ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = "");
-        document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
-        document.getElementById('saveAppBtn').innerText = "حفظ في المتجر ✨";
-        document.getElementById('cancelAppBtn').style.display = "none";
-    }
-
     function copyL(name) {
         const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
         navigator.clipboard.writeText(clientUrl);
         alert("تم نسخ رابط المشترك الثابت ✅");
-    }
-
-    async function saveOrder() {
-        const items = document.querySelectorAll('#appList .app-card');
-        let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
-        cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); await load();
     }
 
     function sendReminder(name, phone, days) {
@@ -323,5 +244,4 @@
     function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id
+        document
