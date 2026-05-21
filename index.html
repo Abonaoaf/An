@@ -13,7 +13,7 @@
         
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
         #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
 
         .header { background: white; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; text-align: center; }
         .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
@@ -96,7 +96,6 @@
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
-                <input type="text" id="cl" placeholder="رابط خاص بالعميل فقط (اتركه فارغاً ليعتمد الرابط العام الموحد)">
                 <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
                 <button class="btn btn-main" id="saveClientBtn" onclick="saveClient()">حفظ في السحابة ☁️</button>
                 <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
@@ -124,7 +123,7 @@
             <div class="modal" style="text-align:center;">
                 <h3>الإعدادات العامة ⚙️</h3>
                 <div style="text-align:right; margin-bottom:15px;">
-                    <label><b>الرابط الموحد للمشتركين (للكل):</b></label>
+                    <label><b>الرابط الموحد للمشتركين:</b></label>
                     <input type="text" id="globalLink" placeholder="أدخل الرابط الذي سيظهر لجميع المشتركين">
                 </div>
                 <hr>
@@ -141,11 +140,11 @@
 <script>
     const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     const MASTER_PASS = "Aztlg1512";
+    // إضافة خاصية globalLink للبيانات السحابية
     let cloudData = { clients: [], apps: [], logo: "", logoSize: "70", globalLink: "" };
 
     async function checkPass() {
         if(document.getElementById('passInput').value === MASTER_PASS) {
-            // الإخفاء الفوري لمنع توقف الشاشة
             document.getElementById('loginOverlay').style.display = "none";
             document.getElementById('adminApp').style.display = "block";
             await load();
@@ -153,43 +152,30 @@
     }
 
     async function load() {
-        try {
-            const r = await fetch(DB);
-            const d = await r.json();
-            if (d) {
-                cloudData = d;
-                if(!cloudData.clients) cloudData.clients = [];
-                if(!cloudData.apps) cloudData.apps = [];
-                if(!cloudData.globalLink) cloudData.globalLink = "";
-                
-                if(cloudData.logo && document.getElementById('currentLogoPreview')) {
-                    document.getElementById('currentLogoPreview').src = cloudData.logo;
-                }
-                if(document.getElementById('globalLink')) document.getElementById('globalLink').value = cloudData.globalLink;
-                if(document.getElementById('logoSize')) document.getElementById('logoSize').value = cloudData.logoSize || 70;
-                updateLogoPreview(cloudData.logoSize || 70);
-                
-                renderClients(); 
-                renderApps();
-            }
-        } catch(e) {
-            console.log("خطأ في الاتصال، تم تفعيل مصفوفات الطوارئ الأمنية.");
-            cloudData.clients = cloudData.clients || [];
-            cloudData.apps = cloudData.apps || [];
-            renderClients(); 
-            renderApps();
+        const r = await fetch(DB);
+        const d = await r.json();
+        if (d) {
+            cloudData = d;
+            if(!cloudData.clients) cloudData.clients = [];
+            if(!cloudData.apps) cloudData.apps = [];
+            if(!cloudData.globalLink) cloudData.globalLink = "";
+            
+            if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;
+            document.getElementById('globalLink').value = cloudData.globalLink;
+            document.getElementById('logoSize').value = cloudData.logoSize || 70;
+            updateLogoPreview(cloudData.logoSize || 70);
+            
+            renderClients(); renderApps();
         }
     }
 
     function renderClients() {
         const grid = document.getElementById('clientGrid');
-        if(!grid) return;
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
-            if(!c) return '';
             const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
             const showWA = (days <= 5 && days > 0);
             return `<div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center;"><b>${c.name || ''}</b> <span class="days-highlight">${days} يوم</span></div>
+                <div style="display:flex; justify-content:space-between; align-items:center;"><b>${c.name}</b> <span class="days-highlight">${days} يوم</span></div>
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
@@ -204,44 +190,32 @@
 
     function renderApps() {
         const list = document.getElementById('appList');
-        if(!list) return;
-        list.innerHTML = (cloudData.apps || []).map((a, i) => {
-            if(!a) return '';
-            return `
+        list.innerHTML = (cloudData.apps || []).map((a, i) => `
             <div class="app-card" data-id="${i}">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
-                <img src="${a.img || 'https://placehold.co/65'}" onerror="this.src='https://placehold.co/65'">
-                <b>${a.name || ''}</b>
+                <img src="${a.img || ''}">
+                <b>${a.name}</b>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:5px;">
                     <button class="btn btn-edit" onclick="editApp(${i})">تعديل</button>
                     <button class="btn btn-view" onclick="openView(${i}, 'app')">معاينة</button>
                     <button class="btn btn-del" onclick="delApp(${i})">حذف</button>
                 </div>
-            </div>`;
-        }).join('');
-        if(cloudData.apps && cloudData.apps.length > 0) {
-            new Sortable(list, { animation: 150, handle: '.drag-handle' });
-        }
+            </div>`).join('');
+        new Sortable(list, { animation: 150, handle: '.drag-handle' });
     }
 
     function openView(i, type) {
         const vContent = document.getElementById('v_content');
-        if(!vContent) return;
         if(type === 'client') {
             const c = cloudData.clients[i];
             document.getElementById('v_title').innerText = "بيانات المشترك";
-            
-            // الفحص الذكي للرابط: إذا كان الرابط الخاص cl فارغاً، يستبدل تلقائياً بالرابط الموحد العام للكل
-            const activeLink = (c.cl && c.cl.trim() !== "") ? c.cl : (cloudData.globalLink || '---');
-            const linkType = (c.cl && c.cl.trim() !== "") ? 'رابط خاص بالعميل 👤' : 'الرابط الموحد للكل 👥';
-
+            // هنا نستخدم cloudData.globalLink بدلاً من الرابط الفردي
             const fields = [
                 ['اسم المشترك', c.name],
                 ['رقم الجوال', c.cp],
                 ['اسم المستخدم', c.cu],
                 ['كلمة السر', c.ck],
-                ['الرابط الفعال', activeLink], 
-                ['نوع الرابط المعتمد', linkType],
+                ['الرابط', cloudData.globalLink || '---'], 
                 ['بداية الاشتراك', c.cs],
                 ['نهاية الاشتراك', c.ce]
             ];
@@ -250,7 +224,7 @@
             const a = cloudData.apps[i];
             document.getElementById('v_title').innerText = "معاينة التطبيق";
             const fields = [['اسم التطبيق', a.name],['كود دونلودر', a.ad],['رابط التحميل', a.al],['الوصف', a.at]];
-            vContent.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><img src="${a.img || 'https://placehold.co/65'}" style="width:80px; height:80px; border-radius:15px; object-fit:cover; border:1px solid #eee;"></div>` + 
+            vContent.innerHTML = `<div style="text-align:center; margin-bottom:15px;"><img src="${a.img}" style="width:80px; height:80px; border-radius:15px; object-fit:cover; border:1px solid #eee;"></div>` + 
                                fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
         }
         document.getElementById('viewModal').style.display = 'flex';
@@ -259,20 +233,16 @@
     function editClient(i) {
         const c = cloudData.clients[i];
         document.getElementById('editClientIndex').value = i;
-        document.getElementById('cn').value = c.name || "";
+        document.getElementById('cn').value = c.name;
         document.getElementById('cn').disabled = true; 
-        ['cp','cu','ck','cl','cs','ce'].forEach(id => {
-            if(document.getElementById(id)) document.getElementById(id).value = c[id] || "";
-        });
-        document.getElementById('clientTitle').innerText = "تعديل: " + (c.name || "");
+        ['cp','cu','ck','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
         document.getElementById('cancelBtn').style.display = "block";
         window.scrollTo(0,0);
     }
 
     function clearClientForm() {
-        ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id => {
-            if(document.getElementById(id)) document.getElementById(id).value = "";
-        });
+        ['cn','cp','cu','ck','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value="");
         document.getElementById('cn').disabled = false;
         document.getElementById('clientTitle').innerText = "إضافة مشترك جديد";
         document.getElementById('cancelBtn').style.display = "none";
@@ -280,21 +250,12 @@
 
     async function saveClient() {
         const idx = document.getElementById('editClientIndex').value;
-        const c = { 
-            name: v('cn'), 
-            cp: v('cp'), 
-            cu: v('cu'), 
-            ck: v('ck'), 
-            cl: v('cl'), // حفظ الرابط الخاص إذا تم تعبئته
-            cs: v('cs'), 
-            ce: v('ce') 
-        };
+        const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cs: v('cs'), ce: v('ce') };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
-        await sync(); 
-        clearClientForm(); 
-        await load();
+        await sync(); clearClientForm(); load();
     }
 
+    // بقية الدوال البرمجية (حفظ التطبيق، الترتيب، إلخ) تبقى كما هي
     async function saveApp() {
         const idx = document.getElementById('editAppIndex').value;
         const iconFile = document.getElementById('appIcon').files[0];
@@ -302,41 +263,35 @@
         if (iconFile) {
             const reader = new FileReader();
             imgBase64 = await new Promise(r => { reader.onload=()=>r(reader.result); reader.readAsDataURL(iconFile); });
-        } else if (idx !== "" && cloudData.apps[idx]) { imgBase64 = cloudData.apps[idx].img || ""; }
+        } else if (idx !== "") { imgBase64 = cloudData.apps[idx].img; }
         const appData = { name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 };
         if (idx === "") cloudData.apps.push(appData); else cloudData.apps[idx] = appData;
-        await sync(); 
-        clearAppForm(); 
-        await load(); 
-        alert("تم الحفظ بنجاح ✨");
+        await sync(); clearAppForm(); load(); alert("تم الحفظ بنجاح ✨");
     }
 
     async function saveSettings() {
         cloudData.logo = document.getElementById('currentLogoPreview').src;
         cloudData.logoSize = document.getElementById('logoSize').value;
-        cloudData.globalLink = document.getElementById('globalLink').value; 
+        cloudData.globalLink = document.getElementById('globalLink').value; // حفظ الرابط الموحد
         await sync();
         alert("تم حفظ الإعدادات بنجاح! 🚀");
-        await load();
     }
 
     function editApp(i) {
         const a = cloudData.apps[i];
         document.getElementById('editAppIndex').value = i;
-        document.getElementById('an').value = a.name || "";
+        document.getElementById('an').value = a.name;
         document.getElementById('ad').value = a.ad || "";
         document.getElementById('al').value = a.al || "";
         document.getElementById('at').value = a.at || "";
-        document.getElementById('appTitle').innerText = "تعديل تطبيق: " + (a.name || "");
+        document.getElementById('appTitle').innerText = "تعديل تطبيق: " + a.name;
         document.getElementById('saveAppBtn').innerText = "تحديث في المتجر ✨";
         document.getElementById('cancelAppBtn').style.display = "block";
         window.scrollTo(0,0);
     }
 
     function clearAppForm() {
-        ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => {
-            if(document.getElementById(id)) document.getElementById(id).value = "";
-        });
+        ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = "");
         document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
         document.getElementById('saveAppBtn').innerText = "حفظ في المتجر ✨";
         document.getElementById('cancelAppBtn').style.display = "none";
@@ -351,7 +306,7 @@
     async function saveOrder() {
         const items = document.querySelectorAll('#appList .app-card');
         let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
-        cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); await load();
+        cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); load();
     }
 
     function sendReminder(name, phone, days) {
@@ -364,15 +319,15 @@
     function closeView() { document.getElementById('viewModal').style.display = 'none'; }
     function saveCardAsImage() { html2canvas(document.getElementById('captureTarget'), {scale: 3}).then(canvas => { const link = document.createElement('a'); link.href = canvas.toDataURL(); link.download = `Vulture_Card.png`; link.click(); }); }
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
-    function v(id) { return document.getElementById(id) ? document.getElementById(id).value : ""; }
+    function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active'); btn.classList.add('active');
     }
-    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); await load(); } }
-    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); await load(); } }
-    function updateLogoPreview(val) { if(document.getElementById('sizeVal')) document.getElementById('sizeVal').innerText = val; if(document.getElementById('currentLogoPreview')) document.getElementById('currentLogoPreview').style.width = val + "px"; }
+    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
+    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
+    function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
     function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
 </script>
 </body>
