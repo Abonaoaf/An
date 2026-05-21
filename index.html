@@ -10,6 +10,7 @@
     <style>
         :root { --p: #1a202c; --s: #28a745; --d: #dc3545; --bg: #f7fafc; --link: #4a4ae2; --view: #4a5568; --soft-red: #f87171; --wa: #25D366; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--link); display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; color: white; }
         #loginOverlay input { padding: 15px; border-radius: 12px; border: none; width: 250px; text-align: center; font-size: 1.1rem; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         #loginOverlay button { padding: 12px 40px; border-radius: 12px; border: 2px solid white; background: transparent; color: white; font-weight: bold; cursor: pointer; }
@@ -32,10 +33,13 @@
         .btn { padding: 10px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; color: white; font-size: 0.8rem; transition: 0.3s; }
         .btn-view { background: var(--view); } .btn-edit { background: var(--s); } .btn-link { background: var(--link); } .btn-del { background: var(--d); } .btn-wa { background: var(--wa); }
         .btn-main { background: var(--link); width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px; display: block; color: white; border: none; }
+        /* نافذة المعاينة الموحدة - تم تعديل التوزيع هنا */
         #viewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .view-card-container { background: white; width: 95%; max-width: 400px; border-radius: 25px; overflow: hidden; position: relative; }
         .view-header { background: var(--link); color: white; padding: 20px; text-align: center; }
         .view-body { padding: 15px 20px; background: white; }
+        
+        /* هذا الجزء يعيد النص والبيانات ليكونوا متقابلين (واحد يمين وواحد يسار) */
         .view-row { border-bottom: 1px solid #f0f0f0; padding: 12px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .v-label { font-size: 0.8rem; color: var(--soft-red); font-weight: bold; white-space: nowrap; }
         .v-text { font-size: 0.9rem; color: #333; font-weight: bold; text-align: left; word-break: break-all; }
@@ -45,14 +49,12 @@
     </style>
 </head>
 <body>
-
 <div id="loginOverlay">
     <i class="fas fa-user-shield" style="font-size: 4rem; margin-bottom: 20px;"></i>
     <h2>إدارة فولتشر 🦅</h2>
     <input type="password" id="passInput" placeholder="كلمة المرور">
     <button onclick="checkPass()">دخول</button>
 </div>
-
 <div id="viewModal">
     <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
         <div style="width: 95%; max-width: 400px; margin-bottom: 10px; display: flex; gap: 10px;">
@@ -65,7 +67,6 @@
         </div>
     </div>
 </div>
-
 <div id="adminApp" style="display:none;">
     <div class="header">
         <b>لوحة تحكم فولتشر 🦅</b>
@@ -75,23 +76,22 @@
             <button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات</button>
         </div>
     </div>
-
     <div class="container">
         <div id="clients" class="section active">
             <div class="modal">
                 <h3 id="clientTitle">إضافة مشترك جديد</h3>
                 <input type="hidden" id="editClientIndex">
-                <input type="text" id="cn" placeholder="اسم العميل">
+                <input type="text" id="cn" placeholder="اسم العميل (الرابط يعتمد عليه)">
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
+                <input type="text" id="cl" placeholder="رابط الدخول">
                 <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
                 <button class="btn btn-main" id="saveClientBtn" onclick="saveClient()">حفظ في السحابة ☁️</button>
                 <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
             </div>
             <div class="grid" id="clientGrid"></div>
         </div>
-
         <div id="store" class="section">
             <div class="modal">
                 <h3 id="appTitle">+ إضافة تطبيق للمتجر</h3>
@@ -107,11 +107,8 @@
             <button class="btn btn-main" style="background:#5e4cc1; margin-bottom:20px;" onclick="saveOrder()"><i class="fas fa-save"></i> حفظ الترتيب الحالي</button>
             <div class="grid" id="appList"></div>
         </div>
-
         <div id="settings" class="section">
             <div class="modal" style="text-align:center;">
-                <h3>رابط الدخول الموحد</h3>
-                <input type="text" id="sharedLink" placeholder="ضع الرابط الثابت هنا...">
                 <h3>تنسيق شعار فولتشر 🦅</h3>
                 <input type="file" id="logoFile" accept="image/*" onchange="previewNewLogo(this)">
                 <div style="margin:20px 0;"><label>الحجم: <b id="sizeVal">70</b>px</label><input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)"></div>
@@ -121,12 +118,10 @@
         </div>
     </div>
 </div>
-
 <script>
     const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     const MASTER_PASS = "Aztlg1512";
-    let cloudData = { clients: [], apps: [], logo: "", logoSize: "70", sharedLink: "" };
-
+    let cloudData = { clients: [], apps: [], logo: "", logoSize: "70" };
     async function checkPass() {
         if(document.getElementById('passInput').value === MASTER_PASS) {
             document.getElementById('loginOverlay').style.display = "none";
@@ -134,7 +129,6 @@
             await load();
         } else { alert("كلمة المرور غير صحيحة!"); }
     }
-
     async function load() {
         const r = await fetch(DB);
         const d = await r.json();
@@ -142,12 +136,10 @@
             cloudData = d;
             if(!cloudData.clients) cloudData.clients = [];
             if(!cloudData.apps) cloudData.apps = [];
-            if(cloudData.sharedLink) document.getElementById('sharedLink').value = cloudData.sharedLink;
             if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;
             renderClients(); renderApps();
         }
     }
-
     function renderClients() {
         const grid = document.getElementById('clientGrid');
         grid.innerHTML = (cloudData.clients || []).map((c, i) => {
@@ -158,7 +150,7 @@
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
-                    <button class="btn btn-link" onclick="copyL()">الرابط</button>
+                    <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
                     <button class="btn btn-view" onclick="openView(${i}, 'client')">بيانات</button>
                     <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
                     ${showWA ? `<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 2; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه واتساب</button>` : ''}
@@ -166,7 +158,6 @@
             </div>`;
         }).join('');
     }
-
     function renderApps() {
         const list = document.getElementById('appList');
         list.innerHTML = (cloudData.apps || []).map((a, i) => `
@@ -182,13 +173,12 @@
             </div>`).join('');
         new Sortable(list, { animation: 150, handle: '.drag-handle' });
     }
-
     function openView(i, type) {
         const vContent = document.getElementById('v_content');
         if(type === 'client') {
             const c = cloudData.clients[i];
             document.getElementById('v_title').innerText = "بيانات المشترك";
-            const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['كلمة السر', c.ck],['الرابط الموحد', cloudData.sharedLink],['بداية الاشتراك', c.cs],['نهاية الاشتراك', c.ce]];
+            const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['كلمة السر', c.ck],['الرابط', c.cl],['بداية الاشتراك', c.cs],['نهاية الاشتراك', c.ce]];
             vContent.innerHTML = fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
         } else {
             const a = cloudData.apps[i];
@@ -199,40 +189,88 @@
         }
         document.getElementById('viewModal').style.display = 'flex';
     }
-
-    function copyL() {
-        const sharedUrl = cloudData.sharedLink || "";
-        if(sharedUrl) {
-            navigator.clipboard.writeText(sharedUrl);
-            alert("تم نسخ الرابط الموحد ✅");
-        } else { alert("لم يتم ضبط رابط موحد في الإعدادات!"); }
+    function editApp(i) {
+        const a = cloudData.apps[i];
+        document.getElementById('editAppIndex').value = i;
+        document.getElementById('an').value = a.name;
+        document.getElementById('ad').value = a.ad || "";
+        document.getElementById('al').value = a.al || "";
+        document.getElementById('at').value = a.at || "";
+        document.getElementById('appTitle').innerText = "تعديل تطبيق: " + a.name;
+        document.getElementById('saveAppBtn').innerText = "تحديث في المتجر ✨";
+        document.getElementById('cancelAppBtn').style.display = "block";
+        window.scrollTo(0,0);
     }
-
+    function clearAppForm() {
+        ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = "");
+        document.getElementById('appTitle').innerText = "+ إضافة تطبيق للمتجر";
+        document.getElementById('saveAppBtn').innerText = "حفظ في المتجر ✨";
+        document.getElementById('cancelAppBtn').style.display = "none";
+    }
+    async function saveApp() {
+        const idx = document.getElementById('editAppIndex').value;
+        const iconFile = document.getElementById('appIcon').files[0];
+        let imgBase64 = "";
+        if (iconFile) {
+            const reader = new FileReader();
+            imgBase64 = await new Promise(r => { reader.onload=()=>r(reader.result); reader.readAsDataURL(iconFile); });
+        } else if (idx !== "") { imgBase64 = cloudData.apps[idx].img; }
+        const appData = { name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 };
+        if (idx === "") cloudData.apps.push(appData); else cloudData.apps[idx] = appData;
+        await sync(); clearAppForm(); load(); alert("تم الحفظ بنجاح ✨");
+    }
+    function editClient(i) {
+        const c = cloudData.clients[i];
+        document.getElementById('editClientIndex').value = i;
+        document.getElementById('cn').value = c.name;
+        document.getElementById('cn').disabled = true; 
+        ['cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
+        document.getElementById('cancelBtn').style.display = "block";
+        window.scrollTo(0,0);
+    }
+    function clearClientForm() {
+        ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value="");
+        document.getElementById('cn').disabled = false;
+        document.getElementById('clientTitle').innerText = "إضافة مشترك جديد";
+        document.getElementById('cancelBtn').style.display = "none";
+    }
+    function copyL(name) {
+        const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
+        navigator.clipboard.writeText(clientUrl);
+        alert("تم نسخ رابط المشترك الثابت ✅");
+    }
     async function saveClient() {
         const idx = document.getElementById('editClientIndex').value;
-        const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cs: v('cs'), ce: v('ce') };
+        const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
         await sync(); clearClientForm(); load();
     }
-
-    // --- بقية الدوال (editApp, clearAppForm, saveApp, editClient, clearClientForm, saveOrder, sendReminder, sync, etc.) تبقى كما هي ---
-    function editApp(i) { const a = cloudData.apps[i]; document.getElementById('editAppIndex').value = i; document.getElementById('an').value = a.name; document.getElementById('ad').value = a.ad || ""; document.getElementById('al').value = a.al || ""; document.getElementById('at').value = a.at || ""; document.getElementById('appTitle').innerText = "تعديل: " + a.name; document.getElementById('saveAppBtn').innerText = "تحديث"; document.getElementById('cancelAppBtn').style.display = "block"; window.scrollTo(0,0); }
-    function clearAppForm() { ['an','ad','al','at','editAppIndex','appIcon'].forEach(id => document.getElementById(id).value = ""); document.getElementById('appTitle').innerText = "+ إضافة تطبيق"; document.getElementById('saveAppBtn').innerText = "حفظ"; document.getElementById('cancelAppBtn').style.display = "none"; }
-    async function saveApp() { const idx = document.getElementById('editAppIndex').value; const iconFile = document.getElementById('appIcon').files[0]; let imgBase64 = ""; if (iconFile) { const reader = new FileReader(); imgBase64 = await new Promise(r => { reader.onload=()=>r(reader.result); reader.readAsDataURL(iconFile); }); } else if (idx !== "") { imgBase64 = cloudData.apps[idx].img; } const appData = { name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 }; if (idx === "") cloudData.apps.push(appData); else cloudData.apps[idx] = appData; await sync(); clearAppForm(); load(); }
-    function editClient(i) { const c = cloudData.clients[i]; document.getElementById('editClientIndex').value = i; document.getElementById('cn').value = c.name; document.getElementById('cn').disabled = true; ['cp','cu','ck','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || ""); document.getElementById('clientTitle').innerText = "تعديل: " + c.name; document.getElementById('cancelBtn').style.display = "block"; window.scrollTo(0,0); }
-    function clearClientForm() { ['cn','cp','cu','ck','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value=""); document.getElementById('cn').disabled = false; document.getElementById('clientTitle').innerText = "إضافة مشترك"; document.getElementById('cancelBtn').style.display = "none"; }
-    async function saveOrder() { const items = document.querySelectorAll('#appList .app-card'); let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')])); cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); load(); }
-    function sendReminder(name, phone, days) { let cleanPhone = phone.replace(/\D/g, ''); if(!cleanPhone.startsWith('966')) cleanPhone = '966' + cleanPhone; const msg = `مرحباً ${name}، اشتراكك ينتهي خلال ${days} أيام.`; window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank'); }
+    async function saveOrder() {
+        const items = document.querySelectorAll('#appList .app-card');
+        let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
+        cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); load();
+    }
+    function sendReminder(name, phone, days) {
+        let cleanPhone = phone.replace(/\D/g, '');
+        if(!cleanPhone.startsWith('966')) cleanPhone = '966' + cleanPhone;
+        const msg = `مرحباً ${name}، اشتراكك في فولتشر ينتهي خلال ${days} أيام.`;
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
     function closeView() { document.getElementById('viewModal').style.display = 'none'; }
     function saveCardAsImage() { html2canvas(document.getElementById('captureTarget'), {scale: 3}).then(canvas => { const link = document.createElement('a'); link.href = canvas.toDataURL(); link.download = `Vulture_Card.png`; link.click(); }); }
     async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
     function v(id) { return document.getElementById(id).value; }
-    function switchTab(id, btn) { document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
+    function switchTab(id, btn) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active'); btn.classList.add('active');
+    }
     async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
     async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
     function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
     function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
-    async function saveSettings() { cloudData.logo = document.getElementById('currentLogoPreview').src; cloudData.logoSize = document.getElementById('logoSize').value; cloudData.sharedLink = document.getElementById('sharedLink').value; await sync(); alert("تم الحفظ!"); }
+    async function saveSettings() { cloudData.logo = document.getElementById('currentLogoPreview').src; cloudData.logoSize = document.getElementById('logoSize').value; await sync(); alert("تم الحفظ!"); }
 </script>
 </body>
 </html>
