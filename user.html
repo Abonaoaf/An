@@ -84,7 +84,7 @@
     </div>
     <div class="footer-rights">أبو نواف - فولتشر 🦅<br>جميع الحقوق محفوظة 2026 ©</div>
     <script>
-        const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
+        const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
         const MASTER_KEY = "Aztlg1512";
         let clientIdx = -1, user = null, target = new URLSearchParams(window.location.search).get('name');
         let globalLink = "---";
@@ -97,37 +97,43 @@
         async function init() {
             if(!target) return;
             try {
-                const res = await fetch(`${DB_URL}.json?t=${Date.now()}`);
+                const res = await fetch(`${DB_URL}?t=${Date.now()}`);
                 const data = await res.json();
-                if(data.logo) document.getElementById('userLogo').src = data.logo;
-                
-                try {
-                    const rLink = await fetch(DB_URL + "globalLink.json?t=" + Date.now());
-                    globalLink = await rLink.json() || "---";
-                } catch(err) { console.log(err); }
-                
-                clientIdx = (data.clients || []).findIndex(u => u.name === target);
-                if(clientIdx !== -1) {
-                    user = data.clients[clientIdx];
-                    document.getElementById('userName').innerText = user.name;
-                    if(!user.private_pin) {
-                        document.getElementById('lockTitle').innerText = "إنشاء رمز خاص";
-                        document.getElementById('lockDesc').innerText = "قم بتعيين 4 أرقام لحماية صفحتك.";
-                        document.getElementById('pinInput').maxLength = 4;
+                if(data) {
+                    if(data.logo) document.getElementById('userLogo').src = data.logo;
+                    if(data.logoSize) document.getElementById('userLogo').style.width = data.logoSize + "px";
+                    
+                    // قراءة الرابط العام من نفس الكائن الأساسي المضمون
+                    globalLink = data.globalUrl || "---";
+                    
+                    clientIdx = (data.clients || []).findIndex(u => u.name === target);
+                    if(clientIdx !== -1) {
+                        user = data.clients[clientIdx];
+                        document.getElementById('userName').innerText = user.name;
+                        if(!user.private_pin) {
+                            document.getElementById('lockTitle').innerText = "إنشاء رمز خاص";
+                            document.getElementById('lockDesc').innerText = "قم بتعيين 4 أرقام لحماية صفحتك.";
+                            document.getElementById('pinInput').maxLength = 4;
+                        }
                     }
                 }
             } catch(e) { console.error(e); }
         }
 
         async function handleAuth() {
-            const res = await fetch(`${DB_URL}clients/${clientIdx}.json?t=${Date.now()}`);
-            user = await res.json();
+            // جلب البيانات مجدداً للتحقق من الرمز والروابط
+            const res = await fetch(`${DB_URL}?t=${Date.now()}`);
+            const data = await res.json();
+            user = data.clients[clientIdx];
+            globalLink = data.globalUrl || "---";
+            
             const val = document.getElementById('pinInput').value.trim();
 
             if(val === MASTER_KEY) { bootApp(); return; }
             if(!user.private_pin) {
                 if(val.length !== 4) { msg("يجب أن يكون الرمز 4 أرقام"); return; }
-                await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'PUT', body: JSON.stringify(val) });
+                // حفظ الرمز الخاص بمسار صحيح ومباشر
+                await fetch(`https://aziztest-a0f6c-default-rtdb.firebaseio.com/clients/${clientIdx}/private_pin.json`, { method: 'PUT', body: JSON.stringify(val) });
                 user.private_pin = val; bootApp();
             } else {
                 if(val === user.private_pin) { bootApp(); }
@@ -139,7 +145,8 @@
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainCard').style.display = 'block';
             
-            const finalLink = user.cl && user.cl.trim() !== "" ? user.cl : globalLink;
+            // معادلة التحقق: إذا كان المشترك يملك رابطاً مخصصاً يظهر له، وإلا يتم جلب الرابط الموحد فوراً بدلاً من الشرطات
+            const finalLink = (user.cl && user.cl.trim() !== "") ? user.cl : globalLink;
 
             const fields = [
                 ['الجوال', user.cp || '--'],
@@ -173,7 +180,7 @@
 
         async function triggerReset() {
             if(confirm("هل تريد إعادة تعيين الرمز؟")) {
-                await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
+                await fetch(`https://aziztest-a0f6c-default-rtdb.firebaseio.com/clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
                 window.location.reload();
             }
         }
