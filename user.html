@@ -207,11 +207,6 @@
             color: #333;
             word-break: break-all;
         }
-        
-        .data-value a {
-            color: var(--main);
-            text-decoration: underline;
-        }
 
         .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; font-size: 1.1rem; }
 
@@ -360,20 +355,83 @@
         }
 
         function bootApp() {
-            document.getElementById('lockScreen').style.display = 'none';
-            document.getElementById('mainCard').style.display = 'block';
-            
-            // سطر التعديل: تحويل الرابط إلى وسم قابل للنقر ومختصر
-            const displayLink = (user.cl && user.cl !== '--') ? `<a href="${user.cl}" target="_blank">اضغط هنا لفتح الرابط</a>` : '--';
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('mainCard').style.display = 'block';
+    
+    // التعديل: تحويل الرابط إلى نص ذكي قابل للنقر بدلاً من النص الطويل
+    const displayLink = (user.cl && user.cl !== '--') ? `<a href="${user.cl}" target="_blank" style="color: var(--main); text-decoration: underline;">اضغط هنا لفتح الرابط</a>` : '--';
 
-            const fields = [
-                ['الجوال', user.cp || '--'],
-                ['اسم المستخدم', user.cu || '--'],
-                ['الرقم السري', user.ck || '--'],
-                ['رابط الدخول', displayLink],
-                ['تاريخ البداية', user.cs || '--'],
-                ['تاريخ النهاية', user.ce || '--']
-            ];
+    function bootApp() {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('mainCard').style.display = 'block';
+    
+    // تعديل ذكي: قراءة رابط المشترك أولاً، وإذا لم يوجد يقرأ الرابط العام من السحابة (cloudData.globalLink)
+    const rawLink = (user.cl && user.cl !== '--' && user.cl.trim() !== '') ? user.cl : (cloudData && cloudData.globalLink ? cloudData.globalLink : '');
+    const displayLink = rawLink ? `<a href="${rawLink}" target="_blank" style="color: var(--main); text-decoration: underline;">اضغط هنا لفتح الرابط</a>` : '--';
+
+    function bootApp() {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('mainCard').style.display = 'block';
+    
+    // تعديل ذكي: قراءة رابط المشترك أولاً، وإذا لم يوجد يقرأ الرابط العام من السحابة (cloudData.globalLink)
+    const rawLink = (user.cl && user.cl !== '--' && user.cl.trim() !== '') ? user.cl : (cloudData && cloudData.globalLink ? cloudData.globalLink : '');
+    const displayLink = rawLink ? `<a href="${rawLink}" target="_blank" style="color: var(--main); text-decoration: underline;">اضغط هنا لفتح الرابط</a>` : '--';
+
+    const fields = [
+        ['الجوال', user.cp || '--'],
+        ['اسم المستخدم', user.cu || '--'],
+        ['الرقم السري', user.ck || '--'],
+        ['رابط الدخول', displayLink], // الآن يعرض الرابط الفعال الموحد بشكل نظيف للكل
+        ['تاريخ البداية', user.cs || '--'],
+        ['تاريخ النهاية', user.ce || '--']
+    ];
+
+    document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
+        <div class="data-row">
+            <div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div>
+            <i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i>
+        </div>
+    `).join('');
+
+    const updateUI = () => {
+        const now = new Date().getTime(), end = new Date(user.ce).getTime();
+        const left = end - now, days = Math.max(0, Math.ceil(left / 86400000));
+        document.getElementById('daysCount').innerText = days;
+        document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%";
+        if(left > 0) {
+            const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
+            const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
+            document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
+        } else {
+            document.getElementById('timerGrid').innerHTML = "<b style='color:red;width:100%'>انتهى الاشتراك</b>";
+        }
+    };
+    updateUI(); setInterval(updateUI, 1000);
+}
+
+    document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
+        <div class="data-row">
+            <div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div>
+            <i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i>
+        </div>
+    `).join('');
+
+    const updateUI = () => {
+        const now = new Date().getTime(), end = new Date(user.ce).getTime();
+        const left = end - now, days = Math.max(0, Math.ceil(left / 86400000));
+        document.getElementById('daysCount').innerText = days;
+        document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%";
+        if(left > 0) {
+            const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
+            const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
+            document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
+        } else {
+            document.getElementById('timerGrid').innerHTML = "<b style='color:red;width:100%'>انتهى الاشتراك</b>";
+        }
+    };
+    updateUI(); setInterval(updateUI, 1000);
+}
+
             document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
                 <div class="data-row">
                     <div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div>
@@ -385,4 +443,39 @@
                 const now = new Date().getTime(), end = new Date(user.ce).getTime();
                 const left = end - now, days = Math.max(0, Math.ceil(left / 86400000));
                 document.getElementById('daysCount').innerText = days;
-                document.getElementById('barConsumed').style.width = Math.max(0, 100 - (
+                document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%";
+                if(left > 0) {
+                    const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
+                    const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
+                    document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
+                } else {
+                    document.getElementById('timerGrid').innerHTML = "<b style='color:red;width:100%'>انتهى الاشتراك</b>";
+                }
+            };
+            updateUI(); setInterval(updateUI, 1000);
+        }
+
+        async function triggerReset() {
+            if(confirm("هل تريد إلغاء الرمز الحالي وتعيين رمز جديد؟")) {
+                try {
+                    if(clientIdx === -1) return;
+                    await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
+                    window.location.reload();
+                } catch(e) { alert("حدث خطأ في الاتصال"); }
+            }
+        }
+
+        function msg(t) {
+            const e = document.getElementById('errorMsg');
+            e.innerText = t; e.style.display = 'block';
+        }
+
+        function copyText(id) {
+            navigator.clipboard.writeText(document.getElementById(id).innerText);
+            alert("تم النسخ!");
+        }
+
+        init();
+    </script>
+</body>
+</html>
