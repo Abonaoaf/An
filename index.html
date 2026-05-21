@@ -81,7 +81,7 @@
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
-                <input type="text" id="cl" placeholder="رابط دخول مخصص (اتركه فارغاً للاعتماد على الرابط الموحد)">
+                <input type="text" id="cl" placeholder="رابط مخصص (اتركه فارغاً للاعتماد على الرابط الموحد)">
                 <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
                 <button class="btn btn-main" id="saveClientBtn" onclick="saveClient()">حفظ في السحابة ☁️</button>
                 <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
@@ -106,11 +106,11 @@
         <div id="settings" class="section">
             <div class="modal" style="text-align:center;">
                 <h3>إعدادات المنصة الموحدة ⚙️</h3>
-                <div style="text-align: right; margin-bottom: 20px;">
-                    <label style="font-weight: bold; color: #333;">رابط الدخول الموحد لجميع المشتركين:</label>
-                    <input type="text" id="globalLink" placeholder="أدخل الرابط العام هنا ليظهر للجميع تلقائياً">
+                <div style="text-align: right; margin-bottom: 15px;">
+                    <label><b>رابط التشغيل الموحد لكل المشتركين:</b></label>
+                    <input type="text" id="globalLink" placeholder="ضع هنا الرابط العام الذي سينعكس للجميع">
                 </div>
-                <hr style="border:0; border-top:1px dashed #ddd; margin:20px 0;">
+                <hr style="border: 0; border-top: 1px dashed #ddd; margin: 20px 0;">
                 <h3>تنسيق شعار فولتشر 🦅</h3>
                 <input type="file" id="logoFile" accept="image/*" onchange="previewNewLogo(this)">
                 <div style="margin:20px 0;"><label>الحجم: <b id="sizeVal">70</b>px</label><input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)"></div>
@@ -121,9 +121,12 @@
     </div>
 </div>
 <script>
-    const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    const BASE_DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
+    const DB = BASE_DB + ".json";
     const MASTER_PASS = "Aztlg1512";
-    let cloudData = { clients: [], apps: [], logo: "", logoSize: "70", globalLink: "" };
+    let cloudData = { clients: [], apps: [], logo: "", logoSize: "70" };
+    let globalLinkStr = "";
+
     async function checkPass() {
         if(document.getElementById('passInput').value === MASTER_PASS) {
             document.getElementById('loginOverlay').style.display = "none";
@@ -134,12 +137,19 @@
     async function load() {
         const r = await fetch(DB);
         const d = await r.json();
+        
+        // جلب مستقل تماماً للرابط لمنع أي تداخل
+        try {
+            const rLink = await fetch(BASE_DB + "globalLink.json");
+            globalLinkStr = await rLink.json() || "";
+            document.getElementById('globalLink').value = globalLinkStr;
+        } catch(e) { console.log(e); }
+
         if (d) {
             cloudData = d;
             if(!cloudData.clients) cloudData.clients = [];
             if(!cloudData.apps) cloudData.apps = [];
             if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;
-            if(cloudData.globalLink) document.getElementById('globalLink').value = cloudData.globalLink;
             renderClients(); renderApps();
         }
     }
@@ -180,7 +190,7 @@
         const vContent = document.getElementById('v_content');
         if(type === 'client') {
             const c = cloudData.clients[i];
-            const activeLink = (c.cl && c.cl.trim() !== "") ? c.cl : (cloudData.globalLink || '---');
+            const activeLink = (c.cl && c.cl.trim() !== "") ? c.cl : (globalLinkStr || '---');
             document.getElementById('v_title').innerText = "بيانات المشترك";
             const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['كلمة السر', c.ck],['الرابط المعتمد', activeLink],['بداية الاشتراك', c.cs],['نهاية الاشتراك', c.ce]];
             vContent.innerHTML = fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
@@ -248,7 +258,7 @@
         const idx = document.getElementById('editClientIndex').value;
         const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
-        await sync(); clearClientForm(); load(); alert("تم حفظ المشترك بنجاح ✅");
+        await sync(); clearClientForm(); load(); alert("تم حفظ العميل بالسحابة ✅");
     }
     async function saveOrder() {
         const items = document.querySelectorAll('#appList .app-card');
@@ -274,10 +284,15 @@
     async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
     function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
     function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
+    
     async function saveSettings() { 
         cloudData.logo = document.getElementById('currentLogoPreview').src;
         cloudData.logoSize = document.getElementById('logoSize').value; 
-        cloudData.globalLink = document.getElementById('globalLink').value; 
+        
+        // حفظ الرابط في مسار منفصل ومستقل تماماً لضمان عدم حدوث أي مشكلة مزامنة
+        const newGlobalLink = document.getElementById('globalLink').value;
+        await fetch(BASE_DB + "globalLink.json", { method: 'PUT', body: JSON.stringify(newGlobalLink) });
+        
         await sync(); 
         alert("تم حفظ الرابط الموحد والإعدادات بنجاح! 🚀");
         await load();
