@@ -49,7 +49,7 @@
         <div class="lock-card">
             <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: #4a4ae2;"></i>
             <h2 id="lockTitle" style="margin-top:15px;">تحقق آمن</h2>
-            <p id="lockDesc">يرجى إدخال الرمز الخاص بك</p>
+            <p id="lockDesc">يرجى إدخل الرمز الخاص بك</p>
             <input type="password" id="pinInput" class="pin-input" placeholder="****">
             <button onclick="handleAuth()" class="btn" style="background: #4a4ae2;">دخول</button>
             <div id="errorMsg" style="color:var(--danger); margin-top:10px; font-weight:bold; display:none;"></div>
@@ -86,7 +86,10 @@
     <script>
         const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
         const MASTER_KEY = "Aztlg1512";
-        let clientIdx = -1, user = null, target = new URLSearchParams(window.location.search).get('name');
+        let target = new URLSearchParams(window.location.search).get('name');
+        let fullData = null;
+        let clientIdx = -1;
+        let user = null;
         let globalLink = "---";
 
         const d = new Date();
@@ -98,17 +101,17 @@
             if(!target) return;
             try {
                 const res = await fetch(`${DB_URL}?t=${Date.now()}`);
-                const data = await res.json();
-                if(data) {
-                    if(data.logo) document.getElementById('userLogo').src = data.logo;
-                    if(data.logoSize) document.getElementById('userLogo').style.width = data.logoSize + "px";
+                fullData = await res.json();
+                if(fullData) {
+                    if(fullData.logo) document.getElementById('userLogo').src = fullData.logo;
+                    if(fullData.logoSize) document.getElementById('userLogo').style.width = fullData.logoSize + "px";
                     
-                    // قراءة الرابط العام من نفس الكائن الأساسي المضمون
-                    globalLink = data.globalUrl || "---";
+                    globalLink = fullData.globalUrl || "---";
                     
-                    clientIdx = (data.clients || []).findIndex(u => u.name === target);
+                    // تحديد العميل الصحيح من المصفوفة
+                    clientIdx = (fullData.clients || []).findIndex(u => u && u.name === target);
                     if(clientIdx !== -1) {
-                        user = data.clients[clientIdx];
+                        user = fullData.clients[clientIdx];
                         document.getElementById('userName').innerText = user.name;
                         if(!user.private_pin) {
                             document.getElementById('lockTitle').innerText = "إنشاء رمز خاص";
@@ -121,20 +124,25 @@
         }
 
         async function handleAuth() {
-            // جلب البيانات مجدداً للتحقق من الرمز والروابط
             const res = await fetch(`${DB_URL}?t=${Date.now()}`);
-            const data = await res.json();
-            user = data.clients[clientIdx];
-            globalLink = data.globalUrl || "---";
+            fullData = await res.json();
+            
+            clientIdx = (fullData.clients || []).findIndex(u => u && u.name === target);
+            user = fullData.clients[clientIdx];
+            globalLink = fullData.globalUrl || "---";
             
             const val = document.getElementById('pinInput').value.trim();
 
             if(val === MASTER_KEY) { bootApp(); return; }
             if(!user.private_pin) {
                 if(val.length !== 4) { msg("يجب أن يكون الرمز 4 أرقام"); return; }
-                // حفظ الرمز الخاص بمسار صحيح ومباشر
-                await fetch(`https://aziztest-a0f6c-default-rtdb.firebaseio.com/clients/${clientIdx}/private_pin.json`, { method: 'PUT', body: JSON.stringify(val) });
-                user.private_pin = val; bootApp();
+                
+                // تحديث الرمز الخاص للعميل المحدد بدقة داخل المصفوفة الكاملة لمنع الخلط
+                fullData.clients[clientIdx].private_pin = val;
+                await fetch("https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json", { method: 'PUT', body: JSON.stringify(fullData) });
+                
+                user.private_pin = val; 
+                bootApp();
             } else {
                 if(val === user.private_pin) { bootApp(); }
                 else { msg("الرمز غير صحيح!"); }
@@ -145,7 +153,6 @@
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainCard').style.display = 'block';
             
-            // معادلة التحقق: إذا كان المشترك يملك رابطاً مخصصاً يظهر له، وإلا يتم جلب الرابط الموحد فوراً بدلاً من الشرطات
             const finalLink = (user.cl && user.cl.trim() !== "") ? user.cl : globalLink;
 
             const fields = [
@@ -180,7 +187,13 @@
 
         async function triggerReset() {
             if(confirm("هل تريد إعادة تعيين الرمز؟")) {
-                await fetch(`https://aziztest-a0f6c-default-rtdb.firebaseio.com/clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
+                const res = await fetch(`${DB_URL}?t=${Date.now()}`);
+                let freshData = await res.json();
+                let idx = (freshData.clients || []).findIndex(u => u && u.name === target);
+                if(idx !== -1) {
+                    delete freshData.clients[idx].private_pin;
+                    await fetch("https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json", { method: 'PUT', body: JSON.stringify(freshData) });
+                }
                 window.location.reload();
             }
         }
