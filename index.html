@@ -78,7 +78,7 @@
         <b>لوحة تحكم فولتشر 🦅</b>
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('clients', this)">المشتركين</button>
-            <button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات</button>
+            <button class="tab-btn" onclick="switchTab('settings', this)">الإعدادات العامة ⚙️</button>
         </div>
     </div>
 
@@ -91,6 +91,7 @@
                 <input type="text" id="cp" placeholder="رقم الجوال">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
+                <input type="text" id="cl" placeholder="رابط خاص بالعميل فقط (اتركه فارغاً ليعتمد الرابط العام للكل)">
                 <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
                 <button class="btn btn-main" id="saveClientBtn" onclick="saveClient()">حفظ في السحابة ☁️</button>
                 <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
@@ -102,8 +103,8 @@
             <div class="modal" style="text-align:center;">
                 <h3>الإعدادات العامة ⚙️</h3>
                 <div style="text-align:right; margin-bottom:15px;">
-                    <label><b>الرابط الموحد للمشتركين:</b></label>
-                    <input type="text" id="globalLink" placeholder="أدخل الرابط الذي سيظهر لجميع المشتركين">
+                    <label><b>الرابط الموحد لجميع المشتركين (للكل):</b></label>
+                    <input type="text" id="globalLink" placeholder="أدخل الرابط العام لجميع المشتركين">
                 </div>
                 <hr>
                 <h3>تنسيق شعار فولتشر 🦅</h3>
@@ -144,8 +145,6 @@
             updateLogoPreview(cloudData.logoSize || 70);
             
             renderClients();
-            // تم فحص وجود العنصر لضمان عدم حدوث تعليق عند الدخول واقلاع الصفحة بنجاح
-            if(document.getElementById('appList')) { renderApps(); }
         }
     }
 
@@ -160,8 +159,8 @@
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
                     <button class="btn btn-edit" onclick="editClient(${i})">تعديل</button>
-                    <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط</button>
-                    <button class="btn btn-view" onclick="openView(${i}, 'client')">بيانات</button>
+                    <button class="btn btn-link" onclick="copyL('${c.name}')">الرابط الثابت</button>
+                    <button class="btn btn-view" onclick="openView(${i})">بيانات</button>
                     <button class="btn btn-del" onclick="delClient(${i})">حذف</button>
                     ${showWA ? `<button class="btn btn-wa" onclick="sendReminder('${c.name}', '${c.cp}', ${days})" style="grid-column: span 2; margin-top:5px;"><i class="fab fa-whatsapp"></i> تنبيه واتساب</button>` : ''}
                 </div>
@@ -169,23 +168,25 @@
         }).join('');
     }
 
-    function openView(i, type) {
+    function openView(i) {
         const vContent = document.getElementById('v_content');
-        if(type === 'client') {
-            const c = cloudData.clients[i];
-            document.getElementById('v_title').innerText = "بيانات المشترك";
-            const linkToShow = cloudData.globalLink || '---';
-            const fields = [
-                ['اسم المشترك', c.name],
-                ['رقم الجوال', c.cp],
-                ['اسم المستخدم', c.cu],
-                ['كلمة السر', c.ck],
-                ['الرابط', linkToShow], 
-                ['بداية الاشتراك', c.cs],
-                ['نهاية الاشتراك', c.ce]
-            ];
-            vContent.innerHTML = fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
-        }
+        const c = cloudData.clients[i];
+        document.getElementById('v_title').innerText = "بيانات المشترك";
+        
+        // الخيار المدمج: إذا وجد رابط للعميل يظهره، وإذا لم يجد يعرض الرابط الموحد للكل
+        const linkToShow = c.cl || cloudData.globalLink || '---';
+        
+        const fields = [
+            ['اسم المشترك', c.name],
+            ['رقم الجوال', c.cp],
+            ['اسم المستخدم', c.cu],
+            ['كلمة السر', c.ck],
+            ['الرابط الفعال', linkToShow], 
+            ['نوع الرابط', c.cl ? 'رابط خاص بالعميل 👤' : 'الرابط الموحد للكل 👥'],
+            ['بداية الاشتراك', c.cs],
+            ['نهاية الاشتراك', c.ce]
+        ];
+        vContent.innerHTML = fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
         document.getElementById('viewModal').style.display = 'flex';
     }
 
@@ -194,14 +195,14 @@
         document.getElementById('editClientIndex').value = i;
         document.getElementById('cn').value = c.name;
         document.getElementById('cn').disabled = true; 
-        ['cp','cu','ck','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        ['cp','cu','ck','cl','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
         document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
         document.getElementById('cancelBtn').style.display = "block";
         window.scrollTo(0,0);
     }
 
     function clearClientForm() {
-        ['cn','cp','cu','ck','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value="");
+        ['cn','cp','cu','ck','cl','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value="");
         document.getElementById('cn').disabled = false;
         document.getElementById('clientTitle').innerText = "إضافة مشترك جديد";
         document.getElementById('cancelBtn').style.display = "none";
@@ -209,7 +210,7 @@
 
     async function saveClient() {
         const idx = document.getElementById('editClientIndex').value;
-        const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cs: v('cs'), ce: v('ce') };
+        const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cl: v('cl'), cs: v('cs'), ce: v('ce') };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
         await sync(); 
         clearClientForm(); 
@@ -228,7 +229,7 @@
     function copyL(name) {
         const clientUrl = "https://abonaoaf.github.io/An/user.html?name=" + encodeURIComponent(name);
         navigator.clipboard.writeText(clientUrl);
-        alert("تم نسخ رابط المشترك الثابت ✅");
+        alert("تم نسخ رابط المشترك الثابت بنجاح ✅");
     }
 
     function sendReminder(name, phone, days) {
@@ -244,4 +245,12 @@
     function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active'); btn.classList.add('active');
+    }
+    async function delClient(i) { if(confirm("هل أنت متأكد من حذف هذا المشترك؟")) { cloudData.clients.splice(i,1); await sync(); await load(); } }
+    function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
+    function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
+</script>
+</body>
+</html>
