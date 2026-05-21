@@ -209,7 +209,6 @@
             const c = cloudData.clients[i];
             document.getElementById('v_title').innerText = "بيانات المشترك";
             
-            // قراءة الرابط الموحد مباشرة وثابتة لضمان الظهور الفوري للعميل الجديد والقديم
             const linkToShow = cloudData.globalLink || '---';
             
             const fields = [
@@ -256,7 +255,7 @@
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
         await sync(); 
         clearClientForm(); 
-        await load(); // إعادة جلب البيانات فوراً لضمان تحديث الذاكرة المحلية بالروابط الموحدة للعميل الجديد
+        await load(); 
     }
 
     async function saveApp() {
@@ -274,7 +273,4 @@
 
     async function saveSettings() {
         cloudData.logo = document.getElementById('currentLogoPreview').src;
-        cloudData.logoSize = document.getElementById('logoSize').value;
-        cloudData.globalLink = document.getElementById('globalLink').value;
-        await sync();
-        alert("تم حفظ الإعدادات
+        cloudData.logoSize = document.getElementById
