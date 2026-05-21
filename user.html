@@ -313,7 +313,7 @@
         const MASTER_KEY = "Aztlg1512";
         let clientIdx = -1;
         let user = null;
-        let cloudData = null; // تعريف متغير البيانات العامة لمنع أي تعارض
+        let cloudData = null; // قمنا بتعريف متغير لاستقبال بيانات السحابة كاملة
 
         const d = new Date();
         document.getElementById('dayNum').innerText = d.getDate();
@@ -325,7 +325,7 @@
             if(!target) return;
             try {
                 const res = await fetch(DB_URL + ".json");
-                cloudData = await res.json(); // تخزين البيانات هنا لتشمل الرابط الموحد للكل
+                cloudData = await res.json(); // قراءة وتخزين السحابة بالكامل لتشمل الرابط العام الموحد للكل
                 if(cloudData.logo) document.getElementById('userLogo').src = cloudData.logo;
                 clientIdx = (cloudData.clients || []).findIndex(u => u.name === target);
                 if(clientIdx !== -1) {
@@ -359,7 +359,7 @@
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainCard').style.display = 'block';
             
-            // قراءة رابط المشترك أولاً، وإذا لم يوجد يقرأ الرابط الموحد للكل من السحابة تلقائياً
+            // قراءة رابط المشترك أولاً، وإذا لم يوجد أو كان شرطتين، يقرأ تلقائياً الرابط العام الموحد للكل من السحابة
             const rawLink = (user.cl && user.cl !== '--' && user.cl.trim() !== '') ? user.cl : (cloudData && cloudData.globalLink ? cloudData.globalLink : '');
             const displayLink = rawLink ? `<a href="${rawLink}" target="_blank" style="color: var(--main); text-decoration: underline;">اضغط هنا لفتح الرابط</a>` : '--';
 
@@ -367,11 +367,10 @@
                 ['الجوال', user.cp || '--'],
                 ['اسم المستخدم', user.cu || '--'],
                 ['الرقم السري', user.ck || '--'],
-                ['رابط الدخول', displayLink], 
+                ['رابط الدخول', displayLink], // عرض الرابط الموحد أو الخاص بشكل أنيق
                 ['تاريخ البداية', user.cs || '--'],
                 ['تاريخ النهاية', user.ce || '--']
             ];
-
             document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
                 <div class="data-row">
                     <div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div>
@@ -411,7 +410,7 @@
         }
 
         function copyText(id) {
-            // كود ذكي يضمن نسخ الرابط الحقيقي المخفي عند النقر على أيقونة النسخ
+            // كود ذكي يقرأ وسم الرابط داخل العنصر لينسخ عنوان الـ href الحقيقي بدلاً من النص
             const linkEl = document.getElementById(id).querySelector('a');
             const txt = linkEl ? linkEl.href : document.getElementById(id).innerText;
             navigator.clipboard.writeText(txt);
