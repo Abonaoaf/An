@@ -121,11 +121,9 @@
     </div>
 </div>
 <script>
-    const BASE_DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/";
-    const DB = BASE_DB + ".json";
+    const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     const MASTER_PASS = "Aztlg1512";
-    let cloudData = { clients: [], apps: [], logo: "", logoSize: "70" };
-    let globalLinkStr = "";
+    let cloudData = { clients: [], apps: [], logo: "", logoSize: "70", globalUrl: "" };
 
     async function checkPass() {
         if(document.getElementById('passInput').value === MASTER_PASS) {
@@ -135,20 +133,22 @@
         } else { alert("كلمة المرور غير صحيحة!"); }
     }
     async function load() {
-        const r = await fetch(DB);
+        const r = await fetch(DB + "?t=" + Date.now());
         const d = await r.json();
-        
-        try {
-            const rLink = await fetch(BASE_DB + "globalLink.json");
-            globalLinkStr = await rLink.json() || "";
-            document.getElementById('globalLink').value = globalLinkStr;
-        } catch(e) { console.log(e); }
-
         if (d) {
             cloudData = d;
             if(!cloudData.clients) cloudData.clients = [];
             if(!cloudData.apps) cloudData.apps = [];
+            
+            // قراءة الرابط الموحد بأمان وعرضه في الإعدادات
+            const currentGlobalLink = cloudData.globalUrl || "";
+            document.getElementById('globalLink').value = currentGlobalLink;
+            
             if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;
+            if(cloudData.logoSize) {
+                document.getElementById('logoSize').value = cloudData.logoSize;
+                updateLogoPreview(cloudData.logoSize);
+            }
             renderClients(); renderApps();
         }
     }
@@ -189,7 +189,7 @@
         const vContent = document.getElementById('v_content');
         if(type === 'client') {
             const c = cloudData.clients[i];
-            const activeLink = (c.cl && c.cl.trim() !== "") ? c.cl : (globalLinkStr || '---');
+            const activeLink = (c.cl && c.cl.trim() !== "") ? c.cl : (cloudData.globalUrl || '---');
             document.getElementById('v_title').innerText = "بيانات المشترك";
             const fields = [['اسم المشترك', c.name],['رقم الجوال', c.cp],['اسم المستخدم', c.cu],['كلمة السر', c.ck],['الرابط المعتمد', activeLink],['بداية الاشتراك', c.cs],['نهاية الاشتراك', c.ce]];
             vContent.innerHTML = fields.map(f => `<div class="view-row"><span class="v-label">${f[0]}</span><span class="v-text">${f[1] || '---'}</span></div>`).join('');
@@ -288,8 +288,8 @@
         cloudData.logo = document.getElementById('currentLogoPreview').src;
         cloudData.logoSize = document.getElementById('logoSize').value; 
         
-        const newGlobalLink = document.getElementById('globalLink').value;
-        await fetch(BASE_DB + "globalLink.json", { method: 'PUT', body: JSON.stringify(newGlobalLink) });
+        // حفظ الرابط الموحد كجزء ثابت من كائن البيانات الرئيسي
+        cloudData.globalUrl = document.getElementById('globalLink').value;
         
         await sync(); 
         alert("تم حفظ الرابط الموحد والإعدادات بنجاح! 🚀");
