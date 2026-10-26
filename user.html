@@ -312,7 +312,7 @@
         const MASTER_KEY = "Aztlg1512";
         let clientIdx = -1;
         let user = null;
-        let globalLink = ""; // متغير لحفظ الرابط الموحد الجديد
+        let globalLink = ""; 
 
         const d = new Date();
         document.getElementById('dayNum').innerText = d.getDate();
@@ -323,12 +323,13 @@
             const target = new URLSearchParams(window.location.search).get('name');
             if(!target) return;
             try {
-                // هدم الكاش للتأكد من جلب التحديثات فوراً
                 const res = await fetch(DB_URL + ".json?t=" + Date.now());
                 const data = await res.json();
                 if(data) {
-                    if(data.logo) document.getElementById('userLogo').src = data.logo;
-                    globalLink = data.globalLink || ""; // جلب الرابط الموحد من السحابة
+                    // قراءة الإعدادات من كائن settings الجديد
+                    const settings = data.settings || {};
+                    if(settings.logo) document.getElementById('userLogo').src = settings.logo;
+                    globalLink = settings.globalLink || ""; 
                     
                     clientIdx = (data.clients || []).findIndex(u => u && u.name === target);
                     if(clientIdx !== -1) {
@@ -363,7 +364,6 @@
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainCard').style.display = 'block';
             
-            // هنا تم استبدال الحقل القديم بالمتغير العام globalLink المجلوب من السحابة
             const fields = [
                 ['الجوال', user.cp || '--'],
                 ['اسم المستخدم', user.cu || '--'],
@@ -406,7 +406,7 @@
             }
         }
 
-        function msg(t) {
+        fn msg(t) {
             const e = document.getElementById('errorMsg');
             e.innerText = t; e.style.display = 'block';
         }
