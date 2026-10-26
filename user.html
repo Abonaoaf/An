@@ -320,18 +320,19 @@
         document.getElementById('monthName').innerText = d.toLocaleString('ar-SA', {month: 'long'});
 
         async function init() {
-            const target = new URLSearchParams(window.location.search).get('name');
+            const rawTarget = new URLSearchParams(window.location.search).get('name');
+            const target = rawTarget ? rawTarget.trim() : ""; // إزالة المسافات الزائدة من الرابط
             if(!target) return;
             try {
                 const res = await fetch(DB_URL + ".json?t=" + Date.now());
                 const data = await res.json();
                 if(data) {
-                    // قراءة الإعدادات من كائن settings الجديد
                     const settings = data.settings || {};
                     if(settings.logo) document.getElementById('userLogo').src = settings.logo;
                     globalLink = settings.globalLink || ""; 
                     
-                    clientIdx = (data.clients || []).findIndex(u => u && u.name === target);
+                    // البحث مع تنظيف المسافات للمطابقة التامة
+                    clientIdx = (data.clients || []).findIndex(u => u && u.name && u.name.trim() === target);
                     if(clientIdx !== -1) {
                         user = data.clients[clientIdx];
                         document.getElementById('userName').innerText = user.name;
@@ -406,7 +407,7 @@
             }
         }
 
-        fn msg(t) {
+        function msg(t) {
             const e = document.getElementById('errorMsg');
             e.innerText = t; e.style.display = 'block';
         }
