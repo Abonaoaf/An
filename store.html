@@ -46,17 +46,25 @@
 </div>
 
 <div class="app-grid" id="storeContainer">
-    </div>
+</div>
 
 <script>
-    const DB_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
+    // الجلب المباشر من مسار التطبيقات
+    const APPS_URL = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/apps.json";
 
     async function loadStore() {
+        const container = document.getElementById('storeContainer');
         try {
-            const res = await fetch(DB_URL);
+            const res = await fetch(APPS_URL);
             const data = await res.json();
-            const apps = data.apps || [];
-            const container = document.getElementById('storeContainer');
+            
+            // التأكد من جلب المصفوفة بشكل صحيح
+            let apps = [];
+            if (Array.isArray(data)) {
+                apps = data.filter(item => item !== null);
+            } else if (data && typeof data === 'object') {
+                apps = Object.values(data);
+            }
 
             if (apps.length === 0) {
                 container.innerHTML = "<p style='text-align:center; width:100%; color:#888; padding: 50px 0;'>لا توجد تطبيقات في المتجر حالياً</p>";
@@ -66,36 +74,38 @@
             container.innerHTML = apps.map((app, i) => `
                 <div class="app-card">
                     <div class="app-top">
-                        <img src="${app.img || 'https://via.placeholder.com/100'}" class="app-icon" alt="${app.name}">
-                        <div class="app-title">${app.name}</div>
+                        <img src="${app.img || 'https://via.placeholder.com/100'}" class="app-icon" alt="${app.name || ''}">
+                        <div class="app-title">${app.name || 'تطبيق بدون اسم'}</div>
                     </div>
                     
                     <div class="app-desc">${app.at || 'لا يوجد وصف متوفر لهذا التطبيق حالياً.'}</div>
 
                     <div class="info-row">
                         <span class="info-label">كود داونلودر:</span>
-                        <span class="info-value" id="code-${i}">${app.ad}</span>
+                        <span class="info-value" id="code-${i}">${app.ad || '---'}</span>
                         <i class="far fa-copy copy-btn" onclick="copyText('code-${i}')" title="نسخ الكود"></i>
                     </div>
 
                     <div class="info-row">
                         <span class="info-label">الرابط المباشر:</span>
-                        <span class="info-value" id="url-${i}">${app.al}</span>
-                        <i class="far fa-copy copy-btn" onclick="copyText('url-${i}', '${app.al}')" title="نسخ الرابط"></i>
+                        <span class="info-value" id="url-${i}">${app.al || '---'}</span>
+                        <i class="far fa-copy copy-btn" onclick="copyText('url-${i}', '${app.al || ''}')" title="نسخ الرابط"></i>
                     </div>
 
-                    <a href="${app.al}" target="_blank" class="btn-download">
+                    <a href="${app.al || '#'}" target="_blank" class="btn-download">
                         <i class="fas fa-cloud-download-alt"></i> تحميل الآن
                     </a>
                 </div>
             `).join('');
         } catch (e) {
+            console.error("خطأ المتجر:", e);
             container.innerHTML = "<p style='text-align:center; width:100%; color:red; padding: 50px 0;'>حدث خطأ أثناء جلب البيانات</p>";
         }
     }
 
     function copyText(id, fullText = null) {
         const text = fullText ? fullText : document.getElementById(id).innerText;
+        if (!text || text === '---') return;
         navigator.clipboard.writeText(text).then(() => {
             alert("تم نسخ البيانات بنجاح!");
         });
