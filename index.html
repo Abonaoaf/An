@@ -24,6 +24,16 @@
         .section { display: none; }
         .section.active { display: block; }
 
+        /* شريط إحصائيات عدد المشتركين */
+        .stats-badge { background: linear-gradient(135deg, #4a4ae2, #6366f1); color: white; padding: 15px 25px; border-radius: 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(74, 74, 226, 0.2); font-weight: bold; }
+        .stats-badge span { font-size: 1.5rem; background: rgba(255,255,255,0.2); padding: 2px 15px; border-radius: 12px; }
+
+        /* شريط البحث عن المشتركين */
+        .search-box { position: relative; margin-bottom: 20px; }
+        .search-box input { padding-right: 45px; border-radius: 16px; border: 2px solid #e2e8f0; font-size: 1rem; transition: 0.3s; background: white; }
+        .search-box input:focus { border-color: var(--link); box-shadow: 0 0 0 3px rgba(74, 74, 226, 0.15); outline: none; }
+        .search-box i { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #a0aec0; font-size: 1.2rem; }
+
         @keyframes dayGlow { 0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--d); } 50% { transform: scale(1.15); text-shadow: 0 0 10px var(--d); opacity: 0.9; } }
         .days-highlight { color: var(--d); font-weight: 900; display: inline-block; animation: dayGlow 1.2s infinite ease-in-out; }
 
@@ -91,6 +101,18 @@
 
     <div class="container">
         <div id="clients" class="section active">
+            <!-- شريط البحث الفوري -->
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="ابحث باسم العميل، رقم الجوال، اسم المستخدم..." oninput="renderClients()">
+            </div>
+
+            <!-- شريط إحصائيات عدد المشتركين -->
+            <div class="stats-badge">
+                <div><i class="fas fa-users"></i> إجمالي المشتركين النشطين:</div>
+                <span id="totalClientsCount">0</span>
+            </div>
+
             <div class="modal">
                 <h3 id="clientTitle">إضافة مشترك جديد</h3>
                 <input type="hidden" id="editClientIndex">
@@ -99,7 +121,6 @@
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
                 
-                <!-- حقول تواريخ نصية حرّة تتيح اللصق بكل سهولة مع زر تقويم اختياري -->
                 <div style="display:flex; gap:8px;">
                     <div style="position:relative; flex:1;">
                         <input type="text" id="cs" placeholder="بداية الاشتراك (ألصق أو اكتب)">
@@ -156,7 +177,6 @@
     const MASTER_PASS = "Aztlg1512";
     let cloudData = { clients: [], apps: [], logo: "", logoSize: "70", globalLink: "" };
 
-    // دالة لتنظيف وقراءة أي تاريخ مدخل أو ملصوق وتحويله لتاريخ معياري YYYY-MM-DD
     function parseFlexDate(dateInput) {
         if (!dateInput) return '';
         let val = dateInput.trim();
@@ -231,9 +251,27 @@
 
     function renderClients() {
         const grid = document.getElementById('clientGrid');
-        grid.innerHTML = (cloudData.clients || []).map((c, i) => {
+        const query = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+
+        // تصفية المشتركين بناءً على مربع البحث
+        const filteredClients = (cloudData.clients || []).map((c, originalIndex) => ({ ...c, originalIndex }))
+            .filter(c => {
+                const searchStr = `${c.name || ''} ${c.cp || ''} ${c.cu || ''} ${c.ck || ''}`.toLowerCase();
+                return searchStr.includes(query);
+            });
+
+        // تحديث عداد المشتركين الظاهرين
+        document.getElementById('totalClientsCount').innerText = filteredClients.length;
+
+        if (filteredClients.length === 0) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:30px; color:#888;">لا توجد نتائج مطابقة للبحث</div>`;
+            return;
+        }
+
+        grid.innerHTML = filteredClients.map((c) => {
             const days = Math.max(0, Math.ceil((new Date(c.ce) - new Date()) / 86400000));
             const showWA = (days <= 5 && days > 0);
+            const i = c.originalIndex;
             return `<div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center;"><b>${c.name}</b> <span class="days-highlight">${days} يوم</span></div>
                 <div class="prog-mini"><div class="fill-red" style="width:${Math.max(0, 100-(days/3.65))}%"></div></div>
