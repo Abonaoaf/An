@@ -49,6 +49,9 @@
         .view-row { border-bottom: 1px solid #f0f0f0; padding: 12px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .v-label { font-size: 0.8rem; color: var(--soft-red); font-weight: bold; white-space: nowrap; }
         .v-text { font-size: 0.9rem; color: #333; font-weight: bold; text-align: left; word-break: break-all; }
+        
+        /* تنسيق خاص للأرقام يمنع الانعكاس */
+        .phone-num { direction: ltr; display: inline-block; unicode-bidi: embed; }
 
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; text-align: center; }
         .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
@@ -93,7 +96,7 @@
                 <h3 id="clientTitle">إضافة مشترك جديد</h3>
                 <input type="hidden" id="editClientIndex">
                 <input type="text" id="cn" placeholder="اسم العميل (الرابط يعتمد عليه)">
-                <input type="text" id="cp" placeholder="رقم الجوال">
+                <input type="text" id="cp" placeholder="رقم الجوال (مثال: 05xxxxxxxx)" dir="ltr" style="text-align: right;">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
                 <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
@@ -138,9 +141,30 @@
 </div>
 
 <script>
-    const DB_BASE = "https://aziztest-a0f6c-default-rtdb.firebaseio.com";
+    const DB = "https://aziztest-a0f6c-default-rtdb.firebaseio.com/.json";
     const MASTER_PASS = "Aztlg1512";
     let cloudData = { clients: [], apps: [], logo: "", logoSize: "70", globalLink: "" };
+
+    // دالة توحيد وتنسيق أرقام الجوالات لمنع الانعكاس وتبدأ بـ +966
+    function formatPhoneNumber(phone) {
+        if (!phone) return '';
+        // تحويل الأرقام العربية/الهندية إلى أرقام إنجليزية
+        let cleaned = phone.toString().replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+        // إزالة كل شيء عدا الأرقام
+        cleaned = cleaned.replace(/\D/g, '');
+
+        if (cleaned.startsWith('966')) {
+            cleaned = cleaned.substring(3);
+        }
+        if (cleaned.startsWith('0')) {
+            cleaned = cleaned.substring(1);
+        }
+
+        if (cleaned.length > 0) {
+            return '+966' + cleaned;
+        }
+        return phone;
+    }
 
     async function checkPass() {
         if(document.getElementById('passInput').value === MASTER_PASS) {
@@ -151,41 +175,21 @@
     }
 
     async function load() {
-        try {
-            const [rClients, rApps, rSettings] = await Promise.all([
-                fetch(`${DB_BASE}/clients.json`).then(res => res.json()),
-                fetch(`${DB_BASE}/apps.json`).then(res => res.json()),
-                fetch(`${DB_BASE}/settings.json`).then(res => res.json())
-            ]);
-            
-            cloudData.clients = rClients || [];
-            cloudData.apps = rApps || [];
-            const settings = rSettings || {};
-            cloudData.logo = settings.logo || "";
-            cloudData.logoSize = settings.logoSize || "70";
-            cloudData.globalLink = settings.globalLink || "";
+        const r = await fetch(DB);
+        const d = await r.json();
+        if (d) {
+            cloudData = d;
+            if(!cloudData.clients) cloudData.clients = [];
+            if(!cloudData.apps) cloudData.apps = [];
+            if(!cloudData.globalLink) cloudData.globalLink = "";
             
             if(cloudData.logo) document.getElementById('currentLogoPreview').src = cloudData.logo;
             document.getElementById('globalLink').value = cloudData.globalLink;
             document.getElementById('logoSize').value = cloudData.logoSize || 70;
             updateLogoPreview(cloudData.logoSize || 70);
             
-            renderClients(); 
-            renderApps();
-        } catch(e) {
-            console.error("خطأ في جلب البيانات:", e);
+            renderClients(); renderApps();
         }
-    }
-
-    // دوال المزامنة المستقلة لكل قسم لتفادي مسح الأقسام الأخرى
-    async function syncClients() { 
-        await fetch(`${DB_BASE}/clients.json`, { method: 'PUT', body: JSON.stringify(cloudData.clients) }); 
-    }
-    async function syncApps() { 
-        await fetch(`${DB_BASE}/apps.json`, { method: 'PUT', body: JSON.stringify(cloudData.apps) }); 
-    }
-    async function syncSettings() { 
-        await fetch(`${DB_BASE}/settings.json`, { method: 'PUT', body: JSON.stringify({ logo: cloudData.logo, logoSize: cloudData.logoSize, globalLink: cloudData.globalLink }) }); 
     }
 
     function renderClients() {
@@ -228,9 +232,12 @@
         if(type === 'client') {
             const c = cloudData.clients[i];
             document.getElementById('v_title').innerText = "بيانات المشترك";
+            
+            const formattedPhone = `<span class="phone-num">${c.cp || '---'}</span>`;
+
             const fields = [
                 ['اسم المشترك', c.name],
-                ['رقم الجوال', c.cp],
+                ['رقم الجوال', formattedPhone],
                 ['اسم المستخدم', c.cu],
                 ['كلمة السر', c.ck],
                 ['الرابط', cloudData.globalLink || '---'], 
@@ -268,11 +275,11 @@
 
     async function saveClient() {
         const idx = document.getElementById('editClientIndex').value;
-        const c = { name: v('cn'), cp: v('cp'), cu: v('cu'), ck: v('ck'), cs: v('cs'), ce: v('ce') };
+        const formattedPhone = formatPhoneNumber(v('cp'));
+        
+        const c = { name: v('cn'), cp: formattedPhone, cu: v('cu'), ck: v('ck'), cs: v('cs'), ce: v('ce') };
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
-        await syncClients(); 
-        clearClientForm(); 
-        load();
+        await sync(); clearClientForm(); load();
     }
 
     async function saveApp() {
@@ -285,17 +292,14 @@
         } else if (idx !== "") { imgBase64 = cloudData.apps[idx].img; }
         const appData = { name: v('an'), ad: v('ad'), al: v('al'), at: v('at'), img: imgBase64 };
         if (idx === "") cloudData.apps.push(appData); else cloudData.apps[idx] = appData;
-        await syncApps(); 
-        clearAppForm(); 
-        load(); 
-        alert("تم الحفظ بنجاح ✨");
+        await sync(); clearAppForm(); load(); alert("تم الحفظ بنجاح ✨");
     }
 
     async function saveSettings() {
         cloudData.logo = document.getElementById('currentLogoPreview').src;
         cloudData.logoSize = document.getElementById('logoSize').value;
         cloudData.globalLink = document.getElementById('globalLink').value;
-        await syncSettings();
+        await sync();
         alert("تم حفظ الإعدادات بنجاح! 🚀");
     }
 
@@ -328,45 +332,26 @@
     async function saveOrder() {
         const items = document.querySelectorAll('#appList .app-card');
         let newArr = []; items.forEach(item => newArr.push(cloudData.apps[item.getAttribute('data-id')]));
-        cloudData.apps = newArr; 
-        await syncApps(); 
-        alert("تم حفظ الترتيب!"); 
-        load();
+        cloudData.apps = newArr; await sync(); alert("تم حفظ الترتيب!"); load();
     }
 
     function sendReminder(name, phone, days) {
         let cleanPhone = phone.replace(/\D/g, '');
-        if(!cleanPhone.startsWith('966')) cleanPhone = '966' + cleanPhone;
         const msg = `مرحباً ${name}، اشتراكك في فولتشر ينتهي خلال ${days} أيام.`;
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     function closeView() { document.getElementById('viewModal').style.display = 'none'; }
     function saveCardAsImage() { html2canvas(document.getElementById('captureTarget'), {scale: 3}).then(canvas => { const link = document.createElement('a'); link.href = canvas.toDataURL(); link.download = `Vulture_Card.png`; link.click(); }); }
-    
+    async function sync() { await fetch(DB, { method: 'PUT', body: JSON.stringify(cloudData) }); }
     function v(id) { return document.getElementById(id).value; }
     function switchTab(id, btn) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active'); btn.classList.add('active');
     }
-    
-    async function delClient(i) { 
-        if(confirm("حذف؟")) { 
-            cloudData.clients.splice(i,1); 
-            await syncClients(); 
-            load(); 
-        } 
-    }
-    
-    async function delApp(i) { 
-        if(confirm("حذف؟")) { 
-            cloudData.apps.splice(i,1); 
-            await syncApps(); 
-            load(); 
-        } 
-    }
-    
+    async function delClient(i) { if(confirm("حذف؟")) { cloudData.clients.splice(i,1); await sync(); load(); } }
+    async function delApp(i) { if(confirm("حذف؟")) { cloudData.apps.splice(i,1); await sync(); load(); } }
     function updateLogoPreview(val) { document.getElementById('sizeVal').innerText = val; document.getElementById('currentLogoPreview').style.width = val + "px"; }
     function previewNewLogo(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = (e) => document.getElementById('currentLogoPreview').src = e.target.result; reader.readAsDataURL(input.files[0]); } }
 </script>
