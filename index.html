@@ -50,7 +50,6 @@
         .v-label { font-size: 0.8rem; color: var(--soft-red); font-weight: bold; white-space: nowrap; }
         .v-text { font-size: 0.9rem; color: #333; font-weight: bold; text-align: left; word-break: break-all; }
         
-        /* تنسيق خاص للأرقام يمنع الانعكاس */
         .phone-num { direction: ltr; display: inline-block; unicode-bidi: embed; }
 
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; text-align: center; }
@@ -99,7 +98,13 @@
                 <input type="text" id="cp" placeholder="رقم الجوال (مثال: 05xxxxxxxx)" dir="ltr" style="text-align: right;">
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
-                <div style="display:flex; gap:8px;"><input type="date" id="cs"><input type="date" id="ce"></div>
+                
+                <!-- تم دعم الإدخال النصي مع إمكانية التعيين من التقويم المنسدل -->
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="cs" placeholder="بداية الاشتراك (اختر أو الصق)" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                    <input type="text" id="ce" placeholder="نهاية الاشتراك (اختر أو الصق)" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                </div>
+
                 <button class="btn btn-main" id="saveClientBtn" onclick="saveClient()">حفظ في السحابة ☁️</button>
                 <button id="cancelBtn" class="btn btn-main" style="background:#edf2f7; color:#4a5568; display:none;" onclick="clearClientForm()">إلغاء التعديل</button>
             </div>
@@ -145,12 +150,42 @@
     const MASTER_PASS = "Aztlg1512";
     let cloudData = { clients: [], apps: [], logo: "", logoSize: "70", globalLink: "" };
 
-    // دالة توحيد وتنسيق أرقام الجوالات لمنع الانعكاس وتبدأ بـ +966
+    // دالة لتنظيف وقراءة أي تاريخ مدخل أو ملصوق وتحويله لتاريخ معياري YYYY-MM-DD
+    function parseFlexDate(dateInput) {
+        if (!dateInput) return '';
+        let val = dateInput.trim();
+        // تحويل الأرقام العربية إلى إنجليزية
+        val = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+        
+        // محاولة التحقق من الصيغة بواسطة Date
+        const parsed = new Date(val);
+        if (!isNaN(parsed.getTime())) {
+            const y = parsed.getFullYear();
+            const m = String(parsed.getMonth() + 1).padStart(2, '0');
+            const d = String(parsed.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+        
+        // استخراج السنة والشهر واليوم يدويًا إذا كانت الصيغة مثل 28/10/2026 أو 2026/10/28
+        const parts = val.match(/\d+/g);
+        if (parts && parts.length >= 3) {
+            let y, m, d;
+            if (parts[0].length === 4) {
+                y = parts[0]; m = parts[1]; d = parts[2];
+            } else if (parts[2].length === 4) {
+                y = parts[2]; m = parts[1]; d = parts[0];
+            }
+            if (y && m && d) {
+                return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            }
+        }
+        return val;
+    }
+
+    // دالة توحيد وتنسيق أرقام الجوالات
     function formatPhoneNumber(phone) {
         if (!phone) return '';
-        // تحويل الأرقام العربية/الهندية إلى أرقام إنجليزية
         let cleaned = phone.toString().replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
-        // إزالة كل شيء عدا الأرقام
         cleaned = cleaned.replace(/\D/g, '');
 
         if (cleaned.startsWith('966')) {
@@ -260,14 +295,30 @@
         document.getElementById('editClientIndex').value = i;
         document.getElementById('cn').value = c.name;
         document.getElementById('cn').disabled = true; 
-        ['cp','cu','ck','cs','ce'].forEach(id => document.getElementById(id).value = c[id] || "");
+        
+        ['cp','cu','ck'].forEach(id => document.getElementById(id).value = c[id] || "");
+        
+        // لضبط التواريخ عند التعديل
+        const csElem = document.getElementById('cs');
+        const ceElem = document.getElementById('ce');
+        csElem.type = c.cs ? 'date' : 'text';
+        csElem.value = c.cs || "";
+        ceElem.type = c.ce ? 'date' : 'text';
+        ceElem.value = c.ce || "";
+
         document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
         document.getElementById('cancelBtn').style.display = "block";
         window.scrollTo(0,0);
     }
 
     function clearClientForm() {
-        ['cn','cp','cu','ck','cs','ce','editClientIndex'].forEach(id=>document.getElementById(id).value="");
+        ['cn','cp','cu','ck','cs','ce','editClientIndex'].forEach(id=> {
+            const el = document.getElementById(id);
+            if(el) {
+                el.value = "";
+                if(id==='cs'||id==='ce') el.type = 'text';
+            }
+        });
         document.getElementById('cn').disabled = false;
         document.getElementById('clientTitle').innerText = "إضافة مشترك جديد";
         document.getElementById('cancelBtn').style.display = "none";
@@ -277,7 +328,19 @@
         const idx = document.getElementById('editClientIndex').value;
         const formattedPhone = formatPhoneNumber(v('cp'));
         
-        const c = { name: v('cn'), cp: formattedPhone, cu: v('cu'), ck: v('ck'), cs: v('cs'), ce: v('ce') };
+        // قراءة التواريخ وتحليلها مرنًا سواًء من التقويم أو باللصق
+        const startDate = parseFlexDate(v('cs'));
+        const endDate = parseFlexDate(v('ce'));
+        
+        const c = { 
+            name: v('cn'), 
+            cp: formattedPhone, 
+            cu: v('cu'), 
+            ck: v('ck'), 
+            cs: startDate, 
+            ce: endDate 
+        };
+        
         if(idx === "") cloudData.clients.push(c); else cloudData.clients[idx] = c;
         await sync(); clearClientForm(); load();
     }
