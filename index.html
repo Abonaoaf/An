@@ -99,10 +99,16 @@
                 <input type="text" id="cu" placeholder="اسم المستخدم">
                 <input type="text" id="ck" placeholder="الرقم السري">
                 
-                <!-- تم دعم الإدخال النصي مع إمكانية التعيين من التقويم المنسدل -->
+                <!-- حقول تواريخ نصية حرّة تتيح اللصق بكل سهولة مع زر تقويم اختياري -->
                 <div style="display:flex; gap:8px;">
-                    <input type="text" id="cs" placeholder="بداية الاشتراك (اختر أو الصق)" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
-                    <input type="text" id="ce" placeholder="نهاية الاشتراك (اختر أو الصق)" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+                    <div style="position:relative; flex:1;">
+                        <input type="text" id="cs" placeholder="بداية الاشتراك (ألصق أو اكتب)">
+                        <input type="date" style="position:absolute; left:10px; top:15px; width:25px; opacity:0; cursor:pointer;" onchange="document.getElementById('cs').value=this.value">
+                    </div>
+                    <div style="position:relative; flex:1;">
+                        <input type="text" id="ce" placeholder="نهاية الاشتراك (ألصق أو اكتب)">
+                        <input type="date" style="position:absolute; left:10px; top:15px; width:25px; opacity:0; cursor:pointer;" onchange="document.getElementById('ce').value=this.value">
+                    </div>
                 </div>
 
                 <button class="btn btn-main" id="saveClientBtn" onclick="saveClient()">حفظ في السحابة ☁️</button>
@@ -154,10 +160,8 @@
     function parseFlexDate(dateInput) {
         if (!dateInput) return '';
         let val = dateInput.trim();
-        // تحويل الأرقام العربية إلى إنجليزية
         val = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
         
-        // محاولة التحقق من الصيغة بواسطة Date
         const parsed = new Date(val);
         if (!isNaN(parsed.getTime())) {
             const y = parsed.getFullYear();
@@ -166,7 +170,6 @@
             return `${y}-${m}-${d}`;
         }
         
-        // استخراج السنة والشهر واليوم يدويًا إذا كانت الصيغة مثل 28/10/2026 أو 2026/10/28
         const parts = val.match(/\d+/g);
         if (parts && parts.length >= 3) {
             let y, m, d;
@@ -182,7 +185,6 @@
         return val;
     }
 
-    // دالة توحيد وتنسيق أرقام الجوالات
     function formatPhoneNumber(phone) {
         if (!phone) return '';
         let cleaned = phone.toString().replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
@@ -297,14 +299,8 @@
         document.getElementById('cn').disabled = true; 
         
         ['cp','cu','ck'].forEach(id => document.getElementById(id).value = c[id] || "");
-        
-        // لضبط التواريخ عند التعديل
-        const csElem = document.getElementById('cs');
-        const ceElem = document.getElementById('ce');
-        csElem.type = c.cs ? 'date' : 'text';
-        csElem.value = c.cs || "";
-        ceElem.type = c.ce ? 'date' : 'text';
-        ceElem.value = c.ce || "";
+        document.getElementById('cs').value = c.cs || "";
+        document.getElementById('ce').value = c.ce || "";
 
         document.getElementById('clientTitle').innerText = "تعديل: " + c.name;
         document.getElementById('cancelBtn').style.display = "block";
@@ -314,10 +310,7 @@
     function clearClientForm() {
         ['cn','cp','cu','ck','cs','ce','editClientIndex'].forEach(id=> {
             const el = document.getElementById(id);
-            if(el) {
-                el.value = "";
-                if(id==='cs'||id==='ce') el.type = 'text';
-            }
+            if(el) el.value = "";
         });
         document.getElementById('cn').disabled = false;
         document.getElementById('clientTitle').innerText = "إضافة مشترك جديد";
@@ -328,7 +321,6 @@
         const idx = document.getElementById('editClientIndex').value;
         const formattedPhone = formatPhoneNumber(v('cp'));
         
-        // قراءة التواريخ وتحليلها مرنًا سواًء من التقويم أو باللصق
         const startDate = parseFlexDate(v('cs'));
         const endDate = parseFlexDate(v('ce'));
         
