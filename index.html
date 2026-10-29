@@ -65,6 +65,11 @@
         .app-card { background: white; border-radius: 22px; padding: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; position: relative; text-align: center; }
         .app-card img { width: 65px; height: 65px; border-radius: 18px; object-fit: cover; align-self: center; }
         .drag-handle { position: absolute; top: 12px; left: 12px; cursor: grab; color: #cbd5e0; }
+
+        .backup-zone { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-backup { flex: 1; padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-export { background: #3b82f6; }
+        .btn-import { background: #8b5cf6; }
     </style>
 </head>
 <body>
@@ -167,6 +172,17 @@
                 <div style="margin:20px 0;"><label>الحجم: <b id="sizeVal">70</b>px</label><input type="range" id="logoSize" min="50" max="250" value="70" oninput="updateLogoPreview(this.value)"></div>
                 <div style="border:1px dashed #ddd; padding:10px; display:inline-block; border-radius:15px;"><img id="currentLogoPreview" src="" style="width:70px; object-fit: contain;"></div>
                 <button class="btn btn-main" onclick="saveSettings()">حفظ الإعدادات 🚀</button>
+
+                <hr style="margin: 25px 0;">
+
+                <!-- قسم إدارة النسخ الاحتياطية -->
+                <h3>النسخ الاحتياطي واستعادة البيانات 📦</h3>
+                <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">يمكنك تصدير كافة البيانات كنسخة احتياطية أو استعادتها في أي وقت.</p>
+                <div class="backup-zone">
+                    <button class="btn-backup btn-export" onclick="exportBackup()"><i class="fas fa-file-export"></i> تصدير نسخة احتياطية</button>
+                    <button class="btn-backup btn-import" onclick="document.getElementById('importFileInput').click()"><i class="fas fa-file-import"></i> استيراد نسخة احتياطية</button>
+                    <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importBackup(this)">
+                </div>
             </div>
         </div>
     </div>
@@ -253,14 +269,12 @@
         const grid = document.getElementById('clientGrid');
         const query = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
 
-        // تصفية المشتركين بناءً على مربع البحث
         const filteredClients = (cloudData.clients || []).map((c, originalIndex) => ({ ...c, originalIndex }))
             .filter(c => {
                 const searchStr = `${c.name || ''} ${c.cp || ''} ${c.cu || ''} ${c.ck || ''}`.toLowerCase();
                 return searchStr.includes(query);
             });
 
-        // تحديث عداد المشتركين الظاهرين
         document.getElementById('totalClientsCount').innerText = filteredClients.length;
 
         if (filteredClients.length === 0) {
@@ -394,6 +408,44 @@
         cloudData.globalLink = document.getElementById('globalLink').value;
         await sync();
         alert("تم حفظ الإعدادات بنجاح! 🚀");
+    }
+
+    /* === وظائف التصدير والاستيراد (النسخ الاحتياطي) === */
+    function exportBackup() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cloudData, null, 2));
+        const downloadAnchor = document.createElement('a');
+        const dateStr = new Date().toISOString().slice(0, 10);
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `Vulture_Backup_${dateStr}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+
+    function importBackup(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (typeof importedData === 'object' && importedData !== null) {
+                    if (confirm("هل أنت تأكد من استعادة هذه النسخة؟ سيتم استبدال البيانات الحالية بالسحابة.")) {
+                        cloudData = importedData;
+                        await sync();
+                        await load();
+                        alert("تمت استعادة النسخة الاحتياطية بنجاح! 📦✨");
+                    }
+                } else {
+                    alert("ملف غير صالح!");
+                }
+            } catch (err) {
+                alert("حدث خطأ أثناء قراءة الملف، يرجى التأكد من اختيار ملف JSON صحيح.");
+            }
+            input.value = '';
+        };
+        reader.readAsText(file);
     }
 
     function editApp(i) {
