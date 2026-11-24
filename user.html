@@ -14,7 +14,7 @@
             --danger: #ef4444;
             --warning: #f59e0b;
             --bg-dark: #0b0f19;
-            --card-bg: rgba(255, 255, 255, 0.97);
+            --card-bg: rgba(255, 255, 255, 0.98);
             --tile-bg: #f8fafc;
             --wa: #075E54;
             --soft-red: #e11d48;
@@ -37,7 +37,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             min-height: 100vh;
         }
 
@@ -61,7 +60,6 @@
             background: var(--card-bg);
             border-radius: 27px;
             width: 100%;
-            height: 100%;
             overflow: hidden;
         }
 
@@ -131,6 +129,7 @@
             display: none;
             width: 100%;
             max-width: 460px;
+            margin: auto;
         }
 
         @media (min-width: 768px) {
@@ -534,7 +533,8 @@
         const MASTER_KEY = "Aztlg1512";
         let clientIdx = -1;
         let user = null;
-        let globalLink = "";[span_2](start_span)[span_2](end_span)
+        let globalLink = "";
+        let initPromise = null;
 
         const d = new Date();
         document.getElementById('dayNum').innerText = d.getDate();
@@ -543,8 +543,11 @@
 
         async function init() {
             const rawTarget = new URLSearchParams(window.location.search).get('name');
-            const target = rawTarget ? rawTarget.trim() : "";[span_3](start_span)[span_3](end_span)
-            if (!target) return;
+            const target = rawTarget ? decodeURIComponent(rawTarget).trim() : "";
+            if (!target) {
+                msg("الرابط ناقص: لم يتم تحديد اسم العميل");
+                return;
+            }
             try {
                 const res = await fetch(DB_URL + ".json?t=" + Date.now());
                 const data = await res.json();
@@ -552,7 +555,7 @@
                     const settings = data.settings || {};
                     const currentLogo = data.logo || settings.logo || "";
                     const currentLogoSize = data.logoSize || settings.logoSize || "70";
-                    globalLink = data.globalLink || settings.globalLink || "";[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span)
+                    globalLink = data.globalLink || settings.globalLink || "";
 
                     if (currentLogo) {
                         const logoEl = document.getElementById('userLogo');
@@ -560,22 +563,32 @@
                         logoEl.style.width = currentLogoSize + "px";
                     }
 
-                    clientIdx = (data.clients || []).findIndex(u => u && u.name && u.name.trim() === target);
+                    const clientsArr = Array.isArray(data.clients)
+                        ? data.clients
+                        : Object.values(data.clients || {});
+                    clientIdx = clientsArr.findIndex(u => u && u.name && u.name.trim() === target);
                     if (clientIdx !== -1) {
-                        user = data.clients[clientIdx];
+                        user = clientsArr[clientIdx];
                         document.getElementById('userName').innerText = user.name;
                         if (!user.private_pin) {
                             document.getElementById('lockTitle').innerText = "إنشاء رمز خاص";
                             document.getElementById('lockDesc').innerText = "قم بتعيين رمز سري خاص بك لحماية الصفحة.";
                         }
+                    } else {
+                        msg("لم يتم العثور على بيانات هذا العميل");
                     }
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error(e);
+                msg("تعذر تحميل البيانات من السحابة");
+            }
         }
 
         async function handleAuth() {
+            if (initPromise) await initPromise;
             const val = document.getElementById('pinInput').value.trim();
             if (val.length < 2) { msg("الرمز قصير جداً"); return; }
+            if (!user) { msg("بيانات العميل غير متوفرة حالياً"); return; }
             if (val === MASTER_KEY) { bootApp(); return; }
             if (!user.private_pin) {
                 try {
@@ -590,6 +603,7 @@
         }
 
         function bootApp() {
+            if (!user) return;
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainCard').style.display = 'block';
 
@@ -617,14 +631,14 @@
             const updateUI = () => {
                 const now = new Date().getTime(), end = new Date(user.ce).getTime();
                 const left = end - now, days = Math.max(0, Math.ceil(left / 86400000));
-                document.getElementById('daysCount').innerText = days;
-                document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%";
-                if (left > 0) {
+                document.getElementById('daysCount').innerText = isNaN(days) ? 0 : days;
+                document.getElementById('barConsumed').style.width = (isNaN(days) ? 0 : Math.max(0, 100 - (days/3.65))) + "%";
+                if (!isNaN(left) && left > 0) {
                     const s = Math.floor(left/1000), m = Math.floor(s/60), h = Math.floor(m/60), dL = Math.floor(h/24);
                     const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
                     document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
                 } else {
-                    document.getElementById('timerGrid').innerHTML = "<b style='color:red;width:100%'>انتهى الاشتراك</b>";
+                    document.getElementById('timerGrid').innerHTML = "<b style='color:red;grid-column:1/-1;text-align:center;'>انتهى الاشتراك</b>";
                 }
             };
             updateUI(); setInterval(updateUI, 1000);
@@ -650,7 +664,7 @@
             alert("تم النسخ!");
         }
 
-        init();
+        initPromise = init();
     </script>
 </body>
 </html>
