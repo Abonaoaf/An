@@ -312,7 +312,7 @@
         const MASTER_KEY = "Aztlg1512";
         let clientIdx = -1;
         let user = null;
-        let globalLink = ""; 
+        let globalLink = "";
 
         const d = new Date();
         document.getElementById('dayNum').innerText = d.getDate();
@@ -321,42 +321,48 @@
 
         async function init() {
             const rawTarget = new URLSearchParams(window.location.search).get('name');
-            const target = rawTarget ? rawTarget.trim() : ""; // إزالة المسافات الزائدة من الرابط
-            if(!target) return;
+            const target = rawTarget ? rawTarget.trim() : "";
+            if (!target) return;
             try {
                 const res = await fetch(DB_URL + ".json?t=" + Date.now());
                 const data = await res.json();
-                if(data) {
+                if (data) {
                     const settings = data.settings || {};
-                    if(settings.logo) document.getElementById('userLogo').src = settings.logo;
-                    globalLink = settings.globalLink || ""; 
-                    
-                    // البحث مع تنظيف المسافات للمطابقة التامة
+                    const currentLogo = data.logo || settings.logo || "";
+                    const currentLogoSize = data.logoSize || settings.logoSize || "70";
+                    globalLink = data.globalLink || settings.globalLink || "";
+
+                    if (currentLogo) {
+                        const logoEl = document.getElementById('userLogo');
+                        logoEl.src = currentLogo;
+                        logoEl.style.width = currentLogoSize + "px";
+                    }
+
                     clientIdx = (data.clients || []).findIndex(u => u && u.name && u.name.trim() === target);
-                    if(clientIdx !== -1) {
+                    if (clientIdx !== -1) {
                         user = data.clients[clientIdx];
                         document.getElementById('userName').innerText = user.name;
-                        if(!user.private_pin) {
+                        if (!user.private_pin) {
                             document.getElementById('lockTitle').innerText = "إنشاء رمز خاص";
                             document.getElementById('lockDesc').innerText = "قم بتعيين رمز سري خاص بك لحماية الصفحة.";
                         }
                     }
                 }
-            } catch(e) { console.error(e); }
+            } catch (e) { console.error(e); }
         }
 
         async function handleAuth() {
             const val = document.getElementById('pinInput').value.trim();
-            if(val.length < 2) { msg("الرمز قصير جداً"); return; }
-            if(val === MASTER_KEY) { bootApp(); return; }
-            if(!user.private_pin) {
+            if (val.length < 2) { msg("الرمز قصير جداً"); return; }
+            if (val === MASTER_KEY) { bootApp(); return; }
+            if (!user.private_pin) {
                 try {
                     await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'PUT', body: JSON.stringify(val) });
                     user.private_pin = val;
                     bootApp();
-                } catch(e) { msg("تعذر الاتصال بالسحابة"); }
+                } catch (e) { msg("تعذر الاتصال بالسحابة"); }
             } else {
-                if(val === user.private_pin) { bootApp(); }
+                if (val === user.private_pin) { bootApp(); }
                 else { msg("الرمز غير صحيح!"); }
             }
         }
@@ -364,16 +370,16 @@
         function bootApp() {
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainCard').style.display = 'block';
-            
+
             const fields = [
                 ['الجوال', user.cp || '--'],
                 ['اسم المستخدم', user.cu || '--'],
                 ['الرقم السري', user.ck || '--'],
-                ['رابط الدخول', globalLink || '--'], 
+                ['رابط الدخول', globalLink || '--'],
                 ['تاريخ البداية', user.cs || '--'],
                 ['تاريخ النهاية', user.ce || '--']
             ];
-            
+
             document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
                 <div class="data-row">
                     <div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div>
@@ -386,8 +392,8 @@
                 const left = end - now, days = Math.max(0, Math.ceil(left / 86400000));
                 document.getElementById('daysCount').innerText = days;
                 document.getElementById('barConsumed').style.width = Math.max(0, 100 - (days/3.65)) + "%";
-                if(left > 0) {
-                    const s=Math.floor(left/1000), m=Math.floor(s/60), h=Math.floor(m/60), dL=Math.floor(h/24);
+                if (left > 0) {
+                    const s = Math.floor(left/1000), m = Math.floor(s/60), h = Math.floor(m/60), dL = Math.floor(h/24);
                     const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
                     document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
                 } else {
@@ -398,12 +404,12 @@
         }
 
         async function triggerReset() {
-            if(confirm("هل تريد إلغاء الرمز الحالي وتعيين رمز جديد؟")) {
+            if (confirm("هل تريد إلغاء الرمز الحالي وتعيين رمز جديد؟")) {
                 try {
-                    if(clientIdx === -1) return;
+                    if (clientIdx === -1) return;
                     await fetch(`${DB_URL}clients/${clientIdx}/private_pin.json`, { method: 'DELETE' });
                     window.location.reload();
-                } catch(e) { alert("حدث خطأ في الاتصال"); }
+                } catch (e) { alert("حدث خطأ في الاتصال"); }
             }
         }
 
