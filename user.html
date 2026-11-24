@@ -63,7 +63,6 @@
             overflow: hidden;
         }
 
-        /* شاشة القفل */
         #lockScreen {
             position: fixed;
             inset: 0;
@@ -124,7 +123,6 @@
             box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
         }
 
-        /* البطاقة الرئيسية المتجاوبة مع كل الشاشات */
         .card {
             display: none;
             width: 100%;
@@ -262,6 +260,12 @@
             font-size: 0.8rem;
         }
 
+        .status-pill.expired {
+            background: #fef2f2;
+            color: #b91c1c;
+            border-color: #fecaca;
+        }
+
         .prog-static {
             height: 14px;
             background: linear-gradient(90deg, #10b981, #059669);
@@ -280,7 +284,6 @@
             border-radius: 999px;
         }
 
-        /* مربعات البيانات المتجاوبة */
         .data-section {
             padding: 6px 20px 14px;
         }
@@ -373,7 +376,6 @@
             transform: scale(0.92);
         }
 
-        /* مربعات العداد التنازلي */
         .timer-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -416,7 +418,6 @@
             font-weight: 700;
         }
 
-        /* أزرار الإجراءات */
         .action-btns {
             padding: 10px 20px 24px;
             display: grid;
@@ -506,8 +507,8 @@
 
             <div class="status-wrapper">
                 <div class="status-line">
-                    <span>اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</span>
-                    <span class="status-pill"><i class="fas fa-check-circle"></i> نشط</span>
+                    <span id="statusSummary">اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</span>
+                    <span class="status-pill" id="statusBadge"><i class="fas fa-check-circle"></i> نشط</span>
                 </div>
                 <div class="prog-static"><div id="barConsumed" class="fill-red"></div></div>
             </div>
@@ -629,16 +630,29 @@
             `).join('');
 
             const updateUI = () => {
-                const now = new Date().getTime(), end = new Date(user.ce).getTime();
-                const left = end - now, days = Math.max(0, Math.ceil(left / 86400000));
-                document.getElementById('daysCount').innerText = isNaN(days) ? 0 : days;
-                document.getElementById('barConsumed').style.width = (isNaN(days) ? 0 : Math.max(0, 100 - (days/3.65))) + "%";
-                if (!isNaN(left) && left > 0) {
-                    const s = Math.floor(left/1000), m = Math.floor(s/60), h = Math.floor(m/60), dL = Math.floor(h/24);
-                    const units = [['ثانية', s%60], ['دقيقة', m%60], ['ساعة', h%24], ['يوم', dL%30], ['شهر', Math.floor(dL/30)]];
-                    document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
-                } else {
+                const now = new Date().getTime();
+                const end = new Date(user.ce).getTime();
+                const left = end - now;
+                const isExpired = isNaN(left) || left <= 0;
+                const days = isExpired ? 0 : Math.max(0, Math.ceil(left / 86400000));
+
+                const badge = document.getElementById('statusBadge');
+                const summary = document.getElementById('statusSummary');
+
+                if (isExpired) {
+                    summary.innerHTML = `انتهى الاشتراك | باقي <span id="daysCount" class="days-glow">0</span> يوم`;
+                    badge.classList.add('expired');
+                    badge.innerHTML = `<i class="fas fa-times-circle"></i> منتهي`;
+                    document.getElementById('barConsumed').style.width = "100%";
                     document.getElementById('timerGrid').innerHTML = "<b style='color:red;grid-column:1/-1;text-align:center;'>انتهى الاشتراك</b>";
+                } else {
+                    summary.innerHTML = `اشتراك ساري | باقي <span id="daysCount" class="days-glow">${days}</span> يوم`;
+                    badge.classList.remove('expired');
+                    badge.innerHTML = `<i class="fas fa-check-circle"></i> نشط`;
+                    document.getElementById('barConsumed').style.width = Math.max(0, Math.min(100, 100 - (days / 3.65))) + "%";
+                    const s = Math.floor(left / 1000), m = Math.floor(s / 60), h = Math.floor(m / 60), dL = Math.floor(h / 24);
+                    const units = [['ثانية', s % 60], ['دقيقة', m % 60], ['ساعة', h % 24], ['يوم', dL % 30], ['شهر', Math.floor(dL / 30)]];
+                    document.getElementById('timerGrid').innerHTML = units.map(u => `<div class="t-box"><b>${u[1]}</b><span>${u[0]}</span></div>`).reverse().join('');
                 }
             };
             updateUI(); setInterval(updateUI, 1000);
