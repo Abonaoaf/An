@@ -7,126 +7,209 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --main: #4a4ae2;
-            --success: #28a745;
-            --danger: #dc3545;
-            --bg: #f0f2f5;
+            --main: #4f46e5;
+            --accent: #ec4899;
+            --cyan: #06b6d4;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(255, 255, 255, 0.97);
+            --tile-bg: #f8fafc;
             --wa: #075E54;
-            --soft-red: #f87171;
+            --soft-red: #e11d48;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: var(--bg);
+            background:
+                radial-gradient(circle at 12% 15%, rgba(79, 70, 229, 0.28), transparent 40%),
+                radial-gradient(circle at 88% 20%, rgba(236, 72, 153, 0.25), transparent 42%),
+                radial-gradient(circle at 50% 90%, rgba(6, 182, 212, 0.22), transparent 45%),
+                var(--bg-dark);
+            color: #0f172a;
             margin: 0;
-            padding: 15px;
+            padding: 20px 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             min-height: 100vh;
         }
 
-        #lockScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
+        @keyframes borderFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .vivid-frame {
+            position: relative;
+            border-radius: 30px;
+            padding: 3.5px;
+            background: linear-gradient(125deg, #4f46e5, #ec4899, #f59e0b, #10b981, #06b6d4, #4f46e5);
+            background-size: 300% 300%;
+            animation: borderFlow 7s ease infinite;
+            box-shadow: 0 22px 50px rgba(0, 0, 0, 0.45);
+        }
+
+        .vivid-inner {
+            background: var(--card-bg);
+            border-radius: 27px;
             width: 100%;
             height: 100%;
-            background: var(--bg);
+            overflow: hidden;
+        }
+
+        /* شاشة القفل */
+        #lockScreen {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(79, 70, 229, 0.35), transparent 45%),
+                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.3), transparent 45%),
+                var(--bg-dark);
             z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 16px;
+        }
+
+        .lock-frame {
+            width: 100%;
+            max-width: 400px;
         }
 
         .lock-card {
-            background: white;
-            padding: 35px 20px;
-            border-radius: 25px;
-            width: 90%;
-            max-width: 380px;
+            padding: 34px 22px;
             text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            border-top: 8px solid var(--main);
+        }
+
+        .lock-icon-badge {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 14px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, var(--main), var(--accent));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.1rem;
+            box-shadow: 0 12px 25px rgba(79, 70, 229, 0.35);
         }
 
         .pin-input {
-            width: 80%;
-            padding: 15px;
-            border-radius: 15px;
-            border: 2px solid #ddd;
+            width: 100%;
+            max-width: 260px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            border: 2px solid #e2e8f0;
+            background: #f8fafc;
             text-align: center;
             font-size: 1.5rem;
-            margin: 20px 0;
+            letter-spacing: 6px;
+            margin: 18px auto;
+            display: block;
             outline: none;
+            transition: 0.25s;
         }
 
+        .pin-input:focus {
+            border-color: var(--main);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+        }
+
+        /* البطاقة الرئيسية المتجاوبة مع كل الشاشات */
         .card {
             display: none;
-            background: white;
             width: 100%;
-            max-width: 400px;
-            border-radius: 25px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            border-top: 8px solid var(--success);
-            border-bottom: 8px solid var(--success);
+            max-width: 460px;
         }
 
-        .top-info {
+        @media (min-width: 768px) {
+            .card {
+                max-width: 760px;
+            }
+        }
+
+        @media (min-width: 1100px) {
+            .card {
+                max-width: 880px;
+            }
+        }
+
+        .top-banner {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+            padding: 22px 20px;
+            color: #fff;
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
-            padding: 20px;
-            border-bottom: 1px solid #eee;
             align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         }
 
         .date-box {
-            border: 2.5px solid var(--danger);
-            border-radius: 18px;
-            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 2.5px solid var(--accent);
+            border-radius: 20px;
+            padding: 10px 16px;
             text-align: center;
-            min-width: 90px;
+            min-width: 96px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
         .date-box b {
-            font-size: 1.8rem;
-            color: #f87171;
-            line-height: 1;
+            font-size: 1.85rem;
+            color: var(--soft-red);
+            line-height: 1.1;
             display: block;
+            font-weight: 900;
         }
 
         .main-logo {
-            width: 70px;
+            width: 72px;
             height: auto;
-            border-radius: 15px;
+            max-height: 140px;
+            border-radius: 18px;
             object-fit: contain;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
         }
 
         .welcome-msg {
-            padding: 20px;
+            padding: 22px 20px 14px;
             text-align: center;
         }
 
-        .welcome-line-1 { font-size: 1.1rem; margin-bottom: 15px; }
-        .welcome-line-2 { font-size: 1rem; margin-bottom: 10px; }
+        .welcome-line-1 { font-size: 1.15rem; margin-bottom: 8px; color: #334155; }
+        .welcome-line-2 { font-size: 0.98rem; margin-bottom: 8px; color: #64748b; }
 
         .v-family {
-            color: var(--danger);
-            font-weight: bold;
-            font-size: 1.4rem;
+            background: linear-gradient(90deg, var(--danger), var(--accent), var(--main));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            font-size: 1.5rem;
             display: block;
-            margin-top: 8px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 15px;
+            margin-top: 6px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .u-name-highlight {
-            color: #000000;
-            font-weight: bold;
-            font-size: 1.1rem;
+            color: #0f172a;
+            font-weight: 800;
+            font-size: 1.15rem;
         }
 
         @keyframes warmHandshake {
@@ -142,8 +225,8 @@
         }
 
         @keyframes strongGlow {
-            0%, 100% { transform: scale(1); text-shadow: 0 0 2px var(--danger); }
-            50% { transform: scale(1.2); text-shadow: 0 0 10px var(--danger); }
+            0%, 100% { transform: scale(1); text-shadow: 0 0 2px rgba(239, 68, 68, 0.4); }
+            50% { transform: scale(1.15); text-shadow: 0 0 12px rgba(239, 68, 68, 0.7); }
         }
 
         .days-glow {
@@ -151,157 +234,296 @@
             color: var(--danger);
             font-weight: 900;
             font-size: 1.3rem;
-            animation: strongGlow 1.2s infinite ease-in-out;
-            margin: 0 5px;
+            animation: strongGlow 1.3s infinite ease-in-out;
+            margin: 0 4px;
+        }
+
+        .status-wrapper {
+            padding: 6px 20px 14px;
         }
 
         .status-line {
-            font-weight: bold;
-            font-size: 0.95rem;
-            color: #333;
-            padding: 0 20px;
+            font-weight: 800;
+            font-size: 0.98rem;
+            color: #1e293b;
             text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .status-pill {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.8rem;
         }
 
         .prog-static {
             height: 14px;
-            background: var(--success);
-            border-radius: 10px;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 999px;
             overflow: hidden;
-            margin: 10px 20px;
-            position: relative;
+            margin-top: 10px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
         }
 
         .fill-red {
             height: 100%;
-            background: var(--danger);
+            background: linear-gradient(90deg, #f43f5e, #dc2626);
             width: 0%;
             float: right;
             transition: 0.5s linear;
+            border-radius: 999px;
         }
 
-        .data-section { padding: 0 20px; }
+        /* مربعات البيانات المتجاوبة */
+        .data-section {
+            padding: 6px 20px 14px;
+        }
 
-        .data-row {
-            background: #f9f9f9;
-            border-radius: 12px;
-            padding: 10px 15px;
-            margin-bottom: 8px;
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 640px) {
+            .data-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .data-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .data-tile {
+            background: var(--tile-bg);
+            border-radius: 18px;
+            padding: 14px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid #f0f0f0;
+            gap: 10px;
+            border: 1.5px solid #e2e8f0;
+            border-right: 5px solid var(--main);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .data-tile:nth-child(6n+2) { border-right-color: var(--accent); }
+        .data-tile:nth-child(6n+3) { border-right-color: var(--cyan); }
+        .data-tile:nth-child(6n+4) { border-right-color: var(--success); }
+        .data-tile:nth-child(6n+5) { border-right-color: var(--warning); }
+        .data-tile:nth-child(6n+6) { border-right-color: var(--danger); }
+
+        .data-tile:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+            background: #ffffff;
+        }
+
+        .data-tile-content {
+            min-width: 0;
+            flex: 1;
         }
 
         .data-label {
-            font-size: 0.75rem;
-            color: var(--soft-red);
-            font-weight: 600;
+            font-size: 0.78rem;
+            color: #64748b;
+            font-weight: 700;
             display: block;
+            margin-bottom: 4px;
         }
 
         .data-value {
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: #333;
-            word-break: break-all;
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: #0f172a;
+            word-break: break-word;
+            overflow-wrap: anywhere;
         }
 
-        .copy-btn { color: var(--soft-red); cursor: pointer; padding: 5px; font-size: 1.1rem; }
+        .copy-btn {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: #eef2ff;
+            color: var(--main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
 
+        .copy-btn:hover {
+            background: var(--main);
+            color: #fff;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* مربعات العداد التنازلي */
         .timer-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
-            padding: 15px 0;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 16px 0 6px;
             direction: ltr;
         }
 
-        .t-box {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 8px 2px;
-            text-align: center;
+        @media (min-width: 640px) {
+            .timer-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
         }
 
-        .t-box b { display: block; color: var(--soft-red); font-size: 1.1rem; }
-        .t-box span { font-size: 0.6rem; color: #000; font-weight: bold; }
+        .t-box {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 1.5px solid #e2e8f0;
+            border-top: 4px solid var(--accent);
+            border-radius: 16px;
+            padding: 12px 6px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        }
 
-        .action-btns { padding: 10px 25px 25px 25px; }
+        .t-box:nth-child(2) { border-top-color: var(--main); }
+        .t-box:nth-child(3) { border-top-color: var(--cyan); }
+        .t-box:nth-child(4) { border-top-color: var(--success); }
+        .t-box:nth-child(5) { border-top-color: var(--warning); }
+
+        .t-box b {
+            display: block;
+            color: var(--soft-red);
+            font-size: 1.25rem;
+            font-weight: 900;
+        }
+
+        .t-box span {
+            font-size: 0.72rem;
+            color: #334155;
+            font-weight: 700;
+        }
+
+        /* أزرار الإجراءات */
+        .action-btns {
+            padding: 10px 20px 24px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        @media (min-width: 640px) {
+            .action-btns {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
 
         .btn {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             width: 100%;
-            padding: 14px;
-            border-radius: 12px;
+            padding: 14px 16px;
+            border-radius: 15px;
             color: white;
-            font-weight: bold;
-            margin-bottom: 12px;
+            font-weight: 800;
             text-decoration: none;
             text-align: center;
-            font-size: 0.95rem;
+            font-size: 0.94rem;
             border: none;
             cursor: pointer;
-            box-sizing: border-box;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .btn-support { background: var(--success); }
-        .btn-wa-channel { background: var(--wa); }
-        .btn-store { background: #5e4cc1; }
-        .btn-reset { background: #6c757d; font-size: 0.8rem; padding: 10px; }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+        }
+
+        .btn-support { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-wa-channel { background: linear-gradient(135deg, #0d9488, var(--wa)); }
+        .btn-store { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+        .btn-reset { background: linear-gradient(135deg, #64748b, #475569); }
 
         .footer-rights {
-            margin-top: 10px;
+            margin-top: 16px;
             text-align: center;
-            color: #aaa;
-            font-size: 0.75rem;
-            padding-bottom: 20px;
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            padding-bottom: 16px;
+            line-height: 1.7;
         }
     </style>
 </head>
 <body>
 
     <div id="lockScreen">
-        <div class="lock-card">
-            <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--main);"></i>
-            <h2 id="lockTitle" style="margin-top:15px;">تحقق آمن</h2>
-            <p id="lockDesc">يرجى إدخال الرمز الخاص بك</p>
-            <input type="password" id="pinInput" class="pin-input" placeholder="****">
-            <button onclick="handleAuth()" id="authBtn" class="btn" style="background: var(--main); width: 100%;">دخول</button>
-            <div id="errorMsg" style="color:var(--danger); margin-top:10px; font-weight:bold; display:none;"></div>
+        <div class="vivid-frame lock-frame">
+            <div class="vivid-inner lock-card">
+                <div class="lock-icon-badge">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h2 id="lockTitle" style="margin: 8px 0 6px; color: #0f172a;">تحقق آمن</h2>
+                <p id="lockDesc" style="margin: 0; color: #64748b; font-size: 0.92rem;">يرجى إدخال الرمز الخاص بك</p>
+                <input type="password" id="pinInput" class="pin-input" placeholder="••••">
+                <button onclick="handleAuth()" id="authBtn" class="btn" style="background: linear-gradient(135deg, #4f46e5, #ec4899); max-width: 260px; margin: 0 auto;">
+                    <i class="fas fa-unlock-alt"></i> دخول
+                </button>
+                <div id="errorMsg" style="color: var(--danger); margin-top: 12px; font-weight: bold; display: none;"></div>
+            </div>
         </div>
     </div>
 
-    <div id="mainCard" class="card">
-        <div class="top-info">
-            <div class="date-box">
-                <span id="dayName" style="font-size:0.75rem; color:#666; font-weight:bold;"></span>
-                <b id="dayNum"></b>
-                <span id="monthName" style="font-size:0.75rem; color:#666; font-weight:bold;"></span>
+    <div id="mainCard" class="card vivid-frame">
+        <div class="vivid-inner">
+            <div class="top-banner">
+                <div class="date-box">
+                    <span id="dayName" style="font-size: 0.78rem; color: #475569; font-weight: 800;"></span>
+                    <b id="dayNum"></b>
+                    <span id="monthName" style="font-size: 0.78rem; color: #475569; font-weight: 800;"></span>
+                </div>
+                <img id="userLogo" src="" class="main-logo" alt="شعار فولتشر">
             </div>
-            <img id="userLogo" src="" class="main-logo">
-        </div>
 
-        <div class="welcome-msg">
-            <div class="welcome-line-1">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight"></span></div>
-            <div class="welcome-line-2">سعدنا بانضمامك معنا في</div>
-            <div class="v-family">أسرة فولتشر 🦅</div>
-        </div>
+            <div class="welcome-msg">
+                <div class="welcome-line-1">مرحباً بك <span class="pulsing-handshake">🤝</span> <span id="userName" class="u-name-highlight"></span></div>
+                <div class="welcome-line-2">سعدنا بانضمامك معنا في</div>
+                <div class="v-family">أسرة فولتشر 🦅</div>
+            </div>
 
-        <div class="status-line">✅ اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</div>
-        <div class="prog-static"><div id="barConsumed" class="fill-red"></div></div>
+            <div class="status-wrapper">
+                <div class="status-line">
+                    <span>اشتراك ساري | باقي <span id="daysCount" class="days-glow">0</span> يوم</span>
+                    <span class="status-pill"><i class="fas fa-check-circle"></i> نشط</span>
+                </div>
+                <div class="prog-static"><div id="barConsumed" class="fill-red"></div></div>
+            </div>
 
-        <div class="data-section">
-            <div id="dataFields"></div>
-            <div class="timer-grid" id="timerGrid"></div>
-        </div>
+            <div class="data-section">
+                <div class="data-grid" id="dataFields"></div>
+                <div class="timer-grid" id="timerGrid"></div>
+            </div>
 
-        <div class="action-btns">
-            <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
-            <a href="https://whatsapp.com/channel/0029Vb7wR186GcGHQd0wPK43" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة قبل الحدث بالواتساب</a>
-            <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
-            <button onclick="triggerReset()" class="btn btn-reset"><i class="fas fa-key"></i> تغيير رمز اغلاق الصفحة </button>
+            <div class="action-btns">
+                <a href="https://wa.me/966594393012" class="btn btn-support"><i class="fab fa-whatsapp"></i> الدعم الفني المباشر</a>
+                <a href="https://whatsapp.com/channel/0029Vb7wR186GcGHQd0wPK43" class="btn btn-wa-channel"><i class="fas fa-bullhorn"></i> قناة قبل الحدث بالواتساب</a>
+                <a href="store.html" class="btn btn-store"><i class="fas fa-th-large"></i> متجر تطبيقات فولتشر</a>
+                <button onclick="triggerReset()" class="btn btn-reset"><i class="fas fa-key"></i> تغيير رمز إغلاق الصفحة</button>
+            </div>
         </div>
     </div>
 
@@ -312,7 +534,7 @@
         const MASTER_KEY = "Aztlg1512";
         let clientIdx = -1;
         let user = null;
-        let globalLink = "";
+        let globalLink = "";[span_2](start_span)[span_2](end_span)
 
         const d = new Date();
         document.getElementById('dayNum').innerText = d.getDate();
@@ -321,7 +543,7 @@
 
         async function init() {
             const rawTarget = new URLSearchParams(window.location.search).get('name');
-            const target = rawTarget ? rawTarget.trim() : "";
+            const target = rawTarget ? rawTarget.trim() : "";[span_3](start_span)[span_3](end_span)
             if (!target) return;
             try {
                 const res = await fetch(DB_URL + ".json?t=" + Date.now());
@@ -330,7 +552,7 @@
                     const settings = data.settings || {};
                     const currentLogo = data.logo || settings.logo || "";
                     const currentLogoSize = data.logoSize || settings.logoSize || "70";
-                    globalLink = data.globalLink || settings.globalLink || "";
+                    globalLink = data.globalLink || settings.globalLink || "";[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span)
 
                     if (currentLogo) {
                         const logoEl = document.getElementById('userLogo');
@@ -381,9 +603,14 @@
             ];
 
             document.getElementById('dataFields').innerHTML = fields.map((f, i) => `
-                <div class="data-row">
-                    <div><span class="data-label">${f[0]}</span><div class="data-value" id="val${i}">${f[1]}</div></div>
-                    <i class="far fa-copy copy-btn" onclick="copyText('val${i}')"></i>
+                <div class="data-tile">
+                    <div class="data-tile-content">
+                        <span class="data-label">${f[0]}</span>
+                        <div class="data-value" id="val${i}">${f[1]}</div>
+                    </div>
+                    <div class="copy-btn" onclick="copyText('val${i}')" title="نسخ">
+                        <i class="far fa-copy"></i>
+                    </div>
                 </div>
             `).join('');
 
